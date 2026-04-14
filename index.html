@@ -3,547 +3,1860 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>FlexiCost — Esnek Ambalaj Maliyet Hesaplama</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<title>Esnek Ambalaj Üretim Maliyet Sistemi</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-:root{--bg:#0a0a0a;--bg1:#111;--bg2:#161616;--card:#1a1a1a;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--text2:#999;--text3:#666;--acc:#10b981;--acc2:#059669;--accbg:#0a1f16;--out:#f59e0b;--outbg:#1a1508;--outborder:#f59e0b33;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6}
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
-.nav{background:var(--bg1);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:50}
-.nav h1{font-size:.95rem;font-weight:700;color:var(--acc);white-space:nowrap}
-.nav h1 span{color:var(--text2);font-weight:400;font-size:.7rem;margin-left:.4rem}
-.nav .spacer{flex:1}
-.nav-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.3rem .65rem;color:var(--text2);font-family:inherit;font-size:.7rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.3rem}
-.nav-btn:hover{border-color:var(--acc);color:var(--acc)}
-.nav-btn svg{width:13px;height:13px}
-.nav-btn input{display:none}
-.tabs{background:var(--bg1);border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;position:sticky;top:40px;z-index:49}
-.tab{padding:.55rem 1rem;font-size:.7rem;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none}
-.tab:hover{color:var(--text)}
-.tab.active{color:var(--acc);border-bottom-color:var(--acc);background:var(--accbg)}
-.content{max-width:1100px;margin:0 auto;padding:1rem}
-.tp{display:none}.tp.active{display:block}
-.sec{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:.75rem;overflow:hidden;animation:fadeUp .3s ease}
-.sec-head{padding:.55rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.03em}
-.sec-head svg{width:14px;height:14px;color:var(--acc);flex-shrink:0}
-.sec-body{padding:.85rem 1rem}
-.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.65rem}
-.fg.c2{grid-template-columns:1fr 1fr}.fg.c3{grid-template-columns:1fr 1fr 1fr}.fg.c4{grid-template-columns:1fr 1fr 1fr 1fr}
-.fi{display:flex;flex-direction:column;gap:.15rem}
-.fi.full{grid-column:1/-1}
-.fi label{font-size:.6rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
-.fi .iw{position:relative;display:flex;align-items:center}
-.fi input,.fi select{width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:5px;padding:.4rem .55rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.78rem;transition:border-color .15s}
-.fi input:focus,.fi select:focus{outline:none;border-color:var(--acc)}
-.fi select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:1.5rem}
-.fi .ur{position:absolute;right:.55rem;color:var(--text3);font-size:.65rem;pointer-events:none;font-family:'DM Sans'}
-.fi.hr input,.fi.hr select{padding-right:2.2rem}
-.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.4rem;margin-top:.6rem}
-.og.c2{grid-template-columns:1fr 1fr}.og.c3{grid-template-columns:1fr 1fr 1fr}.og.c4{grid-template-columns:1fr 1fr 1fr 1fr}
-.out{background:var(--outbg);border:1px solid var(--outborder);border-radius:6px;padding:.45rem .65rem;display:flex;justify-content:space-between;align-items:center}
-.out .ol{font-size:.6rem;color:var(--out);font-weight:600;text-transform:uppercase}
-.out .ov{font-size:.85rem;font-weight:700;color:var(--out);font-family:'JetBrains Mono',monospace}
-.out.big{grid-column:1/-1;background:linear-gradient(135deg,var(--accbg),var(--card));border-color:#10b98133;padding:.65rem .85rem}
-.out.big .ol{color:var(--acc);font-size:.65rem}.out.big .ov{color:var(--acc);font-size:1.4rem}
-.out.danger{border-color:#ef444433;background:#1a0808}.out.danger .ol,.out.danger .ov{color:var(--red)}
-/* Colors */
-.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.35rem}
-.ci{display:flex;align-items:center;gap:.35rem;background:var(--bg1);border:1px solid var(--border);border-radius:5px;padding:.35rem .5rem;cursor:pointer;transition:all .15s;user-select:none}
-.ci:hover{border-color:#444}.ci.on{border-color:var(--acc);background:var(--accbg)}
-.cdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1px solid #555}
-.ci .cn{font-size:.68rem;flex:1;font-weight:500}.ci .cr{font-size:.6rem;color:var(--text3)}.ci .cc{font-size:.6rem;color:var(--acc);font-weight:600;min-width:28px;text-align:right}
-/* Material table */
-.mw{overflow-x:auto}
-.mt{width:100%;border-collapse:collapse;font-size:.72rem}
-.mt th{background:var(--bg2);color:var(--text2);font-weight:600;padding:.4rem;text-align:left;border-bottom:1px solid var(--border);font-size:.6rem;text-transform:uppercase;white-space:nowrap}
-.mt td{padding:.15rem .15rem;border-bottom:1px solid #2a2a2a44}
-.mt input,.mt select{width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:4px;padding:.3rem .35rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.72rem}
-.mt input:focus{outline:none;border-color:var(--acc)}
-.mt .ro{color:var(--out);font-weight:600;text-align:right;padding:.3rem .35rem;font-family:'JetBrains Mono',monospace;font-size:.72rem}
-.bdel{background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;transition:color .15s}.bdel:hover{color:var(--red)}
-.badd{background:var(--bg1);border:1px dashed var(--border);border-radius:6px;padding:.4rem;width:100%;cursor:pointer;color:var(--text2);font-family:inherit;font-size:.68rem;transition:all .15s;margin-top:.4rem}.badd:hover{border-color:var(--acc);color:var(--acc)}
-/* Layer card */
-.layer-card{background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:.75rem;margin-bottom:.5rem}
-.layer-card .lc-title{font-size:.65rem;font-weight:700;color:var(--acc);text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
-.layer-card .lc-title .dot{width:8px;height:8px;border-radius:50%}
-/* Kur Bar */
-.kur-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:.3rem 1rem;display:flex;align-items:center;gap:1rem;font-size:.65rem;overflow-x:auto;flex-shrink:0}
-.kur-item{display:flex;align-items:center;gap:.3rem;white-space:nowrap}
-.kur-item .kl{color:var(--text3);font-weight:600}
-.kur-item .kv{color:var(--acc);font-weight:700;font-family:'JetBrains Mono',monospace}
-.kur-item .kd{font-size:.55rem;padding:.1rem .3rem;border-radius:3px;font-weight:600}
-.kur-item .kd.up{color:#22c55e;background:#22c55e18}.kur-item .kd.down{color:#ef4444;background:#ef444418}
-.kur-status{color:var(--text3);margin-left:auto;font-size:.55rem;display:flex;align-items:center;gap:.3rem}
-.kur-status .dot{width:6px;height:6px;border-radius:50%}
-.kur-status .dot.live{background:#22c55e;animation:pulse 2s infinite}
-.kur-status .dot.off{background:#ef4444}
-@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
-/* TL equivalents */
-.tl-eq{font-size:.6rem;color:var(--blue);font-weight:500;margin-left:.25rem;font-family:'JetBrains Mono',monospace}
-.toast{position:fixed;top:.75rem;right:.75rem;background:var(--card);border:1px solid var(--acc);border-radius:8px;padding:.5rem .75rem;font-size:.72rem;color:var(--acc);z-index:100;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:360px}
-.toast.show{opacity:1;transform:translateY(0)}.toast.err{border-color:var(--red);color:var(--red)}
-@media print{.nav,.tabs{display:none!important}.tp{display:block!important}.sec{break-inside:avoid;border:1px solid #ccc}body{background:#fff;color:#000}.sec-head{background:#f0f0f0;color:#333}.out{background:#fffbeb;border-color:#e5a000;print-color-adjust:exact;-webkit-print-color-adjust:exact}.out .ol,.out .ov{color:#b45309}.out.big{background:#ecfdf5}.out.big .ol,.out.big .ov{color:#059669}.content{max-width:100%;padding:.5rem}}
-@media(max-width:768px){.fg,.og{grid-template-columns:1fr!important}.cg{grid-template-columns:1fr 1fr}.nav h1 span{display:none}}
-@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+:root{
+--bg:#0a0a0a;--bg2:#111;--card:#1a1a1a;--card2:#151515;
+--border:#2a2a2a;--border2:#333;
+--t1:#f5f5f5;--t2:#a0a0a0;--t3:#666;
+--accent:#10b981;--accent2:#059669;--accent-bg:rgba(16,185,129,.08);
+--red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6;--blue:#3b82f6;--green:#22c55e;
+--cyan:#06b6d4;--pink:#ec4899;
+}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.6}
+.app{max-width:1400px;margin:0 auto;padding:16px}
+
+/* ─── HEADER ─── */
+.hdr{text-align:center;padding:32px 0 24px;border-bottom:1px solid var(--border);margin-bottom:24px}
+.hdr h1{font-size:1.8rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:6px}
+.hdr p{color:var(--t2);font-size:.88rem}
+
+/* ─── WIZARD STEPS ─── */
+.steps{display:flex;gap:4px;margin-bottom:24px;overflow-x:auto;padding:4px 0}
+.steps::-webkit-scrollbar{height:3px}
+.steps::-webkit-scrollbar-thumb{background:var(--border);border-radius:4px}
+.step-btn{display:flex;align-items:center;gap:6px;padding:10px 16px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--t2);cursor:pointer;font-family:inherit;font-size:.82rem;font-weight:500;white-space:nowrap;transition:all .2s}
+.step-btn:hover{border-color:var(--accent);color:var(--t1)}
+.step-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.step-btn.done{border-color:var(--accent);color:var(--accent)}
+.step-btn .num{width:22px;height:22px;border-radius:6px;background:var(--border);display:flex;align-items:center;justify-content:center;font-size:.72rem;font-weight:700;flex-shrink:0}
+.step-btn.active .num{background:rgba(255,255,255,.2)}
+.step-btn.done .num{background:var(--accent-bg)}
+
+.panel{display:none;animation:fadeUp .3s ease}
+.panel.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── GRID ─── */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
+@media(max-width:900px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr}}
+@media(max-width:480px){.g3,.g4{grid-template-columns:1fr}}
+
+/* ─── CARD ─── */
+.cd{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
+.cd h2{font-size:1rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.cd h2 .ic{width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.85rem;flex-shrink:0}
+.cd h3{font-size:.82rem;font-weight:600;color:var(--accent);margin:16px 0 10px;text-transform:uppercase;letter-spacing:.6px}
+
+/* ─── FORM ─── */
+.fg{margin-bottom:12px}
+.fg label{display:block;font-size:.8rem;color:var(--t2);margin-bottom:4px;font-weight:500}
+.fg .req{color:var(--red)}
+.iw{position:relative}
+.iw .ul{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.82rem;font-weight:600;pointer-events:none}
+.iw .ur{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.82rem;font-weight:500;pointer-events:none}
+.iw input,.iw select{width:100%;padding:9px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--t1);font-family:inherit;font-size:.88rem;transition:border .2s}
+.iw input:focus,.iw select:focus{outline:none;border-color:var(--accent)}
+.iw.hl input{padding-left:28px}
+.iw.hr input{padding-right:38px}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px}
+select option{background:var(--card);color:var(--t1)}
+
+/* ─── PKG TYPE PILLS ─── */
+.pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.pill{flex:1;min-width:120px;padding:14px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--t2);cursor:pointer;text-align:center;transition:all .2s;font-size:.85rem;font-weight:500}
+.pill:hover{border-color:var(--accent);color:var(--t1)}
+.pill.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
+.pill .pill-icon{font-size:1.4rem;display:block;margin-bottom:4px}
+
+/* ─── LAYER ─── */
+.layer{background:var(--bg2);border:1px solid var(--border);border-radius:10px;padding:14px;margin-bottom:10px;position:relative}
+.layer .lt{font-size:.82rem;font-weight:600;color:var(--accent);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.layer .lt .ln{background:var(--accent);color:#fff;width:20px;height:20px;border-radius:5px;display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700}
+.layer .del-layer{position:absolute;top:10px;right:10px;background:none;border:1px solid var(--border);color:var(--t3);cursor:pointer;border-radius:5px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s}
+.layer .del-layer:hover{border-color:var(--red);color:var(--red)}
+.add-layer-btn{width:100%;padding:10px;border:1px dashed var(--border);border-radius:8px;background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;font-size:.82rem;transition:all .15s}
+.add-layer-btn:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── PRINT TYPE TOGGLE ─── */
+.toggle-group{display:flex;gap:6px;margin-bottom:14px}
+.tgl{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--t2);cursor:pointer;font-family:inherit;font-size:.85rem;font-weight:500;text-align:center;transition:all .2s}
+.tgl:hover{border-color:var(--accent);color:var(--t1)}
+.tgl.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* ─── BTN ─── */
+.btn{padding:12px 24px;border-radius:9px;border:none;font-family:inherit;font-weight:600;cursor:pointer;transition:all .2s;font-size:.9rem}
+.btn-main{background:var(--accent);color:#fff;width:100%}
+.btn-main:hover{background:var(--accent2);transform:translateY(-1px)}
+.btn-out{background:transparent;color:var(--accent);border:1px solid var(--accent)}
+.btn-out:hover{background:var(--accent);color:#fff}
+.btn-sm{padding:8px 16px;font-size:.82rem}
+.btn-danger{background:transparent;color:var(--red);border:1px solid rgba(239,68,68,.3)}
+.btn-danger:hover{background:var(--red);color:#fff}
+
+/* ─── RESULTS ─── */
+.hero-result{text-align:center;padding:28px;background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(6,182,212,.05));border:1px solid rgba(16,185,129,.25);border-radius:14px;margin-bottom:20px}
+.hero-result .hv{font-size:3rem;font-weight:800;color:var(--accent);line-height:1.1}
+.hero-result .hl{font-size:.85rem;color:var(--t2);margin-top:6px}
+.rg{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:10px;margin-bottom:16px}
+.ri{background:var(--bg2);border:1px solid var(--border);border-radius:9px;padding:14px}
+.ri .rl{font-size:.75rem;color:var(--t2);margin-bottom:3px;text-transform:uppercase;letter-spacing:.3px}
+.ri .rv{font-size:1.05rem;font-weight:600}
+.ri .rv.gr{color:var(--green)}
+.ri .rv.rd{color:var(--red)}
+.ri .rv.ac{color:var(--accent)}
+.ri .rv.or{color:var(--orange)}
+
+/* ─── TABLE ─── */
+.tbl{width:100%;border-collapse:collapse;margin:12px 0;font-size:.84rem}
+.tbl th,.tbl td{padding:10px;border-bottom:1px solid var(--border);text-align:left}
+.tbl th{color:var(--t2);font-weight:500;font-size:.76rem;text-transform:uppercase;letter-spacing:.4px}
+.tbl tr:last-child td{border-bottom:none;font-weight:700;color:var(--accent)}
+.tbl .right{text-align:right}
+
+/* ─── BAR ─── */
+.bar{height:32px;border-radius:8px;overflow:hidden;display:flex;background:var(--bg2);margin:12px 0}
+.bar-seg{display:flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:600;color:#fff;transition:width .5s;overflow:hidden;white-space:nowrap}
+.leg{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:12px}
+.leg-i{display:flex;align-items:center;gap:4px;font-size:.76rem;color:var(--t2)}
+.leg-d{width:9px;height:9px;border-radius:2px}
+
+/* ─── WARN/INFO ─── */
+.warn{background:rgba(245,158,11,.08);border:1px solid rgba(245,158,11,.25);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--orange);margin:10px 0;display:flex;align-items:flex-start;gap:8px}
+.info-box{background:var(--accent-bg);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--accent);margin:10px 0}
+.err{background:rgba(239,68,68,.08);border:1px solid rgba(239,68,68,.25);border-radius:8px;padding:10px 14px;font-size:.82rem;color:var(--red);margin:10px 0}
+
+/* ─── CLIENT CARDS ─── */
+.cl-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:12px;margin-bottom:8px;position:relative;cursor:pointer;transition:border-color .15s}
+.cl-card:hover{border-color:var(--accent)}
+.cl-card .cl-name{font-weight:600;font-size:.9rem;margin-bottom:2px}
+.cl-card .cl-detail{font-size:.78rem;color:var(--t2);line-height:1.5}
+.cl-card .cl-actions{position:absolute;top:8px;right:8px;display:flex;gap:4px;opacity:0;transition:opacity .15s}
+.cl-card:hover .cl-actions{opacity:1}
+.cl-card .cl-btn{background:none;border:1px solid var(--border);color:var(--t3);cursor:pointer;border-radius:4px;width:24px;height:24px;display:flex;align-items:center;justify-content:center;font-size:.7rem;transition:all .15s}
+.cl-card .cl-btn:hover{border-color:var(--accent);color:var(--accent)}
+.cl-card .cl-btn.del:hover{border-color:var(--red);color:var(--red)}
+
+/* ─── RATE PROFILE ─── */
+.rp-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color .15s}
+.rp-card:hover{border-color:var(--accent)}
+.rp-card .rp-name{font-weight:600;font-size:.85rem}
+.rp-card .rp-date{font-size:.72rem;color:var(--t3)}
+.rp-card .rp-actions{display:flex;gap:4px}
+
+/* ─── LIVE CHAIN BAR ─── */
+.chain-bar{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);padding:8px 16px;z-index:100;display:flex;gap:4px;align-items:center;overflow-x:auto;font-size:.72rem}
+.chain-bar .cb-item{display:flex;flex-direction:column;align-items:center;padding:4px 10px;border-radius:6px;background:var(--bg2);border:1px solid var(--border);min-width:80px;flex-shrink:0}
+.chain-bar .cb-item.cb-warn{border-color:var(--red);background:rgba(239,68,68,.06)}
+.chain-bar .cb-item.cb-ok{border-color:rgba(16,185,129,.3)}
+.chain-bar .cb-label{color:var(--t3);font-size:.62rem;text-transform:uppercase;letter-spacing:.3px}
+.chain-bar .cb-val{font-weight:700;font-size:.82rem;color:var(--t1)}
+.chain-bar .cb-val.cv-accent{color:var(--accent)}
+.chain-bar .cb-val.cv-red{color:var(--red)}
+.chain-bar .cb-val.cv-orange{color:var(--orange)}
+.chain-bar .cb-arrow{color:var(--t3);font-size:.9rem;flex-shrink:0}
+body{padding-bottom:60px}
+
+/* ─── PRINT ─── */
+@media print{
+.chain-bar{display:none}
+body{background:#fff;color:#000;padding-bottom:0}
+.steps,.btn,.add-layer-btn,.del-layer,.hdr p{display:none}
+.cd{border:1px solid #ddd;break-inside:avoid}
+.hero-result{border:2px solid #10b981}
+}
 </style>
 </head>
 <body>
+<div class="app">
 
-<nav class="nav">
-  <h1>FlexiCost <span>Esnek Ambalaj Maliyet Hesaplama</span></h1>
-  <div class="spacer"></div>
-  <label class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Excel Yükle<input type="file" id="fileInput" accept=".xlsx,.xls"></label>
-  <button class="nav-btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Yazdır / PDF</button>
-</nav>
-
-<!-- KUR BAR -->
-<div class="kur-bar" id="kurBar">
-  <div class="kur-item"><span class="kl">EUR/TRY</span><span class="kv" id="kur_eurtry">-</span></div>
-  <div class="kur-item"><span class="kl">USD/TRY</span><span class="kv" id="kur_usdtry">-</span></div>
-  <div class="kur-item"><span class="kl">EUR/USD</span><span class="kv" id="kur_eurusd">-</span></div>
-  <div class="kur-status"><div class="dot off" id="kurDot"></div><span id="kurTime">Kur yükleniyor...</span></div>
+<div class="hdr">
+  <h1>Esnek Ambalaj Üretim Maliyet Sistemi</h1>
+  <p>Doypack / Flat Bottom / 3 Kenar Kaynak / Bobin — Endüstriyel maliyetlendirme ve üretim planlama (€)</p>
 </div>
 
-<div class="tabs">
-  <button class="tab active" data-t="baski">Baskı Maliyet</button>
-  <button class="tab" data-t="lamin">Laminasyon</button>
-  <button class="tab" data-t="pouch">Pouch / Torba</button>
-  <button class="tab" data-t="hammadde">Hammadde Formül</button>
-  <button class="tab" data-t="seffaf">Şeffaf Formül</button>
+<!-- STEPS NAV -->
+<div class="steps" id="stepsNav">
+  <button class="step-btn" data-step="rates"><span class="num">⚙</span>Makine Fiyatları</button>
+  <button class="step-btn" data-step="clients"><span class="num">👤</span>Müşteriler</button>
+  <button class="step-btn active" data-step="product"><span class="num">1</span>Ürün Tanımı</button>
+  <button class="step-btn" data-step="material"><span class="num">2</span>Malzeme Yapısı</button>
+  <button class="step-btn" data-step="print"><span class="num">3</span>Baskı</button>
+  <button class="step-btn" data-step="converting"><span class="num">4</span>Konverting</button>
+  <button class="step-btn" data-step="summary"><span class="num">5</span>Hesapla & Özet</button>
 </div>
 
-<div class="content">
+<!-- ═══════════════ PANEL: MAKİNE FİYATLARI (RATES) ═══════════════ -->
+<div class="panel" id="p-rates">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--cyan)">🖨️</span> Baskı Makine Fiyatları</h2>
+        <p style="color:var(--t2);font-size:.82rem;margin-bottom:14px">Baskı makinenizin metre/saat bazlı maliyet parametreleri. Bu değerler tüm hesaplamalarda kullanılır.</p>
+        <div class="g2">
+          <div class="fg">
+            <label>Gravür Baskı Hızı</label>
+            <div class="iw hr"><input type="number" id="rate-gravure-speed" step="1" value="150"><span class="ur">mt/dk</span></div>
+          </div>
+          <div class="fg">
+            <label>Gravür Makine Saat Ücreti</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-gravure-hourly" step="1" value="85"></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Dijital Baskı Hızı</label>
+            <div class="iw hr"><input type="number" id="rate-digital-speed" step="1" value="30"><span class="ur">mt/dk</span></div>
+          </div>
+          <div class="fg">
+            <label>Dijital Makine Saat Ücreti</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-digital-hourly" step="1" value="120"></div>
+          </div>
+        </div>
+        <div class="info-box" id="rate-print-calc" style="margin-top:10px">
+          Gravür: <strong id="rc-gravure">—</strong> €/mt | Dijital: <strong id="rc-digital">—</strong> €/mt
+        </div>
+      </div>
 
-<!-- ==================== BASKI MALİYET ==================== -->
-<div class="tp active" id="p-baski">
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Sipariş & Film & Tabla</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>Sipariş Miktarı</label><div class="iw"><input type="number" id="b_siparis" value="300"><span class="ur">kg</span></div></div>
-    <div class="fi hr"><label>Hazırlık Tutarı</label><div class="iw"><input type="number" id="b_hazirlik" value="750"><span class="ur">EUR</span></div></div>
-    <div class="fi hr"><label>Cold Seal</label><div class="iw"><input type="number" id="b_coldSeal" value="0"><span class="ur">EUR</span></div></div>
-    <div class="fi"><label>Yapı</label><select id="b_yapi"><option>20/15</option><option selected>20/20</option><option>Özel</option></select></div>
-    <div class="fi hr"><label>Film Eni</label><div class="iw"><input type="number" id="b_filmEni" value="620"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Fotocel Aralığı</label><div class="iw"><input type="number" id="b_fotocel" value="1120"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Tabla EN</label><div class="iw"><input type="number" id="b_tablaEn" value="746"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Tabla BOY</label><div class="iw"><input type="number" id="b_tablaBoy" value="1120"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Gerçek Film Eni</label><div class="iw"><input type="number" id="b_filmEni2" value="765"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Kenar Firesi</label><div class="iw"><input type="number" id="b_kenarFire" value="2.48" step="0.01"><span class="ur">%</span></div></div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--purple)">🧪</span> Laminasyon Makine Fiyatları</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Laminasyon Hızı</label>
+            <div class="iw hr"><input type="number" id="rate-lam-speed" step="1" value="120"><span class="ur">mt/dk</span></div>
+          </div>
+          <div class="fg">
+            <label>Laminasyon Makine Saat Ücreti</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-lam-hourly" step="1" value="65"></div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Yapıştırıcı Maliyeti (sabit ekleme, €/kg laminat)</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-lam-adhesive" step="0.01" value="0.30"></div>
+        </div>
+        <div class="info-box" id="rate-lam-calc" style="margin-top:10px">
+          Laminasyon: <strong id="rc-lam">—</strong> €/mt
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--orange)">✂️</span> Kesim / Dilimleme (Slitting)</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Kesim Hızı</label>
+            <div class="iw hr"><input type="number" id="rate-slit-speed" step="1" value="200"><span class="ur">mt/dk</span></div>
+          </div>
+          <div class="fg">
+            <label>Kesim Makine Saat Ücreti</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-slit-hourly" step="1" value="45"></div>
+          </div>
+        </div>
+        <div class="info-box" id="rate-slit-calc" style="margin-top:10px">
+          Kesim: <strong id="rc-slit">—</strong> €/mt
+        </div>
+      </div>
+
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--green)">🛍️</span> Poşet Yapım (Konverting)</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Konverting Hızı</label>
+            <div class="iw hr"><input type="number" id="rate-conv-speed" step="1" value="80"><span class="ur">adet/dk</span></div>
+          </div>
+          <div class="fg">
+            <label>Konverting Makine Saat Ücreti</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-conv-hourly" step="1" value="55"></div>
+          </div>
+        </div>
+        <div class="info-box" id="rate-conv-calc" style="margin-top:10px">
+          Konverting: <strong id="rc-conv">—</strong> €/1000 adet
+        </div>
+      </div>
+
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--pink)">📊</span> Genel Giderler (Overhead)</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Genel Gider Yüzdesi</label>
+            <div class="iw hr"><input type="number" id="rate-overhead" step="0.5" value="8"><span class="ur">%</span></div>
+          </div>
+          <div class="fg">
+            <label>Kâr Marjı</label>
+            <div class="iw hr"><input type="number" id="rate-profit-margin" step="0.5" value="15"><span class="ur">%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd" style="background:var(--card2)">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <h3 style="margin-top:0;color:var(--t2)">Fiyat Profilleri</h3>
+          <button class="btn btn-out btn-sm" onclick="saveRateProfile()">Profil Kaydet</button>
+        </div>
+        <div id="rate-profiles" style="margin-top:10px"></div>
+      </div>
+    </div>
   </div>
-  <div class="og c4"><div class="out"><span class="ol">En Adet</span><span class="ov" id="o_enA">-</span></div><div class="out"><span class="ol">Boy Adet</span><span class="ov" id="o_boA">-</span></div><div class="out"><span class="ol">Toplam Adet</span><span class="ov" id="o_topA">-</span></div><div class="out"><span class="ol">Toplam Alan</span><span class="ov" id="o_topAl">-</span></div></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Baskı Parametreleri</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>20gr Baskı Fiyatı</label><div class="iw"><input type="number" id="b_bf" value="67.3"><span class="ur">EUR</span></div></div>
-    <div class="fi hr"><label>İlave Gramaj</label><div class="iw"><input type="number" id="b_ig" value="90"><span class="ur">gr</span></div></div>
-    <div class="fi hr"><label>Gramaj Birim</label><div class="iw"><input type="number" id="b_gb" value="4"><span class="ur">EUR/gr</span></div></div>
-    <div class="fi"><label>Sabit Ölçü</label><input type="number" id="b_so" value="0.851" step="0.001"></div>
-    <div class="fi hr"><label>Baz Gramaj</label><div class="iw"><input type="number" id="b_bg" value="20"><span class="ur">gr</span></div></div>
-    <div class="fi"><label>Klik Çarpanı</label><input type="number" id="b_kc" value="1.08" step="0.01"></div>
-  </div></div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Renk Seçimi <span style="margin-left:auto;font-weight:400;font-size:.6rem;color:var(--text3)" id="clrLbl"></span></div>
-  <div class="sec-body"><div class="cg" id="clrG"></div>
-  <div class="og c3"><div class="out"><span class="ol">Klik Maliyet</span><span class="ov" id="o_klik">-</span></div><div class="out"><span class="ol">Klik Firesi</span><span class="ov" id="o_klikF">-</span></div><div class="out"><span class="ol">Toplam Klik</span><span class="ov" id="o_topK">-</span></div></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Hesap Sonuçları</div>
-  <div class="sec-body">
-    <div class="og c4"><div class="out"><span class="ol">Baskı+Klik</span><span class="ov" id="o_bk">-</span></div><div class="out"><span class="ol">İlave Gramaj Mal.</span><span class="ov" id="o_igm">-</span></div><div class="out"><span class="ol">Birim Maliyet</span><span class="ov" id="o_bm">-</span></div><div class="out"><span class="ol">Malzeme Ölçüsü</span><span class="ov" id="o_mo">-</span></div></div>
-    <div class="og c2"><div class="out big"><span class="ol">Gerçek Fiyat (EUR/kg)</span><span class="ov" id="o_gf">0.00</span></div><div class="out big" style="border-color:#3b82f633;background:linear-gradient(135deg,#0a1428,var(--card))"><span class="ol" style="color:var(--blue)">TL Karşılığı (kg)</span><span class="ov" style="color:var(--blue)" id="o_gf_tl">-</span></div></div>
-    <div class="og c2"><div class="out"><span class="ol">Toplam Tutar</span><span class="ov" id="o_tt">-</span></div><div class="out"><span class="ol">+ Hazırlık</span><span class="ov" id="o_hz">-</span></div><div class="out"><span class="ol">+ Kenar Fire</span><span class="ov" id="o_kft">-</span></div><div class="out"><span class="ol">+ Cold Seal</span><span class="ov" id="o_cst">-</span></div></div>
-    <div class="og c2"><div class="out big"><span class="ol">Fire Dahil Fiyat</span><span class="ov" id="o_fd">-</span></div><div class="out big"><span class="ol">KG Fiyatı</span><span class="ov" id="o_kg1">-</span></div></div>
-    <div class="og c3"><div class="out" id="o_gkfW"><span class="ol">Gerçek Kenar Fire</span><span class="ov" id="o_gkf">-</span></div><div class="out"><span class="ol">Fire Tutarı</span><span class="ov" id="o_ft">-</span></div><div class="out"><span class="ol">Nihai (CS dahil)</span><span class="ov" id="o_nh">-</span></div></div>
-    <div class="og c2"><div class="out big"><span class="ol">Son Toplam</span><span class="ov" id="o_st">-</span><span class="tl-eq" id="o_st_tl"></span></div><div class="out big"><span class="ol">Son KG Fiyatı</span><span class="ov" id="o_kg2">-</span><span class="tl-eq" id="o_kg2_tl"></span></div></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/></svg>Farklı Miktarlar</div>
-  <div class="sec-body"><div class="og c3" id="bQty"></div></div></div>
+  <button class="btn btn-main" onclick="goStep('product')" style="max-width:300px;margin:16px auto;display:block">Ürün Tanımına Geç →</button>
 </div>
 
-<!-- ==================== LAMİNASYON ==================== -->
-<div class="tp" id="p-lamin">
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Sipariş & Reel</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>Sipariş Miktarı</label><div class="iw"><input type="number" id="l_qty" value="1000"><span class="ur">kg</span></div></div>
-    <div class="fi hr"><label>Reel Genişliği</label><div class="iw"><input type="number" id="l_reel" value="620"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Atık/Fire Oranı</label><div class="iw"><input type="number" id="l_waste" value="5"><span class="ur">%</span></div></div>
-  </div></div></div>
+<!-- ═══════════════ PANEL: MÜŞTERİ YÖNETİMİ ═══════════════ -->
+<div class="panel" id="p-clients">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--blue)">➕</span> Yeni Müşteri Ekle</h2>
+        <div class="fg"><label>Firma Adı <span class="req">*</span></label><div class="iw"><input type="text" id="cl-name" placeholder="Firma adı"></div></div>
+        <div class="g2">
+          <div class="fg"><label>Yetkili Kişi</label><div class="iw"><input type="text" id="cl-contact" placeholder="Ad Soyad"></div></div>
+          <div class="fg"><label>Telefon</label><div class="iw"><input type="text" id="cl-phone" placeholder="+90 5xx xxx xxxx"></div></div>
+        </div>
+        <div class="fg"><label>E-posta</label><div class="iw"><input type="email" id="cl-email" placeholder="info@firma.com"></div></div>
+        <div class="fg"><label>Adres</label><div class="iw"><input type="text" id="cl-addr" placeholder="Mahalle, Cadde, No"></div></div>
+        <div class="g2">
+          <div class="fg"><label>İl / İlçe</label><div class="iw"><input type="text" id="cl-city" placeholder="İstanbul / Sancaktepe"></div></div>
+          <div class="fg"><label>Ülke</label><div class="iw"><input type="text" id="cl-country" value="Türkiye"></div></div>
+        </div>
+        <div class="g2">
+          <div class="fg"><label>Vergi Dairesi</label><div class="iw"><input type="text" id="cl-vd" placeholder="VD adı"></div></div>
+          <div class="fg"><label>Vergi No</label><div class="iw"><input type="text" id="cl-vno" placeholder="1234567890"></div></div>
+        </div>
+        <div class="fg"><label>Notlar</label><div class="iw"><input type="text" id="cl-notes" placeholder="Opsiyonel notlar"></div></div>
+        <button class="btn btn-main" onclick="saveClient()" style="margin-top:8px">Müşteri Kaydet</button>
+      </div>
+    </div>
 
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Katman Yapısı (4 Kat)</div>
-  <div class="sec-body" id="layerCards"></div></div>
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--accent)">📋</span> Kayıtlı Müşteriler</h2>
+        <div class="fg"><label>Müşteri Ara</label><div class="iw"><input type="text" id="cl-search" placeholder="Firma adı ile ara..." oninput="renderClients()"></div></div>
+        <div id="clients-list" style="margin-top:12px">
+          <div style="text-align:center;padding:20px;color:var(--t3);font-size:.85rem">Henüz müşteri eklenmedi</div>
+        </div>
+      </div>
 
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 017 7"/></svg>Mürekkep & Yapıştırıcı</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>Mürekkep GSM</label><div class="iw"><input type="number" id="l_inkGsm" value="1.2" step="0.1"><span class="ur">gsm</span></div></div>
-    <div class="fi hr"><label>Mürekkep Fiyat</label><div class="iw"><input type="number" id="l_inkRate" value="8" step="0.1"><span class="ur">$/kg</span></div></div>
-    <div class="fi hr"><label>Yapıştırıcı GSM</label><div class="iw"><input type="number" id="l_adhGsm" value="2" step="0.1"><span class="ur">gsm</span></div></div>
-    <div class="fi hr"><label>Yapıştırıcı Fiyat</label><div class="iw"><input type="number" id="l_adhRate" value="5" step="0.1"><span class="ur">$/kg</span></div></div>
+      <div class="cd" style="background:var(--card2)">
+        <h3 style="margin-top:0;color:var(--t2)">Hızlı Müşteri Seçimi (Teklif için)</h3>
+        <p style="color:var(--t3);font-size:.8rem">Yukarıdan müşteri ekleyin. Teklif oluştururken müşteri listesinden seçebilirsiniz.</p>
+      </div>
+    </div>
   </div>
-  <div class="og c4"><div class="out"><span class="ol">Mürekkep Kuru (kg)</span><span class="ov" id="lo_inkD">-</span></div><div class="out"><span class="ol">Mürekkep Sıvı (kg)</span><span class="ov" id="lo_inkL">-</span></div><div class="out"><span class="ol">Yapıştırıcı Toplam (kg)</span><span class="ov" id="lo_adhKg">-</span></div><div class="out"><span class="ol">Toplam GSM</span><span class="ov" id="lo_tgsm">-</span></div></div>
-  </div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>Dönüşüm Maliyetleri</div>
-  <div class="sec-body"><div class="fg c3">
-    <div class="fi hr"><label>Baskı Maliyeti</label><div class="iw"><input type="number" id="l_printR" value="0.30" step="0.01"><span class="ur">$/kg</span></div></div>
-    <div class="fi hr"><label>Laminasyon Maliyeti</label><div class="iw"><input type="number" id="l_lamR" value="0.50" step="0.01"><span class="ur">$/kg</span></div></div>
-    <div class="fi hr"><label>Ek Maliyet</label><div class="iw"><input type="number" id="l_extraR" value="0" step="0.01"><span class="ur">$/kg</span></div></div>
-  </div></div></div>
-
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Maliyet Özeti</div>
-  <div class="sec-body">
-    <div class="og c2"><div class="out"><span class="ol">Malzeme Toplamı</span><span class="ov" id="lo_matT">-</span></div><div class="out"><span class="ol">Mürekkep Toplamı</span><span class="ov" id="lo_inkT">-</span></div><div class="out"><span class="ol">Yapıştırıcı Toplamı</span><span class="ov" id="lo_adhT">-</span></div><div class="out"><span class="ol">Dönüşüm Toplamı</span><span class="ov" id="lo_convT">-</span></div></div>
-    <div class="og c2"><div class="out big"><span class="ol">Genel Toplam</span><span class="ov" id="lo_grand">0.00</span><span class="tl-eq" id="lo_grand_tl"></span></div><div class="out big"><span class="ol">KG Başına Maliyet</span><span class="ov" id="lo_perKg">0.00</span><span class="tl-eq" id="lo_perKg_tl"></span></div></div>
-    <div class="og c3"><div class="out"><span class="ol">Atık Dahil Toplam</span><span class="ov" id="lo_wGrand">-</span></div><div class="out"><span class="ol">Atık Dahil $/kg</span><span class="ov" id="lo_wPerKg">-</span></div><div class="out"><span class="ol">Metre Cinsinden</span><span class="ov" id="lo_meter">-</span></div></div>
-  </div></div>
+  <button class="btn btn-main" onclick="goStep('product')" style="max-width:300px;margin:16px auto;display:block">Ürün Tanımına Geç →</button>
 </div>
 
-<!-- ==================== POUCH ==================== -->
-<div class="tp" id="p-pouch">
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>Pouch Boyutları</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>Genişlik</label><div class="iw"><input type="number" id="p_w" value="150"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Uzunluk</label><div class="iw"><input type="number" id="p_h" value="200"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Körük (Gusset)</label><div class="iw"><input type="number" id="p_g" value="0"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>Seal Payı</label><div class="iw"><input type="number" id="p_seal" value="10"><span class="ur">mm</span></div></div>
-  </div></div></div>
+<!-- ═══════════════ PANEL 1: ÜRÜN TANIMI ═══════════════ -->
+<div class="panel active" id="p-product">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--accent)">📦</span> Paket Tipi</h2>
+        <div class="pills" id="pkgType">
+          <div class="pill active" data-type="doypack" onclick="selectPkg(this)">
+            <span class="pill-icon">🧃</span>Doypack
+          </div>
+          <div class="pill" data-type="flatbottom" onclick="selectPkg(this)">
+            <span class="pill-icon">📦</span>Flat Bottom
+          </div>
+          <div class="pill" data-type="3sideseal" onclick="selectPkg(this)">
+            <span class="pill-icon">🛍️</span>3 Kenar Kaynak
+          </div>
+          <div class="pill" data-type="rollstock" onclick="selectPkg(this)">
+            <span class="pill-icon">🧻</span>Bobin (Rollstock)
+          </div>
+        </div>
+      </div>
 
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>Malzeme Yapısı</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>Kompozit GSM</label><div class="iw"><input type="number" id="p_gsm" value="70"><span class="ur">gsm</span></div></div>
-    <div class="fi hr"><label>KG Fiyatı</label><div class="iw"><input type="number" id="p_rate" value="3.50" step="0.01"><span class="ur">$/kg</span></div></div>
-    <div class="fi hr"><label>Fermuar Ağırlık</label><div class="iw"><input type="number" id="p_zip" value="0"><span class="ur">gr/m</span></div></div>
-    <div class="fi hr"><label>Fermuar Fiyat</label><div class="iw"><input type="number" id="p_zipR" value="0"><span class="ur">$/m</span></div></div>
-  </div></div></div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--blue)">📐</span> Ölçüler</h2>
+        <div class="g3">
+          <div class="fg">
+            <label>Genişlik <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="dim-w" step="1" placeholder="180"><span class="ur">mm</span></div>
+          </div>
+          <div class="fg">
+            <label>Yükseklik <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="dim-h" step="1" placeholder="260"><span class="ur">mm</span></div>
+          </div>
+          <div class="fg" id="gusset-group">
+            <label>Körük</label>
+            <div class="iw hr"><input type="number" id="dim-g" step="1" value="0" placeholder="50"><span class="ur">mm</span></div>
+          </div>
+        </div>
+      </div>
 
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Hesap Sonuçları</div>
-  <div class="sec-body">
-    <div class="og c3"><div class="out"><span class="ol">Pouch Alanı (cm²)</span><span class="ov" id="po_area">-</span></div><div class="out big"><span class="ol">Pouch Ağırlığı</span><span class="ov" id="po_wt">- gr</span></div><div class="out big"><span class="ol">Adet / KG</span><span class="ov" id="po_perKg">-</span></div></div>
-    <div class="og c3"><div class="out"><span class="ol">Malzeme Fiyatı / Pouch</span><span class="ov" id="po_matC">-</span></div><div class="out"><span class="ol">Fermuar Fiyatı / Pouch</span><span class="ov" id="po_zipC">-</span></div><div class="out big"><span class="ol">Birim Maliyet / Pouch</span><span class="ov" id="po_unit">-</span></div></div>
-    <div class="og c3"><div class="out"><span class="ol">1.000 Adet</span><span class="ov" id="po_1k">-</span></div><div class="out"><span class="ol">10.000 Adet</span><span class="ov" id="po_10k">-</span></div><div class="out"><span class="ol">100.000 Adet</span><span class="ov" id="po_100k">-</span></div></div>
-  </div></div>
-</div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--purple)">🔢</span> Sipariş</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Sipariş Adedi <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="order-qty" step="1000" placeholder="100000"><span class="ur">adet</span></div>
+          </div>
+          <div class="fg">
+            <label>Fire Oranı <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="waste-pct" step="0.5" value="8" min="0" max="30"><span class="ur">%</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-<!-- ==================== HAMMADDE ==================== -->
-<div class="tp" id="p-hammadde">
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Hammadde Listesi<div style="margin-left:auto;display:flex;gap:.25rem" id="hSB"></div></div>
-  <div class="sec-body">
-    <div class="mw"><table class="mt"><thead><tr><th>Ürün</th><th>Marka</th><th>Firma</th><th style="width:65px">Kg</th><th style="width:75px">Fiyat</th><th style="width:75px">Toplam</th><th style="width:24px"></th></tr></thead><tbody id="hR"></tbody></table></div>
-    <button class="badd" onclick="addMat()">+ Malzeme Ekle</button>
-  </div></div>
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Fire & İşçilik</div>
-  <div class="sec-body"><div class="fg c2">
-    <div class="fi hr"><label>İşçilik Oranı</label><div class="iw"><input type="number" id="h_isc" value="0" step="0.01"><span class="ur">%</span></div></div>
-    <div class="fi hr"><label>Fire Oranı</label><div class="iw"><input type="number" id="h_fire" value="3" step="0.01"><span class="ur">%</span></div></div>
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--cyan)">🖨️</span> Baskı Parametreleri (Kritik)</h2>
+        <div class="warn">⚠️ Repeat ve web width olmadan hesaplama yapılamaz.</div>
+        <div class="toggle-group" id="printTypeToggle">
+          <button class="tgl active" data-val="roto" onclick="setPrintType(this)">Rotogravür</button>
+          <button class="tgl" data-val="digital" onclick="setPrintType(this)">Dijital (HP Indigo vb.)</button>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Baskı Çevresi (Repeat) <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="print-repeat" step="1" placeholder="250"><span class="ur">mm</span></div>
+          </div>
+          <div class="fg">
+            <label>Baskı Eni (Web Width) <span class="req">*</span></label>
+            <div class="iw hr"><input type="number" id="print-webw" step="1" placeholder="800"><span class="ur">mm</span></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Baskı Boyu (Cut-off)</label>
+            <div class="iw hr"><input type="number" id="print-cutoff" step="1" placeholder="260"><span class="ur">mm</span></div>
+          </div>
+          <div class="fg">
+            <label>Kaçlı Basım (Up Sayısı) <span class="req">*</span></label>
+            <div class="iw"><input type="number" id="print-up" step="1" value="4" min="1" max="20"></div>
+          </div>
+        </div>
+
+        <!-- ROTO FIELDS -->
+        <div id="roto-fields">
+          <h3>Rotogravür Detay</h3>
+          <div class="g3">
+            <div class="fg">
+              <label>Renk Sayısı</label>
+              <div class="iw"><input type="number" id="roto-colors" step="1" value="8" min="1" max="12"></div>
+            </div>
+            <div class="fg">
+              <label>Silindir Birim Fiyat</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="roto-cylPrice" step="10" value="350" placeholder="350"></div>
+            </div>
+            <div class="fg">
+              <label>Baskı İşçilik / KG</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="roto-laborKg" step="0.01" value="0.15" placeholder="0.15"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- DIGITAL FIELDS -->
+        <div id="digital-fields" style="display:none">
+          <h3>Dijital Baskı Detay</h3>
+          <div class="g2">
+            <div class="fg">
+              <label>Baskı Maliyeti / m²</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="digi-costM2" step="0.01" value="0.80" placeholder="0.80"></div>
+            </div>
+            <div class="fg">
+              <label>veya Baskı Maliyeti / KG</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="digi-costKg" step="0.01" placeholder="—"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd" style="background:var(--card2)">
+        <h3 style="margin-top:0;color:var(--t2)">Otomatik Hesaplamalar (canlı)</h3>
+        <div class="g3" id="live-calcs">
+          <div class="ri"><div class="rl">Toplam Metraj</div><div class="rv ac" id="live-metraj">—</div></div>
+          <div class="ri"><div class="rl">Paket Alanı</div><div class="rv" id="live-area">—</div></div>
+          <div class="ri"><div class="rl">MOQ Kontrol</div><div class="rv" id="live-moq">—</div></div>
+        </div>
+      </div>
+    </div>
   </div>
-  <div class="og c3"><div class="out"><span class="ol">Toplam Kg</span><span class="ov" id="ho_tkg">-</span></div><div class="out"><span class="ol">Toplam Maliyet</span><span class="ov" id="ho_tmal">-</span></div><div class="out"><span class="ol">Birim Maliyet</span><span class="ov" id="ho_bm">-</span></div><div class="out"><span class="ol">İşçilik</span><span class="ov" id="ho_isc">-</span></div><div class="out"><span class="ol">Fire</span><span class="ov" id="ho_fire">-</span></div><div class="out big"><span class="ol">Genel Toplam (TL/kg)</span><span class="ov" id="ho_gen">0.00</span></div></div>
-  </div></div>
+  <button class="btn btn-main" onclick="goStep('material')" style="max-width:300px;margin:16px auto;display:block">Malzeme Yapısına Geç →</button>
 </div>
 
-<!-- ==================== ŞEFFAF ==================== -->
-<div class="tp" id="p-seffaf">
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Baskı Parametreleri</div>
-  <div class="sec-body"><div class="fg c4">
-    <div class="fi hr"><label>20gr Baskı Fiyatı</label><div class="iw"><input type="number" id="s_bf" value="61.5"><span class="ur">EUR</span></div></div>
-    <div class="fi hr"><label>İlave Gramaj</label><div class="iw"><input type="number" id="s_ig" value="18.2" step="0.1"><span class="ur">gr</span></div></div>
-    <div class="fi"><label>Gramaj Çarpanı</label><input type="number" id="s_gc" value="5" step="0.1"></div>
-    <div class="fi hr"><label>Baz Gramaj</label><div class="iw"><input type="number" id="s_bg" value="20"><span class="ur">gr</span></div></div>
-  </div></div></div>
-  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Ölçü Parametreleri</div>
-  <div class="sec-body"><div class="fg c3">
-    <div class="fi"><label>Sabit Ölçü</label><input type="number" id="s_so" value="0.814" step="0.001"></div>
-    <div class="fi hr"><label>EN</label><div class="iw"><input type="number" id="s_en" value="665"><span class="ur">mm</span></div></div>
-    <div class="fi hr"><label>BOY</label><div class="iw"><input type="number" id="s_boy" value="1040"><span class="ur">mm</span></div></div>
+<!-- ═══════════════ PANEL 2: MALZEME YAPISI ═══════════════ -->
+<div class="panel" id="p-material">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--purple)">🧪</span> Katman Yapısı</h2>
+        <p style="color:var(--t2);font-size:.82rem;margin-bottom:14px">Her katmanın malzeme, mikron, yoğunluk ve €/kg bilgisini girin.</p>
+        <div id="layers-container">
+          <!-- Layers injected by JS -->
+        </div>
+        <button class="add-layer-btn" onclick="addLayer()">+ Katman Ekle</button>
+      </div>
+
+      <div class="cd">
+        <h3 style="margin-top:0">Opsiyonel Katmanlar</h3>
+        <div class="g2">
+          <div class="fg">
+            <label>Yapıştırıcı (Adhesive) GSM</label>
+            <div class="iw hr"><input type="number" id="mat-adhGsm" step="0.1" value="2.5"><span class="ur">g/m²</span></div>
+          </div>
+          <div class="fg">
+            <label>Yapıştırıcı Fiyat / KG</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="mat-adhRate" step="0.01" value="8.00"></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Lak GSM (0 = yok)</label>
+            <div class="iw hr"><input type="number" id="mat-lakGsm" step="0.1" value="0"><span class="ur">g/m²</span></div>
+          </div>
+          <div class="fg">
+            <label>Lak Fiyat / KG</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="mat-lakRate" step="0.01" value="6.00"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--orange)">📊</span> Malzeme Özet (Canlı)</h2>
+        <div id="mat-summary-empty" class="info-box">Katman ekleyip mikron/yoğunluk bilgilerini girin.</div>
+        <div id="mat-summary" style="display:none">
+          <table class="tbl" id="mat-table">
+            <thead><tr><th>Katman</th><th>Malzeme</th><th>Mikron</th><th class="right">GSM</th><th class="right">€/kg</th></tr></thead>
+            <tbody></tbody>
+          </table>
+          <div class="rg" style="margin-top:14px">
+            <div class="ri"><div class="rl">Toplam GSM</div><div class="rv ac" id="mat-totalGsm">—</div></div>
+            <div class="ri"><div class="rl">Paket Gramajı</div><div class="rv" id="mat-pktGram">—</div></div>
+            <div class="ri"><div class="rl">Toplam KG (net)</div><div class="rv" id="mat-netKg">—</div></div>
+            <div class="ri"><div class="rl">Fire Dahil KG</div><div class="rv or" id="mat-grossKg">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cd" style="background:var(--card2)">
+        <h3 style="margin-top:0;color:var(--t2)">Film Yoğunluk Referansı</h3>
+        <table class="tbl" style="font-size:.78rem">
+          <thead><tr><th>Malzeme</th><th>Yoğunluk</th><th>Tipik μ</th></tr></thead>
+          <tbody>
+            <tr><td>PET</td><td>1.39</td><td>12</td></tr>
+            <tr><td>METPET</td><td>1.40</td><td>12</td></tr>
+            <tr><td>BOPP</td><td>0.91</td><td>15–20</td></tr>
+            <tr><td>MET BOPP</td><td>0.92</td><td>18–20</td></tr>
+            <tr><td>PE / LLDPE</td><td>0.92</td><td>50–100</td></tr>
+            <tr><td>CPP</td><td>0.90</td><td>25–70</td></tr>
+            <tr><td>Naylon (PA)</td><td>1.14</td><td>15–25</td></tr>
+            <tr><td style="border-bottom:none">Alu Folyo</td><td style="border-bottom:none">2.70</td><td style="border-bottom:none">6–9</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
   </div>
-  <div class="og c2"><div class="out"><span class="ol">İlave Gramaj Maliyet</span><span class="ov" id="so_igm">-</span></div><div class="out"><span class="ol">Toplam Maliyet</span><span class="ov" id="so_tm">-</span></div><div class="out"><span class="ol">Malzeme Ölçüsü</span><span class="ov" id="so_mo">-</span></div><div class="out big"><span class="ol">Gerçek Fiyat (EUR/kg)</span><span class="ov" id="so_gf">0.00</span></div></div>
-  </div></div>
+  <div style="display:flex;gap:10px;max-width:500px;margin:16px auto">
+    <button class="btn btn-out btn-sm" onclick="goStep('product')">← Ürün</button>
+    <button class="btn btn-main" onclick="goStep('print')" style="flex:1">Baskı Detaylarına Geç →</button>
+  </div>
 </div>
 
+<!-- ═══════════════ PANEL 3: BASKI ═══════════════ -->
+<div class="panel" id="p-print">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--cyan)">🎨</span> Mürekkep Tüketimi</h2>
+        <div class="g2">
+          <div class="fg">
+            <label>Kaplama Oranı</label>
+            <div class="iw hr"><input type="number" id="ink-coverage" step="5" value="60" min="0" max="100"><span class="ur">%</span></div>
+          </div>
+          <div class="fg">
+            <label>Mürekkep Yayılma GSM</label>
+            <div class="iw hr"><input type="number" id="ink-laydown" step="0.1" value="1.5"><span class="ur">g/m²</span></div>
+          </div>
+        </div>
+        <div class="fg">
+          <label>Mürekkep Fiyatı / KG</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="ink-rate" step="0.5" value="12.00"></div>
+        </div>
+      </div>
+
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--blue)">⚙️</span> Laminasyon</h2>
+        <div class="fg">
+          <label>Laminasyon İşçilik / KG</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="lam-laborKg" step="0.01" value="0.12"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--green)">📋</span> Baskı Maliyeti Özet (Canlı)</h2>
+        <div id="print-summary-empty" class="info-box">Tüm baskı bilgileri girildiğinde burada canlı hesaplama göreceksiniz.</div>
+        <div id="print-summary" style="display:none">
+          <div class="rg">
+            <div class="ri"><div class="rl">Toplam Mürekkep</div><div class="rv" id="ps-inkKg">—</div></div>
+            <div class="ri"><div class="rl">Mürekkep Maliyeti</div><div class="rv ac" id="ps-inkCost">—</div></div>
+            <div class="ri"><div class="rl">Silindir Maliyeti</div><div class="rv" id="ps-cylCost">—</div></div>
+            <div class="ri"><div class="rl">Baskı İşçilik</div><div class="rv" id="ps-printLabor">—</div></div>
+            <div class="ri"><div class="rl">Laminasyon Maliyeti</div><div class="rv" id="ps-lamCost">—</div></div>
+            <div class="ri"><div class="rl">Toplam Baskı+Lam</div><div class="rv ac" id="ps-total">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;max-width:500px;margin:16px auto">
+    <button class="btn btn-out btn-sm" onclick="goStep('material')">← Malzeme</button>
+    <button class="btn btn-main" onclick="goStep('converting')" style="flex:1">Konverting →</button>
+  </div>
 </div>
-<div class="toast" id="toast"></div>
+
+<!-- ═══════════════ PANEL 4: KONVERTİNG ═══════════════ -->
+<div class="panel" id="p-converting">
+  <div class="g2">
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--orange)">🔧</span> Konverting Maliyetleri</h2>
+        <p style="color:var(--t2);font-size:.82rem;margin-bottom:14px">Poşet kesim, dikiş ve ek malzeme maliyetleri.</p>
+
+        <div class="fg">
+          <label>Konverting İşçilik / KG</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-laborKg" step="0.01" value="0.20"></div>
+        </div>
+        <div class="fg">
+          <label>Makine Süresi / 1000 adet</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-machineK" step="0.5" value="0" placeholder="0"></div>
+        </div>
+
+        <h3>Ek Malzemeler</h3>
+        <div class="g2">
+          <div class="fg">
+            <label>Zipper (fermuar) / adet</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-zipper" step="0.001" value="0" placeholder="0.005"></div>
+          </div>
+          <div class="fg">
+            <label>Valf / adet</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-valve" step="0.001" value="0" placeholder="0.008"></div>
+          </div>
+        </div>
+        <div class="g2">
+          <div class="fg">
+            <label>Spout (kapak) / adet</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-spout" step="0.001" value="0" placeholder="0.02"></div>
+          </div>
+          <div class="fg">
+            <label>Diğer / adet</label>
+            <div class="iw hl"><span class="ul">€</span><input type="number" id="conv-other" step="0.001" value="0"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="cd">
+        <h2><span class="ic" style="background:var(--pink)">💰</span> Konverting Özet (Canlı)</h2>
+        <div id="conv-summary" class="info-box">Tüm bilgiler girildiğinde burada görünecek.</div>
+        <div id="conv-detail" style="display:none">
+          <div class="rg">
+            <div class="ri"><div class="rl">İşçilik</div><div class="rv" id="cs-labor">—</div></div>
+            <div class="ri"><div class="rl">Makine</div><div class="rv" id="cs-machine">—</div></div>
+            <div class="ri"><div class="rl">Zipper</div><div class="rv" id="cs-zipper">—</div></div>
+            <div class="ri"><div class="rl">Valf</div><div class="rv" id="cs-valve">—</div></div>
+            <div class="ri"><div class="rl">Spout</div><div class="rv" id="cs-spout">—</div></div>
+            <div class="ri"><div class="rl">Toplam Konverting</div><div class="rv ac" id="cs-total">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div style="display:flex;gap:10px;max-width:500px;margin:16px auto">
+    <button class="btn btn-out btn-sm" onclick="goStep('print')">← Baskı</button>
+    <button class="btn btn-main" onclick="goStep('summary')" style="flex:1">Hesapla & Özet →</button>
+  </div>
+</div>
+
+<!-- ═══════════════ PANEL 5: HESAPLA & ÖZET ═══════════════ -->
+<div class="panel" id="p-summary">
+  <div id="summary-err" class="err" style="display:none"></div>
+  <div id="summary-content" style="display:none">
+
+    <!-- HERO -->
+    <div class="hero-result">
+      <div class="hv" id="s-totalCost">—</div>
+      <div class="hl">Toplam Maliyet (fire dahil)</div>
+    </div>
+
+    <!-- BİRİM FİYATLAR -->
+    <div class="rg" style="margin-bottom:20px">
+      <div class="ri"><div class="rl">€ / KG</div><div class="rv ac" id="s-eurKg">—</div></div>
+      <div class="ri"><div class="rl">€ / Adet</div><div class="rv ac" id="s-eurPc">—</div></div>
+      <div class="ri"><div class="rl">€ / 1.000 Adet</div><div class="rv ac" id="s-eurK">—</div></div>
+    </div>
+
+    <div class="g2">
+      <!-- SOL: TEKNİK BİLGİ -->
+      <div>
+        <div class="cd">
+          <h2><span class="ic" style="background:var(--blue)">📐</span> Teknik Yapı</h2>
+          <div id="s-techInfo"></div>
+        </div>
+
+        <div class="cd">
+          <h2><span class="ic" style="background:var(--purple)">📊</span> Üretim Verileri</h2>
+          <div class="rg">
+            <div class="ri"><div class="rl">Toplam Metraj</div><div class="rv ac" id="s-metraj">—</div></div>
+            <div class="ri"><div class="rl">Toplam Adet</div><div class="rv" id="s-qty">—</div></div>
+            <div class="ri"><div class="rl">Net KG</div><div class="rv" id="s-netKg">—</div></div>
+            <div class="ri"><div class="rl">Fire Dahil KG</div><div class="rv or" id="s-grossKg">—</div></div>
+            <div class="ri"><div class="rl">Paket Gramajı</div><div class="rv" id="s-pktGram">—</div></div>
+            <div class="ri"><div class="rl">Adet / KG</div><div class="rv" id="s-pcsKg">—</div></div>
+          </div>
+        </div>
+
+        <div class="cd">
+          <h2><span class="ic" style="background:var(--cyan)">📅</span> Tahmini Termin</h2>
+          <div class="rg">
+            <div class="ri"><div class="rl">Baskı Tipi</div><div class="rv" id="s-printType">—</div></div>
+            <div class="ri"><div class="rl">Tahmini Süre</div><div class="rv ac" id="s-leadtime">—</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SAĞ: MALİYET DAĞILIMI -->
+      <div>
+        <div class="cd">
+          <h2><span class="ic" style="background:var(--green)">💰</span> Maliyet Dağılımı</h2>
+          <div class="bar" id="s-bar"></div>
+          <div class="leg" id="s-leg"></div>
+          <table class="tbl" id="s-costTable">
+            <thead><tr><th>Kalem</th><th class="right">Tutar (€)</th><th class="right">%</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+
+        <div class="cd">
+          <h2><span class="ic" style="background:var(--orange)">📈</span> Birim Maliyet Detayı</h2>
+          <table class="tbl" id="s-unitTable">
+            <thead><tr><th>Kalem</th><th class="right">€/KG</th><th class="right">€/Adet</th></tr></thead>
+            <tbody></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- MÜŞTERİ BİLGİLERİ (PDF için) -->
+    <div class="cd" style="margin-top:16px">
+      <h2><span class="ic" style="background:var(--pink)">👤</span> Müşteri Bilgileri (PDF Teklif için)</h2>
+      <div class="fg" style="margin-bottom:14px">
+        <label>Kayıtlı Müşteriden Seç</label>
+        <div class="iw"><select id="cust-select" onchange="fillClientFromSelect()">
+          <option value="">— Manuel giriş veya müşteri seçin —</option>
+        </select></div>
+      </div>
+      <div class="g2">
+        <div>
+          <div class="fg"><label>Firma Adı</label><div class="iw"><input type="text" id="cust-name" placeholder="ROTOVİZYON AMBALAJ GIDA..."></div></div>
+          <div class="fg"><label>Adres</label><div class="iw"><input type="text" id="cust-addr" placeholder="Fevzi Çakmak Mah. Aslım Cad. No:A4"></div></div>
+          <div class="fg"><label>İl / İlçe</label><div class="iw"><input type="text" id="cust-city" placeholder="Konya / Karatay"></div></div>
+        </div>
+        <div>
+          <div class="fg"><label>Vergi Dairesi</label><div class="iw"><input type="text" id="cust-vd" placeholder="SELÇUK"></div></div>
+          <div class="fg"><label>Vergi No</label><div class="iw"><input type="text" id="cust-vno" placeholder="7350832435"></div></div>
+          <div class="fg"><label>KDV Oranı (%)</label><div class="iw hr"><input type="number" id="cust-kdv" value="20" step="1"><span class="ur">%</span></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AKSIYON BUTONLARI -->
+    <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;flex-wrap:wrap">
+      <button class="btn btn-out" onclick="exportFullPDF()">📄 PDF Teklif İndir</button>
+      <button class="btn btn-out" onclick="saveToHistory()">💾 Geçmişe Kaydet</button>
+      <button class="btn btn-out btn-sm" onclick="goStep('product')">🔄 Yeni Hesaplama</button>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:10px;max-width:300px;margin:10px auto">
+    <button class="btn btn-out btn-sm" onclick="goStep('converting')">← Konverting</button>
+  </div>
+</div>
+
+<!-- ═══════════════ GEÇMİŞ ═══════════════ -->
+<div class="cd" style="margin-top:20px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h2 style="margin:0"><span class="ic" style="background:var(--border)">📋</span> Son Hesaplamalar</h2>
+    <button class="btn btn-danger btn-sm" onclick="clearHist()">Temizle</button>
+  </div>
+  <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px" id="hist-scroll">
+    <div id="hist-empty" style="text-align:center;padding:20px;width:100%;color:var(--t3);font-size:.85rem">Henüz kayıt yok</div>
+  </div>
+</div>
+
+</div><!-- /app -->
+
+<!-- LIVE CHAIN BAR -->
+<div class="chain-bar" id="chainBar">
+  <div class="cb-item" id="cb-adet"><div class="cb-label">Adet</div><div class="cb-val" id="cv-adet">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-repeat"><div class="cb-label">Repeat</div><div class="cb-val" id="cv-repeat">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-up"><div class="cb-label">Up</div><div class="cb-val" id="cv-up">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-metraj"><div class="cb-label">Metraj</div><div class="cb-val cv-accent" id="cv-metraj">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-gsm"><div class="cb-label">GSM</div><div class="cb-val" id="cv-gsm">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-gramaj"><div class="cb-label">Gramaj</div><div class="cb-val" id="cv-gramaj">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-netkg"><div class="cb-label">Net KG</div><div class="cb-val" id="cv-netkg">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-grosskg"><div class="cb-label">Fire KG</div><div class="cb-val cv-orange" id="cv-grosskg">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-total"><div class="cb-label">Toplam €</div><div class="cb-val cv-accent" id="cv-total">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-eurkg"><div class="cb-label">€/kg</div><div class="cb-val" id="cv-eurkg">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-eurpc"><div class="cb-label">€/adet</div><div class="cb-val" id="cv-eurpc">—</div></div>
+</div>
 
 <script>
-const V=id=>parseFloat(document.getElementById(id).value)||0;
-const S=(id,v)=>{if(v!=null)document.getElementById(id).value=v};
-const T=(id,v)=>document.getElementById(id).textContent=v;
-const f2=n=>n.toFixed(2);
-const fE=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR';
-const fD=n=>'$'+n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
-const fT=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TL';
-function toast(m,e){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(e?' err':'');setTimeout(()=>t.className='toast',3500)}
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  ESNEK AMBALAJ ÜRETİM MALİYET SİSTEMİ — HESAP MOTORU      ║
+// ║  Tüm değişkenler birbirine bağlı, tek merkezi RECALC()     ║
+// ╚══════════════════════════════════════════════════════════════╝
 
-// ===== DÖVİZ KURU =====
-let rates={EUR_TRY:0,USD_TRY:0,EUR_USD:0};
-let ratesLoaded=false;
+// ═══════════ STATE ═══════════
+const S = {
+  pkgType: 'doypack',
+  printType: 'roto',
+  layers: [],
+  layerCounter: 0
+};
 
-async function fetchRates(){
-  try{
-    const [r1,r2]=await Promise.all([
-      fetch('https://api.frankfurter.dev/v1/latest?from=EUR&to=TRY,USD').then(r=>r.json()),
-      fetch('https://api.frankfurter.dev/v1/latest?from=USD&to=TRY').then(r=>r.json())
-    ]);
-    rates.EUR_TRY=r1.rates.TRY;
-    rates.EUR_USD=r1.rates.USD;
-    rates.USD_TRY=r2.rates.TRY;
-    ratesLoaded=true;
+// Global sonuç nesnesi — PDF export ve history tarafından kullanılır
+let R = {};
 
-    T('kur_eurtry',rates.EUR_TRY.toFixed(4));
-    T('kur_usdtry',rates.USD_TRY.toFixed(4));
-    T('kur_eurusd',rates.EUR_USD.toFixed(4));
+const FILMS = {
+  'PET':      { density: 1.39, micron: 12 },
+  'METPET':   { density: 1.40, micron: 12 },
+  'BOPP':     { density: 0.91, micron: 20 },
+  'MET BOPP': { density: 0.92, micron: 20 },
+  'OPP':      { density: 0.91, micron: 20 },
+  'PE':       { density: 0.92, micron: 70 },
+  'LLDPE':    { density: 0.92, micron: 80 },
+  'CPP':      { density: 0.90, micron: 30 },
+  'Naylon':   { density: 1.14, micron: 15 },
+  'Alu Folyo':{ density: 2.70, micron: 7 }
+};
 
-    const dot=document.getElementById('kurDot');
-    dot.classList.remove('off');dot.classList.add('live');
-    const now=new Date();
-    T('kurTime','Canlı — '+r1.date+' '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'));
+const HIST_KEY = 'ambalaj-uretim-gecmis';
+const PKG_NAMES = { doypack: 'Doypack', flatbottom: 'Flat Bottom', '3sideseal': '3 Kenar Kaynak', rollstock: 'Bobin (Rollstock)' };
+const euro = (v, d=2) => '€' + v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+const num = (v, d=2) => v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+function pf(id) { return parseFloat(document.getElementById(id)?.value) || 0; }
+function $(id) { return document.getElementById(id); }
+function tx(id, v) { const el = $(id); if (el) el.textContent = v; }
 
-    // Recalculate TL values
-    updateTL();
-    toast('Döviz kurları güncellendi: 1 EUR = '+rates.EUR_TRY.toFixed(2)+' TL');
-  }catch(e){
-    console.error('Kur hatası:',e);
-    T('kurTime','Kur alınamadı');
-    document.getElementById('kurDot').classList.add('off');
-  }
+// ═══════════ NAVIGATION ═══════════
+function goStep(step) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  $('p-' + step).classList.add('active');
+  document.querySelectorAll('.step-btn').forEach(b => {
+    b.classList.remove('active');
+    if (b.dataset.step === step) b.classList.add('active');
+  });
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  RECALC();
 }
-
-function eur2tl(eur){return ratesLoaded?eur*rates.EUR_TRY:0}
-function usd2tl(usd){return ratesLoaded?usd*rates.USD_TRY:0}
-function fTL(n){return ratesLoaded?'≈ ₺'+n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}):''}
-
-function updateTL(){
-  if(!ratesLoaded)return;
-  // Baskı: Gerçek Fiyat EUR → TL
-  const gfEl=document.getElementById('o_gf');
-  const gfVal=parseFloat(gfEl.textContent)||0;
-  T('o_gf_tl','₺'+eur2tl(gfVal).toFixed(2));
-  // Son Toplam EUR → TL
-  const stEl=document.getElementById('o_st');
-  const stText=stEl.textContent.replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');
-  const stVal=parseFloat(stText)||0;
-  T('o_st_tl',fTL(eur2tl(stVal)));
-  // Son KG EUR → TL
-  const kg2El=document.getElementById('o_kg2');
-  const kg2Val=parseFloat(kg2El.textContent)||0;
-  T('o_kg2_tl',fTL(eur2tl(kg2Val)));
-  // Laminasyon: Grand Total USD → TL
-  const lgEl=document.getElementById('lo_grand');
-  const lgText=lgEl.textContent.replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');
-  const lgVal=parseFloat(lgText)||0;
-  T('lo_grand_tl',fTL(usd2tl(lgVal)));
-  // Laminasyon: per kg USD → TL
-  const lpEl=document.getElementById('lo_perKg');
-  const lpVal=parseFloat(lpEl.textContent)||0;
-  T('lo_perKg_tl',fTL(usd2tl(lpVal)));
-}
-
-// ===== TABS =====
-document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
-  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
-  document.querySelectorAll('.tp').forEach(x=>x.classList.remove('active'));
-  t.classList.add('active');
-  document.getElementById('p-'+t.dataset.t).classList.add('active');
+document.querySelectorAll('.step-btn').forEach(b => {
+  b.addEventListener('click', () => goStep(b.dataset.step));
 });
 
-// ===== MATERIALS DB =====
-const MATS=[
-  {n:'PET',d:1.40,mic:12},{n:'OPP / BOPP',d:0.91,mic:20},{n:'Metalize PET',d:1.40,mic:12},
-  {n:'Metalize OPP',d:0.91,mic:20},{n:'CPP Natural',d:0.91,mic:25},{n:'Metalize CPP',d:0.91,mic:25},
-  {n:'LD / LDPE',d:0.92,mic:50},{n:'Nylon (PA)',d:1.16,mic:15},{n:'Al Foil',d:2.71,mic:7},
-  {n:'BOPP Mat',d:0.91,mic:20},{n:'PVC',d:1.45,mic:25},{n:'Pearlized OPP',d:0.90,mic:20},
-  {n:'Milky OPP',d:0.91,mic:20},{n:'Yok',d:0,mic:0}
-];
-const DEF_RATES={'PET':2.5,'OPP / BOPP':1.8,'Metalize PET':3.0,'Metalize OPP':2.2,'CPP Natural':1.6,'Metalize CPP':2.0,'LD / LDPE':1.5,'Nylon (PA)':4.0,'Al Foil':5.0,'BOPP Mat':2.0,'PVC':1.8,'Pearlized OPP':2.2,'Milky OPP':1.9,'Yok':0};
-const LAYER_COLORS=['#3b82f6','#f59e0b','#8b5cf6','#22c55e'];
-const LAYER_DEFAULTS=[{mat:'PET',mic:12},{mat:'CPP Natural',mic:25},{mat:'Yok',mic:0},{mat:'Yok',mic:0}];
-
-// ===== COLORS =====
-const COLORS=[
-  {name:'Beyaz',rate:.08,bp:61.5,on:true,dot:'#fff'},{name:'Beyaz',rate:.08,bp:61.5,on:false,dot:'#ddd'},
-  {name:'Siyah',rate:.02,bp:61.5,on:true,dot:'#333'},{name:'Siyah',rate:.02,bp:61.5,on:false,dot:'#555'},
-  {name:'Sarı',rate:.04,bp:61.5,on:true,dot:'#facc15'},{name:'Mavi',rate:.04,bp:61.5,on:true,dot:'#3b82f6'},
-  {name:'Magenta',rate:.04,bp:61.5,on:true,dot:'#ec4899'},{name:'Turuncu',rate:.04,bp:61.5,on:false,dot:'#f97316'},
-  {name:'Yeşil',rate:.04,bp:61.5,on:false,dot:'#22c55e'},{name:'Mor',rate:.04,bp:61.5,on:false,dot:'#8b5cf6'}
-];
-let colors=JSON.parse(JSON.stringify(COLORS));
-function renderClr(){
-  const g=document.getElementById('clrG');g.innerHTML='';let tot=0;
-  colors.forEach((c,i)=>{if(c.on)tot+=c.rate*c.bp;const d=document.createElement('div');d.className='ci'+(c.on?' on':'');d.innerHTML=`<div class="cdot" style="background:${c.dot}"></div><span class="cn">${c.name}</span><span class="cr">${c.rate}</span><span class="cc">${c.on?f2(c.rate*c.bp):'-'}</span>`;d.onclick=()=>{colors[i].on=!colors[i].on;renderClr();calcB()};g.appendChild(d)});
-  document.getElementById('clrLbl').textContent='Toplam: '+f2(tot)+' EUR';
+// ═══════════ PKG TYPE ═══════════
+function selectPkg(el) {
+  document.querySelectorAll('#pkgType .pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+  S.pkgType = el.dataset.type;
+  $('gusset-group').style.display = (S.pkgType === 'rollstock') ? 'none' : 'block';
+  RECALC();
 }
 
-// ===== BASKI =====
-function calcB(){
-  const fe=V('b_filmEni'),fo=V('b_fotocel'),te=V('b_tablaEn'),tb=V('b_tablaBoy'),fe2=V('b_filmEni2');
-  const bf=V('b_bf'),ig=V('b_ig'),gb=V('b_gb'),so=V('b_so'),bg=V('b_bg'),kc=V('b_kc');
-  const sm=V('b_siparis'),hz=V('b_hazirlik'),cs=V('b_coldSeal'),kf=V('b_kenarFire')/100;
-  const eA=fe>0?Math.floor(te/fe):0,bA=fo>0?Math.floor(tb/fo):0,tA=eA*bA;
-  T('o_enA',eA);T('o_boA',bA);T('o_topA',tA);T('o_topAl',f2(tA*fe*fo/1e6)+' m²');
-  let cs_=0;colors.forEach(c=>{if(c.on)cs_+=c.rate*c.bp});
-  const klik=cs_*kc,klikF=tb>0?((tb-fo)/tb)*klik:0,topK=klik+klikF;
-  T('o_klik',f2(klik));T('o_klikF',f2(klikF));T('o_topK',f2(topK));
-  const tM1=bf+topK,igM=ig*gb,pay=ig+bg,tM2=pay>0?((bg*tM1)+igM)/pay:0;
-  const malO=tA*te*tb/1e6,gF=malO>0?(tM2/malO)*so:0;
-  T('o_bk',f2(tM1));T('o_igm',f2(igM));T('o_bm',f2(tM2));T('o_mo',malO.toFixed(5));T('o_gf',f2(gF));
-  const tT=gF*sm,kfT=(tT+hz)*kf,fd=tT+hz+kfT,nh=tT+hz+cs,kg1=sm>0?fd/sm:0;
-  T('o_tt',fE(tT));T('o_hz',fE(hz));T('o_kft',fE(kfT));T('o_cst',fE(cs));T('o_fd',fE(fd));T('o_kg1',f2(kg1)+' EUR');
-  const gkf=fe2>0?(fe2-fe)/fe2:0,fEx=fd*gkf,st=fd+fEx,kg2=sm>0?st/sm:0;
-  T('o_gkf',(gkf*100).toFixed(2)+'%');T('o_ft',fE(fEx));T('o_nh',fE(nh));T('o_st',fE(st));T('o_kg2',f2(kg2)+' EUR');
-  document.getElementById('o_gkfW').classList.toggle('danger',gkf>.15);
-  const q=document.getElementById('bQty');q.innerHTML='';
-  [100,200,300,500,1000].forEach(n=>{const tt=gF*n,k=(tt+hz)*kf,d=tt+hz+k,e=d*gkf,s=d+e;const kgP=n>0?s/n:0;q.innerHTML+=`<div class="out"><span class="ol">${n} kg</span><span class="ov">${f2(kgP)} EUR${ratesLoaded?' <span class=tl-eq>'+fTL(eur2tl(kgP))+'</span>':''}</span></div>`});
-  updateTL();
+// ═══════════ PRINT TYPE ═══════════
+function setPrintType(el) {
+  document.querySelectorAll('#printTypeToggle .tgl').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  S.printType = el.dataset.val;
+  $('roto-fields').style.display = S.printType === 'roto' ? 'block' : 'none';
+  $('digital-fields').style.display = S.printType === 'digital' ? 'block' : 'none';
+  RECALC();
 }
 
-// ===== LAMİNASYON =====
-function buildLayers(){
-  const c=document.getElementById('layerCards');c.innerHTML='';
-  for(let i=0;i<4;i++){
-    const def=LAYER_DEFAULTS[i];const col=LAYER_COLORS[i];
-    let opts=MATS.map(m=>`<option value="${m.n}" ${m.n===def.mat?'selected':''}>${m.n} (${m.d})</option>`).join('');
-    c.innerHTML+=`<div class="layer-card"><div class="lc-title"><div class="dot" style="background:${col}"></div>${i+1}. Kat ${i===0?'(Dış)':i===3?'(İç)':''}</div>
-    <div class="fg c4"><div class="fi"><label>Malzeme</label><select id="l${i}_mat" onchange="onLayerMat(${i})">${opts}</select></div>
-    <div class="fi hr"><label>Mikron</label><div class="iw"><input type="number" id="l${i}_mic" value="${def.mic}" step="1"><span class="ur">µ</span></div></div>
-    <div class="fi hr"><label>Fiyat</label><div class="iw"><input type="number" id="l${i}_rate" value="${DEF_RATES[def.mat]||0}" step="0.01"><span class="ur">$/kg</span></div></div></div>
-    <div class="og c4" style="margin-top:.4rem"><div class="out"><span class="ol">GSM</span><span class="ov" id="lo${i}_gsm">-</span></div><div class="out"><span class="ol">Gerekli (kg)</span><span class="ov" id="lo${i}_kg">-</span></div><div class="out"><span class="ol">Gerekli (m)</span><span class="ov" id="lo${i}_m">-</span></div><div class="out"><span class="ol">Maliyet</span><span class="ov" id="lo${i}_cost">-</span></div></div></div>`;
+// ═══════════ LAYERS ═══════════
+function addLayer(filmName, micron, rate) {
+  S.layerCounter++;
+  const id = S.layerCounter;
+  const film = filmName || '';
+  const m = micron || '';
+  const r = rate || '';
+  const dens = film && FILMS[film] ? FILMS[film].density : '';
+
+  const div = document.createElement('div');
+  div.className = 'layer';
+  div.id = 'layer-' + id;
+  div.innerHTML = `
+    <div class="lt"><span class="ln">${id}</span> Katman ${id}</div>
+    <button class="del-layer" onclick="removeLayer(${id})">✕</button>
+    <div class="g4">
+      <div class="fg">
+        <label>Malzeme</label>
+        <div class="iw"><select onchange="onLayerFilm(${id},this)">
+          <option value="">Seçiniz</option>
+          ${Object.keys(FILMS).map(f => `<option value="${f}" ${f===film?'selected':''}>${f}</option>`).join('')}
+        </select></div>
+      </div>
+      <div class="fg">
+        <label>Mikron</label>
+        <div class="iw hr"><input type="number" id="ly-mic-${id}" step="0.5" value="${m}"><span class="ur">μ</span></div>
+      </div>
+      <div class="fg">
+        <label>Yoğunluk</label>
+        <div class="iw hr"><input type="number" id="ly-den-${id}" step="0.01" value="${dens}"><span class="ur">g/cc</span></div>
+      </div>
+      <div class="fg">
+        <label>Fiyat / KG</label>
+        <div class="iw hl"><span class="ul">€</span><input type="number" id="ly-rate-${id}" step="0.01" value="${r}"></div>
+      </div>
+    </div>`;
+  $('layers-container').appendChild(div);
+  S.layers.push(id);
+  bindInputs(); // yeni inputları da dinle
+  RECALC();
+}
+
+function removeLayer(id) {
+  const el = $('layer-' + id);
+  if (el) el.remove();
+  S.layers = S.layers.filter(l => l !== id);
+  RECALC();
+}
+
+function onLayerFilm(id, sel) {
+  const f = FILMS[sel.value];
+  if (f) {
+    $('ly-mic-' + id).value = f.micron;
+    $('ly-den-' + id).value = f.density;
+  }
+  RECALC();
+}
+
+function initLayers() {
+  addLayer('PET', 12, 3.20);
+  addLayer('METPET', 12, 4.50);
+  addLayer('PE', 80, 2.10);
+}
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║           M E R K E Z İ   H E S A P   M O T O R U          ║
+// ║                                                              ║
+// ║  Adet → Repeat → Up → METRAJ → Alan → GSM → Gramaj →       ║
+// ║  → Net KG → Fire KG → MALİYET → Birim Fiyatlar             ║
+// ║                                                              ║
+// ║  Her input değişikliğinde bu fonksiyon çağrılır.             ║
+// ║  Hiçbir hesap bağımsız çalışmaz.                            ║
+// ╚══════════════════════════════════════════════════════════════╝
+function RECALC() {
+  // ═══ 0. MAKİNE FİYATLARINI HESAPLA ═══
+  calcMachineRates();
+
+  // ═══ 1. GİRDİLER ═══
+  const qty     = pf('order-qty');
+  const repeat  = pf('print-repeat');
+  const webw    = pf('print-webw');
+  const up      = pf('print-up') || 1;
+  const w       = pf('dim-w');
+  const h       = pf('dim-h');
+  const g       = pf('dim-g') || 0;
+  const waste   = pf('waste-pct') || 0;
+
+  // ═══ 2. KATMAN VERİLERİ & GSM ZİNCİRİ ═══
+  const layers = [];
+  for (const id of S.layers) {
+    const mic = pf('ly-mic-' + id);
+    const den = pf('ly-den-' + id);
+    const rate = pf('ly-rate-' + id);
+    const sel = document.querySelector('#layer-' + id + ' select');
+    const film = sel ? sel.value : '';
+    if (mic && den) {
+      layers.push({ id, film, micron: mic, density: den, rate: rate || 0, gsm: mic * den });
+    }
+  }
+
+  let totalGSM = layers.reduce((s, l) => s + l.gsm, 0);
+  const adhGsm = pf('mat-adhGsm') || 0;
+  const adhRate = pf('mat-adhRate') || 0;
+  const bonds = Math.max(0, layers.length - 1);
+  const totalAdhGsm = adhGsm * bonds;
+  totalGSM += totalAdhGsm;
+  const lakGsm = pf('mat-lakGsm') || 0;
+  const lakRate = pf('mat-lakRate') || 0;
+  totalGSM += lakGsm;
+
+  // ═══ 3. ALAN HESABI (körük dahil) ═══
+  // Her poşet tipi için gerçek film kesim alanı (m²)
+  //
+  // DOYPACK (dip körüklü):
+  //   Ön yüz    = W × H
+  //   Arka yüz  = W × H
+  //   Dip körük  = W × G  (alt katlama)
+  //   TOPLAM    = W×H×2 + W×G
+  //
+  // FLAT BOTTOM (4 taraflı körük + alt panel):
+  //   Ön yüz    = W × H
+  //   Arka yüz  = W × H
+  //   Yan körük  = G × H × 2 (sol+sağ)
+  //   Alt panel  = W × G
+  //   TOPLAM    = W×H×2 + G×H×2 + W×G
+  //
+  // 3 KENAR KAYNAK (körüklü veya körüksüz):
+  //   Ön yüz    = W × H
+  //   Arka yüz  = W × H
+  //   Yan körük  = G × H × 2 (varsa)
+  //   TOPLAM    = W×H×2 + G×H×2
+  //
+  // BOBİN (tek yüzey):
+  //   TOPLAM    = W × H
+  //
+  let area = 0; // m²
+  if (w > 0 && h > 0) {
+    switch (S.pkgType) {
+      case 'doypack':
+        area = (w * h * 2 + w * g) / 1e6;
+        break;
+      case 'flatbottom':
+        area = (w * h * 2 + g * h * 2 + w * g) / 1e6;
+        break;
+      case '3sideseal':
+        area = (w * h * 2 + g * h * 2) / 1e6;
+        break;
+      case 'rollstock':
+        area = (w * h) / 1e6;
+        break;
+      default:
+        area = (w * h * 2) / 1e6;
+    }
+  }
+
+  // ═══ 4. METRAJ (SİSTEMİN KALBİ) ═══
+  //    Metre = (Adet × Repeat_mm / 1000) / Up
+  const metraj = (qty > 0 && repeat > 0 && up > 0) ? (qty * repeat / 1000) / up : 0;
+  const metrajFire = metraj * (1 + waste / 100);
+
+  // ═══ 5. GRAMAJ & KG ZİNCİRİ ═══
+  const pktGram = area * totalGSM;          // gram/adet
+  const pcsPerKg = pktGram > 0 ? 1000 / pktGram : 0;
+  const netKg = (qty * pktGram) / 1000;
+  const grossKg = netKg * (1 + waste / 100);
+  const fireKg = grossKg - netKg;
+
+  // ═══ 6. HAMMADDE MALİYETİ (kg bazlı) ═══
+  const totalAreaGross = area * qty * (1 + waste / 100);
+  let rawMatCost = 0;
+  layers.forEach(l => {
+    rawMatCost += (l.gsm / 1000) * totalAreaGross * l.rate;
+  });
+  rawMatCost += (totalAdhGsm / 1000) * totalAreaGross * adhRate;
+  if (lakGsm > 0) rawMatCost += (lakGsm / 1000) * totalAreaGross * lakRate;
+
+  // ═══ 7. BASKI MALİYETİ (metre/m² bazlı) ═══
+  const coverage = pf('ink-coverage') || 0;
+  const laydown = pf('ink-laydown') || 0;
+  const inkRate = pf('ink-rate') || 0;
+  const printAreaM2 = metraj * (webw / 1000);
+  const inkKg = (printAreaM2 * (coverage / 100) * laydown) / 1000;
+  const inkCost = inkKg * inkRate;
+
+  let cylCost = 0, printLabor = 0;
+  // Makine fiyatı bazlı baskı maliyeti (metraj × €/mt)
+  const rates = S.rates || {};
+  const printRatePerMt = S.printType === 'roto' ? (rates.gPerMt || 0) : (rates.dPerMt || 0);
+  const printMachineCost = metrajFire * printRatePerMt;
+
+  if (S.printType === 'roto') {
+    const colors = pf('roto-colors') || 0;
+    cylCost = colors * (pf('roto-cylPrice') || 0);
+    printLabor = grossKg * (pf('roto-laborKg') || 0) + printMachineCost;
+  } else {
+    const dcm2 = pf('digi-costM2') || 0;
+    const dckg = pf('digi-costKg') || 0;
+    printLabor = (dckg > 0 ? grossKg * dckg : printAreaM2 * dcm2) + printMachineCost;
+  }
+  const totalPrintCost = inkCost + cylCost + printLabor;
+
+  // ═══ 8. LAMİNASYON MALİYETİ (kg + makine fiyatı bazlı) ═══
+  const lamManual = grossKg * (pf('lam-laborKg') || 0);
+  const lamMachine = metrajFire * (rates.lPerMt || 0);
+  const lamAdhExtra = grossKg * (rates.lamAdhesive || 0);
+  const lamCost = lamManual + lamMachine + lamAdhExtra;
+
+  // ═══ 9. KONVERTİNG MALİYETİ (kg + adet + makine bazlı) ═══
+  const convLabor   = grossKg * (pf('conv-laborKg') || 0);
+  const convMachinePer1000 = rates.cPer1000 || 0;
+  const convMachineFromRate = (qty / 1000) * convMachinePer1000;
+  const convMachine = (qty / 1000) * (pf('conv-machineK') || 0) + convMachineFromRate;
+  const convZipper  = qty * (pf('conv-zipper') || 0);
+  const convValve   = qty * (pf('conv-valve') || 0);
+  const convSpout   = qty * (pf('conv-spout') || 0);
+  const convOther   = qty * (pf('conv-other') || 0);
+  const totalConvCost = convLabor + convMachine + convZipper + convValve + convSpout + convOther;
+
+  // ═══ 10. KESİM (SLITTING) MALİYETİ ═══
+  const slitCost = metrajFire * (rates.sPerMt || 0);
+
+  // ═══ 11. TOPLAM MALİYET + OVERHEAD + KÂR MARJI ═══
+  const baseCost = rawMatCost + totalPrintCost + lamCost + totalConvCost + slitCost;
+  const overheadPct = rates.overhead || 0;
+  const profitPct = rates.profitMargin || 0;
+  const overheadAmount = baseCost * (overheadPct / 100);
+  const costWithOverhead = baseCost + overheadAmount;
+  const profitAmount = costWithOverhead * (profitPct / 100);
+  const totalCost = costWithOverhead + profitAmount;
+  const eurKg = grossKg > 0 ? totalCost / grossKg : 0;
+  const eurPc = qty > 0 ? totalCost / qty : 0;
+  const eurK = eurPc * 1000;
+
+  // ═══ GLOBAL SONUÇ NESNESİ (PDF + History) ═══
+  R = {
+    qty, repeat, webw, up, w, h, g, waste, area, metraj, metrajFire,
+    totalGSM, pktGram, pcsPerKg, netKg, grossKg, fireKg,
+    layers, totalAdhGsm, adhRate, lakGsm, lakRate,
+    rawMatCost, inkKg, inkCost, cylCost, printLabor, totalPrintCost,
+    lamCost, slitCost, convLabor, convMachine, convZipper, convValve, convSpout, convOther, totalConvCost,
+    baseCost, overheadAmount, profitAmount,
+    totalCost, eurKg, eurPc, eurK,
+    layerStr: layers.map(l => `${l.micron}μ ${l.film}`).join(' / ')
+  };
+
+  // ╔════════════════════════════════════════╗
+  // ║    TÜM PANELLERİ GÜNCELLE (REAL-TIME) ║
+  // ╚════════════════════════════════════════╝
+
+  // ─── CHAIN BAR (Alt sabit çubuk) ───
+  const cb = (id, val, warn) => {
+    tx(id, val);
+    const item = $(id)?.parentElement;
+    if (item) { item.className = 'cb-item' + (warn ? ' cb-warn' : val !== '—' ? ' cb-ok' : ''); }
+  };
+  cb('cv-adet',    qty > 0 ? num(qty, 0) : '—', false);
+  cb('cv-repeat',  repeat > 0 ? repeat + 'mm' : '❗', !repeat);
+  cb('cv-up',      up > 0 ? up + '' : '❗', !up);
+  cb('cv-metraj',  metraj > 0 ? num(metraj, 0) + ' mt' : '—', metraj === 0 && qty > 0);
+  cb('cv-gsm',     totalGSM > 0 ? num(totalGSM, 1) : '—', totalGSM === 0);
+  cb('cv-gramaj',  pktGram > 0 ? num(pktGram, 2) + ' gr' : '—', false);
+  cb('cv-netkg',   netKg > 0 ? num(netKg, 1) + ' kg' : '—', false);
+  cb('cv-grosskg', grossKg > 0 ? num(grossKg, 1) + ' kg' : '—', false);
+  cb('cv-total',   totalCost > 0 ? euro(totalCost) : '—', false);
+  cb('cv-eurkg',   eurKg > 0 ? euro(eurKg) : '—', false);
+  cb('cv-eurpc',   eurPc > 0 ? euro(eurPc, 4) : '—', false);
+
+  // ─── PANEL 1: Ürün Tanımı — canlı göstergeler ───
+  tx('live-metraj', metraj > 0 ? num(metraj, 0) + ' mt' : '—');
+  tx('live-area', area > 0 ? num(area * 10000, 2) + ' cm²' : '—');
+  const moqEl = $('live-moq');
+  if (qty > 0) {
+    const minQty = S.printType === 'digital' ? 10000 : 100000;
+    const ok = qty >= minQty;
+    moqEl.textContent = ok ? '✓ OK' : ('⚠️ Min ' + num(minQty, 0));
+    moqEl.style.color = ok ? 'var(--green)' : (S.printType === 'digital' ? 'var(--red)' : 'var(--orange)');
+  } else { moqEl.textContent = '—'; moqEl.style.color = ''; }
+
+  // ─── PANEL 2: Malzeme Yapısı ───
+  if (layers.length > 0) {
+    $('mat-summary-empty').style.display = 'none';
+    $('mat-summary').style.display = 'block';
+    const tbody = document.querySelector('#mat-table tbody');
+    tbody.innerHTML = '';
+    layers.forEach((l, i) => {
+      tbody.innerHTML += `<tr><td>${i + 1}</td><td>${l.film || '—'}</td><td>${l.micron}μ</td><td class="right">${l.gsm.toFixed(2)}</td><td class="right">${l.rate > 0 ? euro(l.rate) : '—'}</td></tr>`;
+    });
+    if (totalAdhGsm > 0) tbody.innerHTML += `<tr><td>—</td><td>Yapıştırıcı (×${bonds})</td><td>—</td><td class="right">${totalAdhGsm.toFixed(2)}</td><td class="right">${euro(adhRate)}</td></tr>`;
+    if (lakGsm > 0) tbody.innerHTML += `<tr><td>—</td><td>Lak</td><td>—</td><td class="right">${lakGsm.toFixed(2)}</td><td class="right">${euro(lakRate)}</td></tr>`;
+    tbody.innerHTML += `<tr><td></td><td>TOPLAM</td><td></td><td class="right">${totalGSM.toFixed(2)}</td><td></td></tr>`;
+    tx('mat-totalGsm', totalGSM.toFixed(2) + ' g/m²');
+    tx('mat-pktGram', pktGram > 0 ? num(pktGram, 2) + ' gr' : '—');
+    tx('mat-netKg', netKg > 0 ? num(netKg, 1) + ' kg' : '—');
+    tx('mat-grossKg', grossKg > 0 ? num(grossKg, 1) + ' kg' : '—');
+  } else {
+    $('mat-summary-empty').style.display = 'block';
+    $('mat-summary').style.display = 'none';
+  }
+
+  // ─── PANEL 3: Baskı ───
+  if (grossKg > 0) {
+    $('print-summary-empty').style.display = 'none';
+    $('print-summary').style.display = 'block';
+    tx('ps-inkKg', num(inkKg, 2) + ' kg');
+    tx('ps-inkCost', euro(inkCost));
+    if (S.printType === 'roto') {
+      tx('ps-cylCost', euro(cylCost));
+      tx('ps-printLabor', euro(printLabor));
+    } else {
+      tx('ps-cylCost', '—');
+      tx('ps-printLabor', euro(printLabor));
+    }
+    tx('ps-lamCost', euro(lamCost));
+    tx('ps-total', euro(totalPrintCost + lamCost));
+  } else {
+    $('print-summary-empty').style.display = 'block';
+    $('print-summary').style.display = 'none';
+  }
+
+  // ─── PANEL 4: Konverting ───
+  if (grossKg > 0 && qty > 0) {
+    $('conv-summary').style.display = 'none';
+    $('conv-detail').style.display = 'block';
+    tx('cs-labor', euro(convLabor));
+    tx('cs-machine', euro(convMachine));
+    tx('cs-zipper', euro(convZipper));
+    tx('cs-valve', euro(convValve));
+    tx('cs-spout', euro(convSpout));
+    tx('cs-total', euro(totalConvCost));
+  }
+
+  // ─── PANEL 5: Özet ───
+  const errEl = $('summary-err');
+  const contentEl = $('summary-content');
+  const errors = [];
+  if (!w || !h) errors.push('Ölçüler eksik (genişlik/yükseklik)');
+  if (!qty) errors.push('Sipariş adedi girilmedi');
+  if (!repeat) errors.push('Baskı çevresi (repeat) girilmedi — hesaplama yapılamaz ❗');
+  if (!up) errors.push('Up sayısı girilmedi ❗');
+  if (!webw) errors.push('Baskı eni (web width) girilmedi');
+  if (layers.length === 0) errors.push('En az bir malzeme katmanı girilmeli');
+  if (totalGSM === 0) errors.push('GSM hesaplanamıyor — katman mikron/yoğunluk eksik ❗');
+  if (metraj === 0 && qty > 0) errors.push('Metraj = 0 — repeat veya up kontrol edin ❗');
+
+  if (errors.length > 0) {
+    errEl.style.display = 'block';
+    errEl.innerHTML = '⚠️ <strong>Kırılma noktaları:</strong><br>' + errors.map(e => '• ' + e).join('<br>');
+    contentEl.style.display = 'none';
+  } else {
+    errEl.style.display = 'none';
+    contentEl.style.display = 'block';
+
+    tx('s-totalCost', euro(totalCost));
+    tx('s-eurKg', euro(eurKg));
+    tx('s-eurPc', euro(eurPc, 4));
+    tx('s-eurK', euro(eurK));
+
+    $('s-techInfo').innerHTML = `<div class="rg">
+      <div class="ri"><div class="rl">Paket Tipi</div><div class="rv">${PKG_NAMES[S.pkgType]}</div></div>
+      <div class="ri"><div class="rl">Ölçü</div><div class="rv">${w}×${h}${g > 0 ? '+' + g : ''} mm</div></div>
+      <div class="ri"><div class="rl">Yapı</div><div class="rv" style="font-size:.85rem">${R.layerStr}</div></div>
+      <div class="ri"><div class="rl">Toplam GSM</div><div class="rv">${num(totalGSM, 2)} g/m²</div></div>
+      <div class="ri"><div class="rl">Repeat</div><div class="rv">${repeat} mm</div></div>
+      <div class="ri"><div class="rl">Web Width / Up</div><div class="rv">${webw} mm / ${up} up</div></div>
+    </div>`;
+
+    tx('s-metraj', num(metraj, 0) + ' mt');
+    tx('s-qty', num(qty, 0) + ' adet');
+    tx('s-netKg', num(netKg, 1) + ' kg');
+    tx('s-grossKg', num(grossKg, 1) + ' kg');
+    tx('s-pktGram', num(pktGram, 2) + ' gr');
+    tx('s-pcsKg', num(pcsPerKg, 0) + ' adet');
+    tx('s-printType', S.printType === 'roto' ? 'Rotogravür' : 'Dijital');
+    tx('s-leadtime', S.printType === 'roto' ? '20 – 30 gün' : '7 – 10 gün');
+
+    // Cost breakdown bar + table
+    const costItems = [
+      { label: 'Hammadde', cost: rawMatCost, color: '#3b82f6' },
+      { label: 'Mürekkep', cost: inkCost, color: '#8b5cf6' },
+      { label: S.printType === 'roto' ? 'Silindir' : 'Dijital Baskı', cost: cylCost, color: '#06b6d4' },
+      { label: 'Baskı (işçilik+makine)', cost: printLabor, color: '#ec4899' },
+      { label: 'Laminasyon', cost: lamCost, color: '#f59e0b' },
+      { label: 'Kesim (Slitting)', cost: slitCost, color: '#14b8a6' },
+      { label: 'Konverting', cost: totalConvCost, color: '#22c55e' },
+      { label: 'Genel Gider (%' + overheadPct + ')', cost: overheadAmount, color: '#a855f7' },
+      { label: 'Kâr Marjı (%' + profitPct + ')', cost: profitAmount, color: '#f97316' }
+    ].filter(c => c.cost > 0);
+
+    const barEl = $('s-bar'), legEl = $('s-leg');
+    barEl.innerHTML = ''; legEl.innerHTML = '';
+    costItems.forEach(c => {
+      const pct = c.cost / totalCost * 100;
+      barEl.innerHTML += `<div class="bar-seg" style="width:${pct}%;background:${c.color}">${pct > 6 ? pct.toFixed(0) + '%' : ''}</div>`;
+      legEl.innerHTML += `<div class="leg-i"><div class="leg-d" style="background:${c.color}"></div>${c.label}</div>`;
+    });
+
+    const ctbody = document.querySelector('#s-costTable tbody');
+    ctbody.innerHTML = '';
+    costItems.forEach(c => { ctbody.innerHTML += `<tr><td>${c.label}</td><td class="right">${euro(c.cost)}</td><td class="right">${(c.cost / totalCost * 100).toFixed(1)}%</td></tr>`; });
+    ctbody.innerHTML += `<tr><td>TOPLAM</td><td class="right">${euro(totalCost)}</td><td class="right">100%</td></tr>`;
+
+    const utbody = document.querySelector('#s-unitTable tbody');
+    utbody.innerHTML = '';
+    [{l:'Hammadde',c:rawMatCost},{l:'Baskı (mürekkep+silindir+işçilik)',c:totalPrintCost},{l:'Laminasyon',c:lamCost},{l:'Kesim',c:slitCost},{l:'Konverting',c:totalConvCost},{l:'Genel Gider + Kâr',c:overheadAmount+profitAmount}].filter(u=>u.c>0).forEach(u => {
+      utbody.innerHTML += `<tr><td>${u.l}</td><td class="right">${euro(u.c / grossKg)}</td><td class="right">${euro(u.c / qty, 4)}</td></tr>`;
+    });
+    utbody.innerHTML += `<tr><td>TOPLAM</td><td class="right">${euro(eurKg)}</td><td class="right">${euro(eurPc, 4)}</td></tr>`;
   }
 }
-function onLayerMat(i){
-  const sel=document.getElementById('l'+i+'_mat').value;
-  const m=MATS.find(x=>x.n===sel);
-  if(m){S('l'+i+'_mic',m.mic);S('l'+i+'_rate',DEF_RATES[m.n]||0)}
-  calcL();
+
+// ═══════════ DEBOUNCED RECALC ═══════════
+let _recalcTimer = null;
+function scheduleRecalc() {
+  if (_recalcTimer) clearTimeout(_recalcTimer);
+  _recalcTimer = setTimeout(RECALC, 60);
 }
-function calcL(){
-  const qty=V('l_qty'),reel=V('l_reel'),waste=V('l_waste')/100;
-  const inkGsm=V('l_inkGsm'),inkR=V('l_inkRate'),adhGsm=V('l_adhGsm'),adhR=V('l_adhRate');
-  // Layer GSMs
-  let layerGsm=[],layerKg=[],layerCost=[],totalGsm=0;
-  for(let i=0;i<4;i++){
-    const sel=document.getElementById('l'+i+'_mat').value;
-    const m=MATS.find(x=>x.n===sel);
-    const mic=V('l'+i+'_mic');
-    const gsm=m?mic*m.d:0;
-    layerGsm[i]=gsm;
+
+// Müşteri formu ve arama kutusu RECALC tetiklememeli
+const EXCLUDED_IDS = new Set([
+  'cl-name','cl-contact','cl-phone','cl-email','cl-addr','cl-city','cl-country',
+  'cl-vd','cl-vno','cl-notes','cl-search',
+  'cust-name','cust-addr','cust-city','cust-vd','cust-vno'
+]);
+
+function bindInputs() {
+  document.querySelectorAll('input, select').forEach(el => {
+    if (el._bound) return;
+    el._bound = true;
+    if (EXCLUDED_IDS.has(el.id)) return; // müşteri alanları RECALC tetiklemez
+    el.addEventListener('input', scheduleRecalc);
+    el.addEventListener('change', scheduleRecalc);
+  });
+}
+
+// ═══════════ PDF EXPORT ═══════════
+function exportFullPDF() {
+  RECALC(); // son durumu garantile
+  // R nesnesinden tüm değerleri al (tek merkezi hesap)
+  const { qty, repeat, webw, up, w, h, g, waste, metraj, totalGSM: gsm,
+    pktGram, pcsPerKg, netKg, grossKg, layers, layerStr,
+    totalCost, eurKg, eurPc } = R;
+
+  // Customer info
+  const custName = ($('cust-name')?.value) || '—';
+  const custAddr = ($('cust-addr')?.value) || '—';
+  const custCity = ($('cust-city')?.value) || '—';
+  const custVd = ($('cust-vd')?.value) || '—';
+  const custVno = ($('cust-vno')?.value) || '—';
+  const kdvRate = pf('cust-kdv') || 20;
+
+  const now = new Date();
+  const dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
+  const dateShort = now.toLocaleDateString('tr-TR');
+  const refNo = 'EA-' + Date.now().toString(36).toUpperCase();
+
+  // layerStr zaten R'den geliyor, tekrar tanımlamaya gerek yok
+  const productDesc = `${PKG_NAMES[S.pkgType]} ${w}×${h}${g > 0 ? '+' + g : ''} mm\n${layerStr}\nToplam GSM: ${num(gsm,2)} | ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'} Baskı`;
+
+  // Build line items for teklif table
+  const items = [];
+  // Option 1: Single product line
+  items.push({
+    desc: `${PKG_NAMES[S.pkgType]} Ambalaj\n${w}×${h}${g > 0 ? '+' + g : ''} mm\nYapı: ${layerStr}`,
+    qty: num(qty, 0) + ' adet',
+    unitPrice: eurPc,
+    kdv: kdvRate,
+    total: totalCost
+  });
+
+  const araToplam = totalCost;
+  const kdvTutar = araToplam * (kdvRate / 100);
+  const brutToplam = araToplam;
+  const genelToplam = araToplam + kdvTutar;
+
+  const LOGO_B64 = 'data:image/png;base64,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';
+
+  const win = window.open('', '_blank');
+  win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Teklif - ${refNo}</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+@page{size:A4;margin:0}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min-height:297mm;margin:0 auto;position:relative;background:#fff}
+.page{padding:28px;position:relative;min-height:297mm}
+
+/* Header */
+.hdr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0}
+.logo{width:165px;height:auto}
+.teklif-title{font-size:36px;font-weight:900;color:#585858;letter-spacing:1px;text-transform:uppercase}
+
+/* Company / Customer columns */
+.info-row{display:flex;justify-content:space-between;margin-top:16px}
+.info-col{width:48%}
+.info-col.right{text-align:left}
+.company-name{font-size:9pt;font-weight:700;color:#444;margin-bottom:3px}
+.company-detail{font-size:9pt;color:#444;line-height:1.7}
+.company-detail.bold{font-weight:700}
+.section-label{font-size:9pt;font-weight:700;color:#444;margin-bottom:4px}
+.cust-line{font-size:9pt;color:#444;line-height:1.7}
+.divider{height:2.5px;background:#5e5e5e;margin:6px 0 10px}
+.divider-thin{height:0.75px;background:#aaa;margin:8px 0}
+
+/* Teklif tarihi */
+.date-row{display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:.75px solid #aaa}
+.date-row .lbl{font-size:9pt;font-weight:700;color:#444}
+.date-row .val{font-size:9pt;font-weight:700;color:#726869}
+
+/* Notlar bölümü */
+.notes-section{margin-top:10px;padding-top:8px;border-top:.75px solid #aaa}
+.note-title{font-size:9pt;font-weight:700;color:#444;margin-bottom:4px}
+.note-line{font-size:8pt;color:#555;line-height:1.8}
+
+/* Table */
+.tbl{width:100%;border-collapse:collapse;margin-top:16px}
+.tbl th{font-size:9pt;font-weight:700;padding:10px 6px;border-bottom:.75px solid #aaa;text-align:left}
+.tbl th.right{text-align:right}
+.tbl th:first-child{width:40%}
+.tbl td{font-size:8.5pt;padding:8px 6px;border-bottom:.5px solid #ddd;vertical-align:top}
+.tbl td.right{text-align:right}
+.tbl td.desc-cell{line-height:1.6}
+.tbl td.mono{font-family:'DM Sans',monospace;font-weight:500}
+.tbl .hdr-miktar{color:#726869}
+.tbl .hdr-fiyat{color:#726869}
+.tbl .hdr-kdv{color:#726869}
+
+/* Totals */
+.totals{margin-top:8px;display:flex;justify-content:flex-end}
+.totals-box{width:320px}
+.total-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid #eee;font-size:9pt}
+.total-row .t-label{font-weight:700;color:#726869}
+.total-row .t-val{font-weight:500;color:#444}
+.total-row.grand{border-bottom:none;border-top:1.5px solid #aaa;padding-top:10px}
+.total-row.grand .t-label{color:#444;font-weight:800}
+.total-row.grand .t-val{font-weight:800;color:#444;font-size:10pt}
+
+/* Tech specs box */
+.specs-box{margin-top:20px;padding:14px;border:1px solid #ddd;border-radius:8px;background:#fafafa}
+.specs-title{font-size:9pt;font-weight:700;color:#10b981;margin-bottom:8px}
+.specs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
+.spec-item{font-size:8pt;color:#555}
+.spec-item strong{color:#333}
+
+/* Footer */
+.footer{position:absolute;bottom:12px;left:28px;right:28px;display:flex;justify-content:space-between;font-size:7.5pt;color:#565656}
+
+@media print{
+  body{width:auto;margin:0}
+  .page{padding:28px}
+}
+</style></head><body>
+<div class="page">
+
+  <!-- HEADER -->
+  <div class="hdr-row">
+    <img src="${LOGO_B64}" class="logo" alt="Logo">
+    <div class="teklif-title">TEKLİF</div>
+  </div>
+
+  <!-- COMPANY + CUSTOMER -->
+  <div class="info-row">
+    <div class="info-col">
+      <div class="company-name">CVK PLASTİK AMBALAJ GIDA SANAYİ VE TİCARET LİMİTED ŞİRKETİ</div>
+      <div class="company-detail bold">Eyüp Sultan Mahallesi Sandalcı Sok. No:6 34885 Sancaktepe / İstanbul</div>
+      <br>
+      <div class="company-detail bold">İstanbul / Sancaktepe</div>
+      <br>
+      <div class="company-detail bold">VD: SULTANBEYLİ</div>
+      <div class="company-detail">2161102211</div>
+    </div>
+    <div class="info-col right">
+      <div class="divider"></div>
+      <div class="section-label">MÜŞTERİ</div>
+      <div class="cust-line">${custName}</div>
+      <div class="cust-line">${custAddr}</div>
+      <div class="cust-line">${custCity}</div>
+      <div class="cust-line">VD: ${custVd}</div>
+      <div class="cust-line">${custVno}</div>
+      <div class="divider-thin"></div>
+      <div class="date-row">
+        <span class="lbl">TEKLİF TARİHİ</span>
+        <span class="val">${dateStr}</span>
+      </div>
+      <div class="divider-thin"></div>
+      <div class="date-row">
+        <span class="lbl">TEKLİF NO</span>
+        <span class="val">${refNo}</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TABLE -->
+  <table class="tbl">
+    <thead>
+      <tr>
+        <th>Hizmet / Ürün</th>
+        <th class="right hdr-miktar">Miktar</th>
+        <th class="right hdr-fiyat">Br. Fiyat</th>
+        <th class="right hdr-kdv">KDV</th>
+        <th class="right">Toplam</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td class="desc-cell">
+          <strong>${PKG_NAMES[S.pkgType]} Ambalaj</strong><br>
+          Ölçü: ${w}×${h}${g > 0 ? '+' + g : ''} mm<br>
+          Yapı: ${layerStr}<br>
+          GSM: ${num(gsm, 2)} g/m² | ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'} Baskı
+        </td>
+        <td class="right mono">${num(qty, 0)} adet</td>
+        <td class="right mono">${eurPc.toFixed(4)} €</td>
+        <td class="right mono">%${kdvRate}</td>
+        <td class="right mono">${num(totalCost, 2)} €</td>
+      </tr>
+      <tr>
+        <td class="desc-cell" colspan="5" style="font-size:7.5pt;color:#888;border-bottom:none;padding-top:2px">
+          Metraj: ${num(metraj, 0)} mt | Net: ${num(netKg, 1)} kg | Fire dahil: ${num(grossKg, 1)} kg (%${waste}) | Birim: ${eurPc.toFixed(4)} €/adet — ${num(eurKg, 2)} €/kg
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- TOTALS -->
+  <div class="totals">
+    <div class="totals-box">
+      <div class="total-row">
+        <span class="t-label">ARA TOPLAM</span>
+        <span class="t-val mono">${num(araToplam, 2)} €</span>
+      </div>
+      <div class="total-row">
+        <span class="t-label">BRÜT TOPLAM</span>
+        <span class="t-val mono">${num(brutToplam, 2)} €</span>
+      </div>
+      <div class="total-row">
+        <span class="t-label">TOPLAM K.D.V (%${kdvRate})</span>
+        <span class="t-val mono">${num(kdvTutar, 2)} €</span>
+      </div>
+      <div class="total-row grand">
+        <span class="t-label">GENEL TOPLAM</span>
+        <span class="t-val mono">${num(genelToplam, 2)} €</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- TEKNIK DETAY -->
+  <div class="specs-box">
+    <div class="specs-title">Teknik Detaylar</div>
+    <div class="specs-grid">
+      <div class="spec-item"><strong>Paket Tipi:</strong> ${PKG_NAMES[S.pkgType]}</div>
+      <div class="spec-item"><strong>Ölçü:</strong> ${w}×${h}${g > 0 ? '+' + g : ''} mm</div>
+      <div class="spec-item"><strong>Yapı:</strong> ${layerStr}</div>
+      <div class="spec-item"><strong>Toplam GSM:</strong> ${num(gsm, 2)} g/m²</div>
+      <div class="spec-item"><strong>Baskı:</strong> ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'}</div>
+      <div class="spec-item"><strong>Repeat:</strong> ${repeat} mm</div>
+      <div class="spec-item"><strong>Web Width:</strong> ${webw} mm</div>
+      <div class="spec-item"><strong>Up Sayısı:</strong> ${up}</div>
+      <div class="spec-item"><strong>Toplam Metraj:</strong> ${num(metraj, 0)} mt</div>
+      <div class="spec-item"><strong>Net KG:</strong> ${num(netKg, 1)} kg</div>
+      <div class="spec-item"><strong>Fire Dahil KG:</strong> ${num(grossKg, 1)} kg</div>
+      <div class="spec-item"><strong>Paket Gramajı:</strong> ${num(pktGram, 2)} gr</div>
+      <div class="spec-item"><strong>Adet/KG:</strong> ${num(pcsPerKg, 0)}</div>
+      <div class="spec-item"><strong>€/KG:</strong> ${num(eurKg, 2)} €</div>
+      <div class="spec-item"><strong>€/1000 Adet:</strong> ${num(eurPc * 1000, 2)} €</div>
+    </div>
+  </div>
+
+  <!-- NOTLAR -->
+  <div class="notes-section">
+    <div class="note-title">Notlar</div>
+    <div class="note-line">• Fiyatlar ${kdvRate > 0 ? 'KDV hariç' : ''} Euro (€) bazlıdır.</div>
+    <div class="note-line">• Tahmini termin: ${S.printType === 'roto' ? '20 – 30 iş günü' : '7 – 10 iş günü'}</div>
+    <div class="note-line">• Teklif geçerlilik süresi: 15 gündür.</div>
+    <div class="note-line">• Fire oranı %${waste} olarak hesaplanmıştır.</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <span>${dateShort} tarihinde hazırlanmıştır.</span>
+    <span>SAYFA 1 / 1</span>
+  </div>
+
+</div>
+</body></html>`);
+  win.document.close();
+  setTimeout(() => win.print(), 600);
+}
+
+// ═══════════ HISTORY ═══════════
+function saveToHistory() {
+  if (!R.qty || !R.totalCost) { alert('Önce hesaplama yapın.'); return; }
+  let hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  hist.unshift({
+    id: 'h_' + Date.now(),
+    pkg: PKG_NAMES[S.pkgType],
+    size: `${R.w}×${R.h}`,
+    qty: num(R.qty, 0),
+    total: euro(R.totalCost),
+    eurKg: euro(R.eurKg),
+    date: new Date().toISOString()
+  });
+  if (hist.length > 15) hist = hist.slice(0, 15);
+  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
+  renderHist();
+  alert('Geçmişe kaydedildi.');
+}
+
+function renderHist() {
+  const hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  const el = $('hist-scroll');
+  if (!el) return;
+  if (hist.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;width:100%;color:var(--t3);font-size:.85rem">Henüz kayıt yok</div>';
+    return;
   }
-  // Adhesive GSM per join (between layers)
-  let adhGsmArr=[0,0,0,0];
-  for(let i=1;i<4;i++){if(layerGsm[i]>0)adhGsmArr[i]=adhGsm}
-  totalGsm=layerGsm.reduce((a,b)=>a+b,0)+inkGsm+adhGsmArr.reduce((a,b)=>a+b,0);
-  T('lo_tgsm',f2(totalGsm));
-  // Per layer
-  let matTotal=0;
-  for(let i=0;i<4;i++){
-    const gsm=layerGsm[i];
-    const kg=totalGsm>0?Math.round(gsm*qty/totalGsm):0;
-    const rate=V('l'+i+'_rate');
-    const cost=kg*rate;
-    const meter=reel>0&&gsm>0?Math.round(kg*1e6/(reel*gsm)):0;
-    layerKg[i]=kg;layerCost[i]=cost;matTotal+=cost;
-    T('lo'+i+'_gsm',f2(gsm));T('lo'+i+'_kg',kg);T('lo'+i+'_m',meter.toLocaleString('tr-TR'));T('lo'+i+'_cost',fD(cost));
+  el.innerHTML = hist.map(h => {
+    const d = new Date(h.date);
+    return `<div style="min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;flex-shrink:0;position:relative">
+      <button onclick="delHist('${h.id}')" style="position:absolute;top:6px;right:6px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.75rem;opacity:.5">✕</button>
+      <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${h.pkg || '—'}</div>
+      <div style="font-size:.75rem;color:var(--accent);margin-bottom:6px">${h.size || '—'} mm — ${h.qty || '—'} adet</div>
+      <div style="font-size:1.15rem;font-weight:700;color:var(--accent)">${h.total || '—'}</div>
+      <div style="font-size:.72rem;color:var(--t3);margin-top:4px">${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>
+    </div>`;
+  }).join('');
+}
+
+function delHist(id) {
+  let h = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  h = h.filter(x => x.id !== id);
+  localStorage.setItem(HIST_KEY, JSON.stringify(h));
+  renderHist();
+}
+
+function clearHist() {
+  if (confirm('Tüm geçmiş silinecek?')) {
+    localStorage.removeItem(HIST_KEY);
+    renderHist();
   }
-  // Ink
-  const inkDry=totalGsm>0?Math.round(inkGsm*qty/totalGsm):0;
-  const inkLiq=inkDry*4;
-  const inkCost=inkLiq*inkR;
-  T('lo_inkD',inkDry);T('lo_inkL',inkLiq);
-  // Adhesive
-  let adhTotalKg=0;
-  for(let i=1;i<4;i++){if(adhGsmArr[i]>0&&totalGsm>0)adhTotalKg+=Math.round(adhGsmArr[i]*qty/totalGsm)}
-  const adhCost=adhTotalKg*adhR;
-  T('lo_adhKg',adhTotalKg);
-  // Conversion
-  const convCost=qty*(V('l_printR')+V('l_lamR')+V('l_extraR'));
-  const grand=matTotal+inkCost+adhCost+convCost;
-  const perKg=qty>0?grand/qty:0;
-  const wGrand=grand*(1+waste);
-  const wPerKg=qty>0?wGrand/qty:0;
-  // Total meters (based on first layer)
-  const totalMeter=reel>0&&totalGsm>0?Math.round(qty*1e6/(reel*totalGsm)):0;
-  T('lo_matT',fD(matTotal));T('lo_inkT',fD(inkCost));T('lo_adhT',fD(adhCost));T('lo_convT',fD(convCost));
-  T('lo_grand',fD(grand));T('lo_perKg',f2(perKg)+' $/kg');
-  T('lo_wGrand',fD(wGrand));T('lo_wPerKg',f2(wPerKg)+' $/kg');T('lo_meter',totalMeter.toLocaleString('tr-TR')+' m');
-  updateTL();
 }
 
-// ===== POUCH =====
-function calcP(){
-  const w=V('p_w'),h=V('p_h'),g=V('p_g'),seal=V('p_seal');
-  const gsm=V('p_gsm'),rate=V('p_rate'),zipW=V('p_zip'),zipR=V('p_zipR');
-  const totalW=(w*2+g)+seal*2;
-  const totalH=h+seal*2;
-  const areaCm2=totalW*totalH/100; // mm² to cm²
-  const areaM2=totalW*totalH/1e6;
-  const wtG=areaM2*gsm*1000;
-  const zipG=zipW>0?(w/1000)*zipW:0;
-  const totalWtG=wtG+zipG;
-  const perKg=totalWtG>0?1000/totalWtG:0;
-  const matCost=totalWtG>0?(totalWtG/1000)*rate:0;
-  const zipCost=zipR>0?(w/1000)*zipR:0;
-  const unitCost=matCost+zipCost;
-  T('po_area',f2(areaCm2));T('po_wt',f2(totalWtG)+' gr');T('po_perKg',Math.floor(perKg));
-  T('po_matC',fD(matCost));T('po_zipC',fD(zipCost));T('po_unit',fD(unitCost));
-  T('po_1k',fD(unitCost*1000));T('po_10k',fD(unitCost*10000));T('po_100k',fD(unitCost*100000));
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  MAKİNE FİYATLARI — €/mt hesaplama ve RECALC entegrasyonu  ║
+// ╚══════════════════════════════════════════════════════════════╝
+const RATES_KEY = 'flexicost-rates';
+const RATES_PROFILES_KEY = 'flexicost-rate-profiles';
+
+function calcMachineRates() {
+  // Gravür: €/mt = saat_ücreti / (hız_mt_dk × 60)
+  const gSpeed = pf('rate-gravure-speed') || 1;
+  const gHourly = pf('rate-gravure-hourly') || 0;
+  const gPerMt = gHourly / (gSpeed * 60);
+  tx('rc-gravure', gPerMt.toFixed(4));
+
+  // Dijital: €/mt
+  const dSpeed = pf('rate-digital-speed') || 1;
+  const dHourly = pf('rate-digital-hourly') || 0;
+  const dPerMt = dHourly / (dSpeed * 60);
+  tx('rc-digital', dPerMt.toFixed(4));
+
+  // Laminasyon: €/mt
+  const lSpeed = pf('rate-lam-speed') || 1;
+  const lHourly = pf('rate-lam-hourly') || 0;
+  const lPerMt = lHourly / (lSpeed * 60);
+  tx('rc-lam', lPerMt.toFixed(4));
+
+  // Kesim: €/mt
+  const sSpeed = pf('rate-slit-speed') || 1;
+  const sHourly = pf('rate-slit-hourly') || 0;
+  const sPerMt = sHourly / (sSpeed * 60);
+  tx('rc-slit', sPerMt.toFixed(4));
+
+  // Konverting: €/1000 adet
+  const cSpeed = pf('rate-conv-speed') || 1;
+  const cHourly = pf('rate-conv-hourly') || 0;
+  const cPer1000 = (cHourly / (cSpeed * 60)) * 1000;
+  tx('rc-conv', cPer1000.toFixed(2));
+
+  // Store rates for RECALC to use
+  S.rates = { gPerMt, dPerMt, lPerMt, sPerMt, cPer1000,
+    overhead: pf('rate-overhead') || 0,
+    profitMargin: pf('rate-profit-margin') || 0,
+    lamAdhesive: pf('rate-lam-adhesive') || 0
+  };
+
+  // Save to localStorage
+  localStorage.setItem(RATES_KEY, JSON.stringify({
+    'rate-gravure-speed': pf('rate-gravure-speed'),
+    'rate-gravure-hourly': pf('rate-gravure-hourly'),
+    'rate-digital-speed': pf('rate-digital-speed'),
+    'rate-digital-hourly': pf('rate-digital-hourly'),
+    'rate-lam-speed': pf('rate-lam-speed'),
+    'rate-lam-hourly': pf('rate-lam-hourly'),
+    'rate-lam-adhesive': pf('rate-lam-adhesive'),
+    'rate-slit-speed': pf('rate-slit-speed'),
+    'rate-slit-hourly': pf('rate-slit-hourly'),
+    'rate-conv-speed': pf('rate-conv-speed'),
+    'rate-conv-hourly': pf('rate-conv-hourly'),
+    'rate-overhead': pf('rate-overhead'),
+    'rate-profit-margin': pf('rate-profit-margin')
+  }));
 }
 
-// ===== HAMMADDE =====
-let mats=[];let hSheets={};
-function defMats(){return [{u:'SOLID PAYET WAX',m:'LOXIOL G78',f:'YİMKA',kg:1.4,p:4.8},{u:'KAYDIRICI',m:'LOXIOL G32',f:'YİMKA',kg:1.4,p:3.1},{u:'POLİETİLEN WAX',m:'280-371',f:'polivinil',kg:0.4,p:3.5},{u:'ANTİOKSİDAN',m:'1076',f:'polivinil',kg:0,p:7},{u:'IMPACT MODIFIER',m:'2020',f:'POLİVİNİL',kg:15,p:2.9},{u:'STABİLİZER',m:'MARK 17 MOKD',f:'POLİVİNİL',kg:4.5,p:8},{u:'PVC K58',m:'PETKİM',f:'PETKİM',kg:187.5,p:0.9},{u:'PVC K67',m:'PETKİM',f:'PETKİM',kg:0,p:0.9},{u:'Toz boya',m:'',f:'ASİL KİMYA',kg:0.17,p:25},{u:'PA',m:'',f:'POLİVİNİL',kg:1,p:3.65},{u:'Mürekkep/navlun/işçilik',m:'',f:'',kg:1,p:175}]}
-function renderH(){
-  const tb=document.getElementById('hR');tb.innerHTML='';
-  mats.forEach((m,i)=>{const t=(m.kg||0)*(m.p||0);const tr=document.createElement('tr');tr.innerHTML=`<td><input value="${m.u||''}" onchange="mats[${i}].u=this.value"></td><td><input value="${m.m||''}" onchange="mats[${i}].m=this.value"></td><td><input value="${m.f||''}" onchange="mats[${i}].f=this.value"></td><td><input type="number" value="${m.kg}" step="0.01" oninput="mats[${i}].kg=parseFloat(this.value)||0;calcH()"></td><td><input type="number" value="${m.p}" step="0.01" oninput="mats[${i}].p=parseFloat(this.value)||0;calcH()"></td><td><div class="ro">${f2(t)}</div></td><td><button class="bdel" onclick="mats.splice(${i},1);renderH();calcH()">×</button></td>`;tb.appendChild(tr)});
-}
-function addMat(d){mats.push(d||{u:'',m:'',f:'',kg:0,p:0});renderH();calcH()}
-function calcH(){
-  let tkg=0,tmal=0;mats.forEach(m=>{tkg+=m.kg||0;tmal+=(m.kg||0)*(m.p||0)});
-  const bm=tkg>0?tmal/tkg:0,isc=bm*(V('h_isc')/100),fire=bm*(V('h_fire')/100),gen=bm+isc+fire;
-  T('ho_tkg',f2(tkg));T('ho_tmal',fT(tmal));T('ho_bm',f2(bm)+' TL');T('ho_isc',f2(isc)+' TL');T('ho_fire',f2(fire)+' TL');T('ho_gen',f2(gen));
-  renderH();
-}
-function selHS(n){document.querySelectorAll('#hSB .nav-btn').forEach(b=>b.style.borderColor=b.textContent===n?'var(--acc)':'');if(hSheets[n]){mats=JSON.parse(JSON.stringify(hSheets[n].m));S('h_isc',hSheets[n].i);S('h_fire',hSheets[n].f);renderH();calcH()}}
-
-// ===== ŞEFFAF =====
-function calcS(){
-  const bf=V('s_bf'),ig=V('s_ig'),gc=V('s_gc'),bg=V('s_bg'),so=V('s_so'),en=V('s_en'),boy=V('s_boy');
-  const igM=ig*gc,pay=bg+ig,tM=pay>0?((bf*bg)+igM)/pay:0,malO=en*boy/1e6,gF=malO>0?(tM/malO)*so:0;
-  T('so_igm',f2(igM)+' EUR');T('so_tm',f2(tM)+' EUR');T('so_mo',malO.toFixed(5));T('so_gf',f2(gF));
+function loadSavedRates() {
+  const saved = JSON.parse(localStorage.getItem(RATES_KEY) || 'null');
+  if (saved) {
+    Object.keys(saved).forEach(id => {
+      const el = $(id);
+      if (el) el.value = saved[id];
+    });
+  }
+  calcMachineRates();
 }
 
-// ===== EXCEL =====
-function handleFile(file){
-  const r=new FileReader();r.onload=function(e){
-    try{
-      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellFormula:true});let ld=[];
-      const rn=wb.SheetNames.find(s=>s.toLowerCase().includes('renkli'));
-      if(rn){const ws=wb.Sheets[rn];const c=r=>{const x=ws[r];return x?x.v:null};
-        [['b_filmEni','A2'],['b_fotocel','B2'],['b_tablaEn','J6'],['b_tablaBoy','K6'],['b_filmEni2','P2'],['b_bf','B16'],['b_ig','B18'],['b_so','B22'],['b_siparis','B25'],['b_hazirlik','B27'],['b_coldSeal','B28']].forEach(([id,ref])=>{const v=c(ref);if(v!=null&&typeof v==='number')S(id,v)});
-        const kfv=c('B29');if(kfv!=null&&typeof kfv==='number')S('b_kenarFire',(kfv*100).toFixed(2));
-        [9,10,11,12,13,16,17,18,19,20].forEach((row,i)=>{const nm=c('J'+row),rt=c('K'+row),bp=c('L'+row),ac=c('M'+row);if(nm!=null)colors[i].name=nm;if(rt!=null&&typeof rt==='number')colors[i].rate=rt;if(bp!=null&&typeof bp==='number')colors[i].bp=bp;if(ac!=null)colors[i].on=(ac===true||ac===1)});
-        renderClr();calcB();ld.push(rn)}
-      hSheets={};wb.SheetNames.forEach(sn=>{const ws=wb.Sheets[sn];const c=r=>{const x=ws[r];return x?x.v:null};
-        if((c('B2')==='Ürün Açılımı'||c('B1')==='Ürün Açılımı')&&!sn.toLowerCase().includes('renkli')){const sr=c('B2')==='Ürün Açılımı'?3:2;const ms=[];for(let r=sr;r<=sr+20;r++){const u=c('B'+r);if(!u||String(u).includes('SUM'))break;ms.push({u:String(u),m:String(c('C'+r)||''),f:String(c('D'+r)||''),kg:typeof c('E'+r)==='number'?c('E'+r):0,p:typeof c('F'+r)==='number'?c('F'+r):0})}let fr=3;for(let r=sr+12;r<=sr+25;r++){const ev=c('E'+r);if(ev!=null&&typeof ev==='number'&&ev>0&&ev<1){fr=ev*100;break}}if(ms.length>0){hSheets[sn]={m:ms,i:0,f:fr};ld.push(sn)}}
-        if(c('G41')==='Ürün Açılımı'||c('F41')==='Ürün Adı'){const ms=[];for(let r=42;r<=60;r++){const u=c('G'+r);if(!u||String(u).includes('TOPLAM'))break;ms.push({u:String(u),m:String(c('H'+r)||''),f:String(c('I'+r)||''),kg:typeof c('J'+r)==='number'?c('J'+r):0,p:typeof c('K'+r)==='number'?c('K'+r):0})}let fr=5;const jf=c('J59');if(jf!=null&&typeof jf==='number')fr=jf*100;if(ms.length>0){hSheets[sn]={m:ms,i:0,f:fr};ld.push(sn)}}});
-      const hb=document.getElementById('hSB');hb.innerHTML='';const hn=Object.keys(hSheets);
-      if(hn.length>0){hn.forEach(n=>{const b=document.createElement('button');b.className='nav-btn';b.textContent=n;b.onclick=()=>selHS(n);hb.appendChild(b)});selHS(hn[0])}
-      const sf=wb.SheetNames.find(s=>s.toLowerCase().includes('şeffaf')||s.toLowerCase().includes('seffaf'));
-      if(sf){const ws=wb.Sheets[sf];const c=r=>{const x=ws[r];return x?x.v:null};const bf=c('B2');if(bf!=null&&typeof bf==='number')S('s_bf',bf);const ig=c('B3');if(ig!=null&&typeof ig==='number')S('s_ig',ig);const so=c('B7');if(so!=null&&typeof so==='number')S('s_so',so);const en=c('C8');if(en!=null&&typeof en==='number')S('s_en',en);const boy=c('D8');if(boy!=null&&typeof boy==='number')S('s_boy',boy);calcS();ld.push(sf)}
-      if(ld.length>0)toast(ld.length+' sayfa yüklendi: '+ld.join(', '));
-      else toast('Tanınan yapı bulunamadı',true);
-    }catch(err){toast('Dosya okunamadı: '+err.message,true)}
-  };r.readAsArrayBuffer(file);
+function saveRateProfile() {
+  const name = prompt('Profil adı girin:');
+  if (!name) return;
+  let profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
+  const data = JSON.parse(localStorage.getItem(RATES_KEY) || '{}');
+  profiles.unshift({ id: 'rp_' + Date.now(), name, data, date: new Date().toISOString() });
+  if (profiles.length > 10) profiles = profiles.slice(0, 10);
+  localStorage.setItem(RATES_PROFILES_KEY, JSON.stringify(profiles));
+  renderRateProfiles();
 }
-document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);e.target.value=''});
 
-// ===== AUTO-CALC =====
-let dt;document.addEventListener('input',e=>{if(e.target.matches('input[type="number"]')){clearTimeout(dt);dt=setTimeout(()=>{calcB();calcL();calcP();calcH();calcS()},80)}});
+function loadRateProfile(id) {
+  const profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
+  const p = profiles.find(x => x.id === id);
+  if (!p) return;
+  Object.keys(p.data).forEach(k => { const el = $(k); if (el) el.value = p.data[k]; });
+  calcMachineRates();
+  RECALC();
+}
 
-// ===== INIT =====
-mats=defMats();renderClr();renderH();buildLayers();
-calcB();calcL();calcP();calcH();calcS();
-fetchRates();
-// Her 30 dakikada kur güncelle
-setInterval(fetchRates,30*60*1000);
+function deleteRateProfile(id) {
+  let profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
+  profiles = profiles.filter(x => x.id !== id);
+  localStorage.setItem(RATES_PROFILES_KEY, JSON.stringify(profiles));
+  renderRateProfiles();
+}
+
+function renderRateProfiles() {
+  const profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
+  const el = $('rate-profiles');
+  if (!el) return;
+  if (profiles.length === 0) { el.innerHTML = '<div style="color:var(--t3);font-size:.82rem;text-align:center;padding:10px">Henüz profil kaydedilmedi</div>'; return; }
+  el.innerHTML = profiles.map(p => {
+    const d = new Date(p.date);
+    return `<div class="rp-card" onclick="loadRateProfile('${p.id}')">
+      <div><div class="rp-name">${p.name}</div><div class="rp-date">${d.toLocaleDateString('tr-TR')}</div></div>
+      <div class="rp-actions"><button class="cl-btn del" onclick="event.stopPropagation();deleteRateProfile('${p.id}')" title="Sil">✕</button></div>
+    </div>`;
+  }).join('');
+}
+
+// ╔══════════════════════════════════════════════════════════════╗
+// ║  MÜŞTERİ YÖNETİMİ — localStorage ile CRUD                 ║
+// ╚══════════════════════════════════════════════════════════════╝
+const CLIENTS_KEY = 'flexicost-clients';
+
+function saveClient() {
+  const name = $('cl-name').value.trim();
+  if (!name) { alert('Firma adı zorunludur.'); return; }
+  let clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const editId = $('cl-name').dataset.editId;
+  const clientData = {
+    name, contact: $('cl-contact').value.trim(), phone: $('cl-phone').value.trim(),
+    email: $('cl-email').value.trim(), addr: $('cl-addr').value.trim(),
+    city: $('cl-city').value.trim(), country: $('cl-country').value.trim(),
+    vd: $('cl-vd').value.trim(), vno: $('cl-vno').value.trim(),
+    notes: $('cl-notes').value.trim()
+  };
+  if (editId) {
+    const idx = clients.findIndex(c => c.id === editId);
+    if (idx >= 0) clients[idx] = { ...clients[idx], ...clientData };
+    delete $('cl-name').dataset.editId;
+  } else {
+    clients.push({ id: 'cl_' + Date.now(), ...clientData, createdAt: new Date().toISOString() });
+  }
+  localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+  // Clear form
+  ['cl-name','cl-contact','cl-phone','cl-email','cl-addr','cl-city','cl-vd','cl-vno','cl-notes'].forEach(id => $(id).value = '');
+  $('cl-country').value = 'Türkiye';
+  renderClients();
+  updateClientSelect();
+}
+
+function editClient(id) {
+  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  $('cl-name').value = c.name; $('cl-name').dataset.editId = id;
+  $('cl-contact').value = c.contact || '';
+  $('cl-phone').value = c.phone || '';
+  $('cl-email').value = c.email || '';
+  $('cl-addr').value = c.addr || '';
+  $('cl-city').value = c.city || '';
+  $('cl-country').value = c.country || 'Türkiye';
+  $('cl-vd').value = c.vd || '';
+  $('cl-vno').value = c.vno || '';
+  $('cl-notes').value = c.notes || '';
+  goStep('clients');
+}
+
+function deleteClient(id) {
+  if (!confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
+  let clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  clients = clients.filter(c => c.id !== id);
+  localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+  renderClients();
+  updateClientSelect();
+}
+
+function renderClients() {
+  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const search = ($('cl-search')?.value || '').toLowerCase();
+  const filtered = search ? clients.filter(c => c.name.toLowerCase().includes(search)) : clients;
+  const el = $('clients-list');
+  if (filtered.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3);font-size:.85rem">' + (search ? 'Sonuç bulunamadı' : 'Henüz müşteri eklenmedi') + '</div>';
+    return;
+  }
+  el.innerHTML = filtered.map(c => `
+    <div class="cl-card">
+      <div class="cl-actions">
+        <button class="cl-btn" onclick="editClient('${c.id}')" title="Düzenle">✎</button>
+        <button class="cl-btn del" onclick="deleteClient('${c.id}')" title="Sil">✕</button>
+      </div>
+      <div class="cl-name">${c.name}</div>
+      <div class="cl-detail">
+        ${c.contact ? c.contact + ' | ' : ''}${c.city || ''}${c.vd ? ' | VD: ' + c.vd : ''}${c.vno ? ' | ' + c.vno : ''}
+      </div>
+    </div>`).join('');
+}
+
+function updateClientSelect() {
+  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const sel = $('cust-select');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">— Manuel giriş veya müşteri seçin —</option>' +
+    clients.map(c => `<option value="${c.id}">${c.name}${c.city ? ' — ' + c.city : ''}</option>`).join('');
+}
+
+function fillClientFromSelect() {
+  const id = $('cust-select').value;
+  if (!id) return;
+  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const c = clients.find(x => x.id === id);
+  if (!c) return;
+  $('cust-name').value = c.name;
+  $('cust-addr').value = c.addr || '';
+  $('cust-city').value = c.city || '';
+  $('cust-vd').value = c.vd || '';
+  $('cust-vno').value = c.vno || '';
+}
+
+// ═══════════ INIT ═══════════
+loadSavedRates();
+renderRateProfiles();
+initLayers();
+bindInputs();
+renderHist();
+renderClients();
+updateClientSelect();
+RECALC();
 </script>
 </body>
 </html>
