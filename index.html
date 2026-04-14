@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FlexiCost — Esnek Ambalaj Maliyet Hesaplama</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0a0a0a;--bg1:#111;--bg2:#161616;--card:#1a1a1a;--border:#2a2a2a;--border2:#333;--text:#f0f0f0;--text2:#999;--text3:#666;--acc:#10b981;--acc2:#059669;--accbg:#0a1f16;--out:#f59e0b;--outbg:#1a1508;--outborder:#f59e0b33;--red:#ef4444;--blue:#3b82f6;--purple:#8b5cf6}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+.nav{background:var(--bg1);border-bottom:1px solid var(--border);padding:.5rem 1rem;display:flex;align-items:center;gap:.75rem;position:sticky;top:0;z-index:50}
+.nav h1{font-size:.95rem;font-weight:700;color:var(--acc);white-space:nowrap}
+.nav h1 span{color:var(--text2);font-weight:400;font-size:.7rem;margin-left:.4rem}
+.nav .spacer{flex:1}
+.nav-btn{background:var(--card);border:1px solid var(--border);border-radius:6px;padding:.3rem .65rem;color:var(--text2);font-family:inherit;font-size:.7rem;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:.3rem}
+.nav-btn:hover{border-color:var(--acc);color:var(--acc)}
+.nav-btn svg{width:13px;height:13px}
+.nav-btn input{display:none}
+.tabs{background:var(--bg1);border-bottom:1px solid var(--border);display:flex;gap:0;overflow-x:auto;position:sticky;top:40px;z-index:49}
+.tab{padding:.55rem 1rem;font-size:.7rem;font-weight:600;color:var(--text2);cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;white-space:nowrap;font-family:inherit;background:none;border-top:none;border-left:none;border-right:none}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--acc);border-bottom-color:var(--acc);background:var(--accbg)}
+.content{max-width:1100px;margin:0 auto;padding:1rem}
+.tp{display:none}.tp.active{display:block}
+.sec{background:var(--card);border:1px solid var(--border);border-radius:10px;margin-bottom:.75rem;overflow:hidden;animation:fadeUp .3s ease}
+.sec-head{padding:.55rem 1rem;background:var(--bg2);border-bottom:1px solid var(--border);display:flex;align-items:center;gap:.5rem;font-size:.7rem;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.03em}
+.sec-head svg{width:14px;height:14px;color:var(--acc);flex-shrink:0}
+.sec-body{padding:.85rem 1rem}
+.fg{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.65rem}
+.fg.c2{grid-template-columns:1fr 1fr}.fg.c3{grid-template-columns:1fr 1fr 1fr}.fg.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.fi{display:flex;flex-direction:column;gap:.15rem}
+.fi.full{grid-column:1/-1}
+.fi label{font-size:.6rem;color:var(--text2);font-weight:600;text-transform:uppercase;letter-spacing:.02em}
+.fi .iw{position:relative;display:flex;align-items:center}
+.fi input,.fi select{width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:5px;padding:.4rem .55rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.78rem;transition:border-color .15s}
+.fi input:focus,.fi select:focus{outline:none;border-color:var(--acc)}
+.fi select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23999' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;padding-right:1.5rem}
+.fi .ur{position:absolute;right:.55rem;color:var(--text3);font-size:.65rem;pointer-events:none;font-family:'DM Sans'}
+.fi.hr input,.fi.hr select{padding-right:2.2rem}
+.og{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:.4rem;margin-top:.6rem}
+.og.c2{grid-template-columns:1fr 1fr}.og.c3{grid-template-columns:1fr 1fr 1fr}.og.c4{grid-template-columns:1fr 1fr 1fr 1fr}
+.out{background:var(--outbg);border:1px solid var(--outborder);border-radius:6px;padding:.45rem .65rem;display:flex;justify-content:space-between;align-items:center}
+.out .ol{font-size:.6rem;color:var(--out);font-weight:600;text-transform:uppercase}
+.out .ov{font-size:.85rem;font-weight:700;color:var(--out);font-family:'JetBrains Mono',monospace}
+.out.big{grid-column:1/-1;background:linear-gradient(135deg,var(--accbg),var(--card));border-color:#10b98133;padding:.65rem .85rem}
+.out.big .ol{color:var(--acc);font-size:.65rem}.out.big .ov{color:var(--acc);font-size:1.4rem}
+.out.danger{border-color:#ef444433;background:#1a0808}.out.danger .ol,.out.danger .ov{color:var(--red)}
+/* Colors */
+.cg{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:.35rem}
+.ci{display:flex;align-items:center;gap:.35rem;background:var(--bg1);border:1px solid var(--border);border-radius:5px;padding:.35rem .5rem;cursor:pointer;transition:all .15s;user-select:none}
+.ci:hover{border-color:#444}.ci.on{border-color:var(--acc);background:var(--accbg)}
+.cdot{width:10px;height:10px;border-radius:50%;flex-shrink:0;border:1px solid #555}
+.ci .cn{font-size:.68rem;flex:1;font-weight:500}.ci .cr{font-size:.6rem;color:var(--text3)}.ci .cc{font-size:.6rem;color:var(--acc);font-weight:600;min-width:28px;text-align:right}
+/* Material table */
+.mw{overflow-x:auto}
+.mt{width:100%;border-collapse:collapse;font-size:.72rem}
+.mt th{background:var(--bg2);color:var(--text2);font-weight:600;padding:.4rem;text-align:left;border-bottom:1px solid var(--border);font-size:.6rem;text-transform:uppercase;white-space:nowrap}
+.mt td{padding:.15rem .15rem;border-bottom:1px solid #2a2a2a44}
+.mt input,.mt select{width:100%;background:var(--bg1);border:1px solid var(--border);border-radius:4px;padding:.3rem .35rem;color:var(--text);font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.mt input:focus{outline:none;border-color:var(--acc)}
+.mt .ro{color:var(--out);font-weight:600;text-align:right;padding:.3rem .35rem;font-family:'JetBrains Mono',monospace;font-size:.72rem}
+.bdel{background:none;border:none;color:#555;cursor:pointer;font-size:.85rem;transition:color .15s}.bdel:hover{color:var(--red)}
+.badd{background:var(--bg1);border:1px dashed var(--border);border-radius:6px;padding:.4rem;width:100%;cursor:pointer;color:var(--text2);font-family:inherit;font-size:.68rem;transition:all .15s;margin-top:.4rem}.badd:hover{border-color:var(--acc);color:var(--acc)}
+/* Layer card */
+.layer-card{background:var(--bg1);border:1px solid var(--border);border-radius:8px;padding:.75rem;margin-bottom:.5rem}
+.layer-card .lc-title{font-size:.65rem;font-weight:700;color:var(--acc);text-transform:uppercase;margin-bottom:.5rem;display:flex;align-items:center;gap:.35rem}
+.layer-card .lc-title .dot{width:8px;height:8px;border-radius:50%}
+/* Kur Bar */
+.kur-bar{background:var(--bg2);border-bottom:1px solid var(--border);padding:.3rem 1rem;display:flex;align-items:center;gap:1rem;font-size:.65rem;overflow-x:auto;flex-shrink:0}
+.kur-item{display:flex;align-items:center;gap:.3rem;white-space:nowrap}
+.kur-item .kl{color:var(--text3);font-weight:600}
+.kur-item .kv{color:var(--acc);font-weight:700;font-family:'JetBrains Mono',monospace}
+.kur-item .kd{font-size:.55rem;padding:.1rem .3rem;border-radius:3px;font-weight:600}
+.kur-item .kd.up{color:#22c55e;background:#22c55e18}.kur-item .kd.down{color:#ef4444;background:#ef444418}
+.kur-status{color:var(--text3);margin-left:auto;font-size:.55rem;display:flex;align-items:center;gap:.3rem}
+.kur-status .dot{width:6px;height:6px;border-radius:50%}
+.kur-status .dot.live{background:#22c55e;animation:pulse 2s infinite}
+.kur-status .dot.off{background:#ef4444}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+/* TL equivalents */
+.tl-eq{font-size:.6rem;color:var(--blue);font-weight:500;margin-left:.25rem;font-family:'JetBrains Mono',monospace}
+.toast{position:fixed;top:.75rem;right:.75rem;background:var(--card);border:1px solid var(--acc);border-radius:8px;padding:.5rem .75rem;font-size:.72rem;color:var(--acc);z-index:100;opacity:0;transform:translateY(-10px);transition:all .3s;pointer-events:none;max-width:360px}
+.toast.show{opacity:1;transform:translateY(0)}.toast.err{border-color:var(--red);color:var(--red)}
+@media print{.nav,.tabs{display:none!important}.tp{display:block!important}.sec{break-inside:avoid;border:1px solid #ccc}body{background:#fff;color:#000}.sec-head{background:#f0f0f0;color:#333}.out{background:#fffbeb;border-color:#e5a000;print-color-adjust:exact;-webkit-print-color-adjust:exact}.out .ol,.out .ov{color:#b45309}.out.big{background:#ecfdf5}.out.big .ol,.out.big .ov{color:#059669}.content{max-width:100%;padding:.5rem}}
+@media(max-width:768px){.fg,.og{grid-template-columns:1fr!important}.cg{grid-template-columns:1fr 1fr}.nav h1 span{display:none}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+::-webkit-scrollbar{width:6px;height:6px}::-webkit-scrollbar-track{background:var(--bg)}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <h1>FlexiCost <span>Esnek Ambalaj Maliyet Hesaplama</span></h1>
+  <div class="spacer"></div>
+  <label class="nav-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>Excel Yükle<input type="file" id="fileInput" accept=".xlsx,.xls"></label>
+  <button class="nav-btn" onclick="window.print()"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Yazdır / PDF</button>
+</nav>
+
+<!-- KUR BAR -->
+<div class="kur-bar" id="kurBar">
+  <div class="kur-item"><span class="kl">EUR/TRY</span><span class="kv" id="kur_eurtry">-</span></div>
+  <div class="kur-item"><span class="kl">USD/TRY</span><span class="kv" id="kur_usdtry">-</span></div>
+  <div class="kur-item"><span class="kl">EUR/USD</span><span class="kv" id="kur_eurusd">-</span></div>
+  <div class="kur-status"><div class="dot off" id="kurDot"></div><span id="kurTime">Kur yükleniyor...</span></div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-t="baski">Baskı Maliyet</button>
+  <button class="tab" data-t="lamin">Laminasyon</button>
+  <button class="tab" data-t="pouch">Pouch / Torba</button>
+  <button class="tab" data-t="hammadde">Hammadde Formül</button>
+  <button class="tab" data-t="seffaf">Şeffaf Formül</button>
+</div>
+
+<div class="content">
+
+<!-- ==================== BASKI MALİYET ==================== -->
+<div class="tp active" id="p-baski">
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Sipariş & Film & Tabla</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>Sipariş Miktarı</label><div class="iw"><input type="number" id="b_siparis" value="300"><span class="ur">kg</span></div></div>
+    <div class="fi hr"><label>Hazırlık Tutarı</label><div class="iw"><input type="number" id="b_hazirlik" value="750"><span class="ur">EUR</span></div></div>
+    <div class="fi hr"><label>Cold Seal</label><div class="iw"><input type="number" id="b_coldSeal" value="0"><span class="ur">EUR</span></div></div>
+    <div class="fi"><label>Yapı</label><select id="b_yapi"><option>20/15</option><option selected>20/20</option><option>Özel</option></select></div>
+    <div class="fi hr"><label>Film Eni</label><div class="iw"><input type="number" id="b_filmEni" value="620"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Fotocel Aralığı</label><div class="iw"><input type="number" id="b_fotocel" value="1120"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Tabla EN</label><div class="iw"><input type="number" id="b_tablaEn" value="746"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Tabla BOY</label><div class="iw"><input type="number" id="b_tablaBoy" value="1120"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Gerçek Film Eni</label><div class="iw"><input type="number" id="b_filmEni2" value="765"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Kenar Firesi</label><div class="iw"><input type="number" id="b_kenarFire" value="2.48" step="0.01"><span class="ur">%</span></div></div>
+  </div>
+  <div class="og c4"><div class="out"><span class="ol">En Adet</span><span class="ov" id="o_enA">-</span></div><div class="out"><span class="ol">Boy Adet</span><span class="ov" id="o_boA">-</span></div><div class="out"><span class="ol">Toplam Adet</span><span class="ov" id="o_topA">-</span></div><div class="out"><span class="ol">Toplam Alan</span><span class="ov" id="o_topAl">-</span></div></div>
+  </div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>Baskı Parametreleri</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>20gr Baskı Fiyatı</label><div class="iw"><input type="number" id="b_bf" value="67.3"><span class="ur">EUR</span></div></div>
+    <div class="fi hr"><label>İlave Gramaj</label><div class="iw"><input type="number" id="b_ig" value="90"><span class="ur">gr</span></div></div>
+    <div class="fi hr"><label>Gramaj Birim</label><div class="iw"><input type="number" id="b_gb" value="4"><span class="ur">EUR/gr</span></div></div>
+    <div class="fi"><label>Sabit Ölçü</label><input type="number" id="b_so" value="0.851" step="0.001"></div>
+    <div class="fi hr"><label>Baz Gramaj</label><div class="iw"><input type="number" id="b_bg" value="20"><span class="ur">gr</span></div></div>
+    <div class="fi"><label>Klik Çarpanı</label><input type="number" id="b_kc" value="1.08" step="0.01"></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/></svg>Renk Seçimi <span style="margin-left:auto;font-weight:400;font-size:.6rem;color:var(--text3)" id="clrLbl"></span></div>
+  <div class="sec-body"><div class="cg" id="clrG"></div>
+  <div class="og c3"><div class="out"><span class="ol">Klik Maliyet</span><span class="ov" id="o_klik">-</span></div><div class="out"><span class="ol">Klik Firesi</span><span class="ov" id="o_klikF">-</span></div><div class="out"><span class="ol">Toplam Klik</span><span class="ov" id="o_topK">-</span></div></div>
+  </div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Hesap Sonuçları</div>
+  <div class="sec-body">
+    <div class="og c4"><div class="out"><span class="ol">Baskı+Klik</span><span class="ov" id="o_bk">-</span></div><div class="out"><span class="ol">İlave Gramaj Mal.</span><span class="ov" id="o_igm">-</span></div><div class="out"><span class="ol">Birim Maliyet</span><span class="ov" id="o_bm">-</span></div><div class="out"><span class="ol">Malzeme Ölçüsü</span><span class="ov" id="o_mo">-</span></div></div>
+    <div class="og c2"><div class="out big"><span class="ol">Gerçek Fiyat (EUR/kg)</span><span class="ov" id="o_gf">0.00</span></div><div class="out big" style="border-color:#3b82f633;background:linear-gradient(135deg,#0a1428,var(--card))"><span class="ol" style="color:var(--blue)">TL Karşılığı (kg)</span><span class="ov" style="color:var(--blue)" id="o_gf_tl">-</span></div></div>
+    <div class="og c2"><div class="out"><span class="ol">Toplam Tutar</span><span class="ov" id="o_tt">-</span></div><div class="out"><span class="ol">+ Hazırlık</span><span class="ov" id="o_hz">-</span></div><div class="out"><span class="ol">+ Kenar Fire</span><span class="ov" id="o_kft">-</span></div><div class="out"><span class="ol">+ Cold Seal</span><span class="ov" id="o_cst">-</span></div></div>
+    <div class="og c2"><div class="out big"><span class="ol">Fire Dahil Fiyat</span><span class="ov" id="o_fd">-</span></div><div class="out big"><span class="ol">KG Fiyatı</span><span class="ov" id="o_kg1">-</span></div></div>
+    <div class="og c3"><div class="out" id="o_gkfW"><span class="ol">Gerçek Kenar Fire</span><span class="ov" id="o_gkf">-</span></div><div class="out"><span class="ol">Fire Tutarı</span><span class="ov" id="o_ft">-</span></div><div class="out"><span class="ol">Nihai (CS dahil)</span><span class="ov" id="o_nh">-</span></div></div>
+    <div class="og c2"><div class="out big"><span class="ol">Son Toplam</span><span class="ov" id="o_st">-</span><span class="tl-eq" id="o_st_tl"></span></div><div class="out big"><span class="ol">Son KG Fiyatı</span><span class="ov" id="o_kg2">-</span><span class="tl-eq" id="o_kg2_tl"></span></div></div>
+  </div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="3" width="15" height="13"/><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"/></svg>Farklı Miktarlar</div>
+  <div class="sec-body"><div class="og c3" id="bQty"></div></div></div>
+</div>
+
+<!-- ==================== LAMİNASYON ==================== -->
+<div class="tp" id="p-lamin">
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Sipariş & Reel</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>Sipariş Miktarı</label><div class="iw"><input type="number" id="l_qty" value="1000"><span class="ur">kg</span></div></div>
+    <div class="fi hr"><label>Reel Genişliği</label><div class="iw"><input type="number" id="l_reel" value="620"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Atık/Fire Oranı</label><div class="iw"><input type="number" id="l_waste" value="5"><span class="ur">%</span></div></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>Katman Yapısı (4 Kat)</div>
+  <div class="sec-body" id="layerCards"></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a7 7 0 017 7"/></svg>Mürekkep & Yapıştırıcı</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>Mürekkep GSM</label><div class="iw"><input type="number" id="l_inkGsm" value="1.2" step="0.1"><span class="ur">gsm</span></div></div>
+    <div class="fi hr"><label>Mürekkep Fiyat</label><div class="iw"><input type="number" id="l_inkRate" value="8" step="0.1"><span class="ur">$/kg</span></div></div>
+    <div class="fi hr"><label>Yapıştırıcı GSM</label><div class="iw"><input type="number" id="l_adhGsm" value="2" step="0.1"><span class="ur">gsm</span></div></div>
+    <div class="fi hr"><label>Yapıştırıcı Fiyat</label><div class="iw"><input type="number" id="l_adhRate" value="5" step="0.1"><span class="ur">$/kg</span></div></div>
+  </div>
+  <div class="og c4"><div class="out"><span class="ol">Mürekkep Kuru (kg)</span><span class="ov" id="lo_inkD">-</span></div><div class="out"><span class="ol">Mürekkep Sıvı (kg)</span><span class="ov" id="lo_inkL">-</span></div><div class="out"><span class="ol">Yapıştırıcı Toplam (kg)</span><span class="ov" id="lo_adhKg">-</span></div><div class="out"><span class="ol">Toplam GSM</span><span class="ov" id="lo_tgsm">-</span></div></div>
+  </div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="M12 8v4l3 3"/></svg>Dönüşüm Maliyetleri</div>
+  <div class="sec-body"><div class="fg c3">
+    <div class="fi hr"><label>Baskı Maliyeti</label><div class="iw"><input type="number" id="l_printR" value="0.30" step="0.01"><span class="ur">$/kg</span></div></div>
+    <div class="fi hr"><label>Laminasyon Maliyeti</label><div class="iw"><input type="number" id="l_lamR" value="0.50" step="0.01"><span class="ur">$/kg</span></div></div>
+    <div class="fi hr"><label>Ek Maliyet</label><div class="iw"><input type="number" id="l_extraR" value="0" step="0.01"><span class="ur">$/kg</span></div></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>Maliyet Özeti</div>
+  <div class="sec-body">
+    <div class="og c2"><div class="out"><span class="ol">Malzeme Toplamı</span><span class="ov" id="lo_matT">-</span></div><div class="out"><span class="ol">Mürekkep Toplamı</span><span class="ov" id="lo_inkT">-</span></div><div class="out"><span class="ol">Yapıştırıcı Toplamı</span><span class="ov" id="lo_adhT">-</span></div><div class="out"><span class="ol">Dönüşüm Toplamı</span><span class="ov" id="lo_convT">-</span></div></div>
+    <div class="og c2"><div class="out big"><span class="ol">Genel Toplam</span><span class="ov" id="lo_grand">0.00</span><span class="tl-eq" id="lo_grand_tl"></span></div><div class="out big"><span class="ol">KG Başına Maliyet</span><span class="ov" id="lo_perKg">0.00</span><span class="tl-eq" id="lo_perKg_tl"></span></div></div>
+    <div class="og c3"><div class="out"><span class="ol">Atık Dahil Toplam</span><span class="ov" id="lo_wGrand">-</span></div><div class="out"><span class="ol">Atık Dahil $/kg</span><span class="ov" id="lo_wPerKg">-</span></div><div class="out"><span class="ol">Metre Cinsinden</span><span class="ov" id="lo_meter">-</span></div></div>
+  </div></div>
+</div>
+
+<!-- ==================== POUCH ==================== -->
+<div class="tp" id="p-pouch">
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18"/></svg>Pouch Boyutları</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>Genişlik</label><div class="iw"><input type="number" id="p_w" value="150"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Uzunluk</label><div class="iw"><input type="number" id="p_h" value="200"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Körük (Gusset)</label><div class="iw"><input type="number" id="p_g" value="0"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>Seal Payı</label><div class="iw"><input type="number" id="p_seal" value="10"><span class="ur">mm</span></div></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/></svg>Malzeme Yapısı</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>Kompozit GSM</label><div class="iw"><input type="number" id="p_gsm" value="70"><span class="ur">gsm</span></div></div>
+    <div class="fi hr"><label>KG Fiyatı</label><div class="iw"><input type="number" id="p_rate" value="3.50" step="0.01"><span class="ur">$/kg</span></div></div>
+    <div class="fi hr"><label>Fermuar Ağırlık</label><div class="iw"><input type="number" id="p_zip" value="0"><span class="ur">gr/m</span></div></div>
+    <div class="fi hr"><label>Fermuar Fiyat</label><div class="iw"><input type="number" id="p_zipR" value="0"><span class="ur">$/m</span></div></div>
+  </div></div></div>
+
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Hesap Sonuçları</div>
+  <div class="sec-body">
+    <div class="og c3"><div class="out"><span class="ol">Pouch Alanı (cm²)</span><span class="ov" id="po_area">-</span></div><div class="out big"><span class="ol">Pouch Ağırlığı</span><span class="ov" id="po_wt">- gr</span></div><div class="out big"><span class="ol">Adet / KG</span><span class="ov" id="po_perKg">-</span></div></div>
+    <div class="og c3"><div class="out"><span class="ol">Malzeme Fiyatı / Pouch</span><span class="ov" id="po_matC">-</span></div><div class="out"><span class="ol">Fermuar Fiyatı / Pouch</span><span class="ov" id="po_zipC">-</span></div><div class="out big"><span class="ol">Birim Maliyet / Pouch</span><span class="ov" id="po_unit">-</span></div></div>
+    <div class="og c3"><div class="out"><span class="ol">1.000 Adet</span><span class="ov" id="po_1k">-</span></div><div class="out"><span class="ol">10.000 Adet</span><span class="ov" id="po_10k">-</span></div><div class="out"><span class="ol">100.000 Adet</span><span class="ov" id="po_100k">-</span></div></div>
+  </div></div>
+</div>
+
+<!-- ==================== HAMMADDE ==================== -->
+<div class="tp" id="p-hammadde">
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Hammadde Listesi<div style="margin-left:auto;display:flex;gap:.25rem" id="hSB"></div></div>
+  <div class="sec-body">
+    <div class="mw"><table class="mt"><thead><tr><th>Ürün</th><th>Marka</th><th>Firma</th><th style="width:65px">Kg</th><th style="width:75px">Fiyat</th><th style="width:75px">Toplam</th><th style="width:24px"></th></tr></thead><tbody id="hR"></tbody></table></div>
+    <button class="badd" onclick="addMat()">+ Malzeme Ekle</button>
+  </div></div>
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v4l3 3"/></svg>Fire & İşçilik</div>
+  <div class="sec-body"><div class="fg c2">
+    <div class="fi hr"><label>İşçilik Oranı</label><div class="iw"><input type="number" id="h_isc" value="0" step="0.01"><span class="ur">%</span></div></div>
+    <div class="fi hr"><label>Fire Oranı</label><div class="iw"><input type="number" id="h_fire" value="3" step="0.01"><span class="ur">%</span></div></div>
+  </div>
+  <div class="og c3"><div class="out"><span class="ol">Toplam Kg</span><span class="ov" id="ho_tkg">-</span></div><div class="out"><span class="ol">Toplam Maliyet</span><span class="ov" id="ho_tmal">-</span></div><div class="out"><span class="ol">Birim Maliyet</span><span class="ov" id="ho_bm">-</span></div><div class="out"><span class="ol">İşçilik</span><span class="ov" id="ho_isc">-</span></div><div class="out"><span class="ol">Fire</span><span class="ov" id="ho_fire">-</span></div><div class="out big"><span class="ol">Genel Toplam (TL/kg)</span><span class="ov" id="ho_gen">0.00</span></div></div>
+  </div></div>
+</div>
+
+<!-- ==================== ŞEFFAF ==================== -->
+<div class="tp" id="p-seffaf">
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/></svg>Baskı Parametreleri</div>
+  <div class="sec-body"><div class="fg c4">
+    <div class="fi hr"><label>20gr Baskı Fiyatı</label><div class="iw"><input type="number" id="s_bf" value="61.5"><span class="ur">EUR</span></div></div>
+    <div class="fi hr"><label>İlave Gramaj</label><div class="iw"><input type="number" id="s_ig" value="18.2" step="0.1"><span class="ur">gr</span></div></div>
+    <div class="fi"><label>Gramaj Çarpanı</label><input type="number" id="s_gc" value="5" step="0.1"></div>
+    <div class="fi hr"><label>Baz Gramaj</label><div class="iw"><input type="number" id="s_bg" value="20"><span class="ur">gr</span></div></div>
+  </div></div></div>
+  <div class="sec"><div class="sec-head"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>Ölçü Parametreleri</div>
+  <div class="sec-body"><div class="fg c3">
+    <div class="fi"><label>Sabit Ölçü</label><input type="number" id="s_so" value="0.814" step="0.001"></div>
+    <div class="fi hr"><label>EN</label><div class="iw"><input type="number" id="s_en" value="665"><span class="ur">mm</span></div></div>
+    <div class="fi hr"><label>BOY</label><div class="iw"><input type="number" id="s_boy" value="1040"><span class="ur">mm</span></div></div>
+  </div>
+  <div class="og c2"><div class="out"><span class="ol">İlave Gramaj Maliyet</span><span class="ov" id="so_igm">-</span></div><div class="out"><span class="ol">Toplam Maliyet</span><span class="ov" id="so_tm">-</span></div><div class="out"><span class="ol">Malzeme Ölçüsü</span><span class="ov" id="so_mo">-</span></div><div class="out big"><span class="ol">Gerçek Fiyat (EUR/kg)</span><span class="ov" id="so_gf">0.00</span></div></div>
+  </div></div>
+</div>
+
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const V=id=>parseFloat(document.getElementById(id).value)||0;
+const S=(id,v)=>{if(v!=null)document.getElementById(id).value=v};
+const T=(id,v)=>document.getElementById(id).textContent=v;
+const f2=n=>n.toFixed(2);
+const fE=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' EUR';
+const fD=n=>'$'+n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2});
+const fT=n=>n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2})+' TL';
+function toast(m,e){const t=document.getElementById('toast');t.textContent=m;t.className='toast show'+(e?' err':'');setTimeout(()=>t.className='toast',3500)}
+
+// ===== DÖVİZ KURU =====
+let rates={EUR_TRY:0,USD_TRY:0,EUR_USD:0};
+let ratesLoaded=false;
+
+async function fetchRates(){
+  try{
+    const [r1,r2]=await Promise.all([
+      fetch('https://api.frankfurter.dev/v1/latest?from=EUR&to=TRY,USD').then(r=>r.json()),
+      fetch('https://api.frankfurter.dev/v1/latest?from=USD&to=TRY').then(r=>r.json())
+    ]);
+    rates.EUR_TRY=r1.rates.TRY;
+    rates.EUR_USD=r1.rates.USD;
+    rates.USD_TRY=r2.rates.TRY;
+    ratesLoaded=true;
+
+    T('kur_eurtry',rates.EUR_TRY.toFixed(4));
+    T('kur_usdtry',rates.USD_TRY.toFixed(4));
+    T('kur_eurusd',rates.EUR_USD.toFixed(4));
+
+    const dot=document.getElementById('kurDot');
+    dot.classList.remove('off');dot.classList.add('live');
+    const now=new Date();
+    T('kurTime','Canlı — '+r1.date+' '+now.getHours().toString().padStart(2,'0')+':'+now.getMinutes().toString().padStart(2,'0'));
+
+    // Recalculate TL values
+    updateTL();
+    toast('Döviz kurları güncellendi: 1 EUR = '+rates.EUR_TRY.toFixed(2)+' TL');
+  }catch(e){
+    console.error('Kur hatası:',e);
+    T('kurTime','Kur alınamadı');
+    document.getElementById('kurDot').classList.add('off');
+  }
+}
+
+function eur2tl(eur){return ratesLoaded?eur*rates.EUR_TRY:0}
+function usd2tl(usd){return ratesLoaded?usd*rates.USD_TRY:0}
+function fTL(n){return ratesLoaded?'≈ ₺'+n.toLocaleString('tr-TR',{minimumFractionDigits:2,maximumFractionDigits:2}):''}
+
+function updateTL(){
+  if(!ratesLoaded)return;
+  // Baskı: Gerçek Fiyat EUR → TL
+  const gfEl=document.getElementById('o_gf');
+  const gfVal=parseFloat(gfEl.textContent)||0;
+  T('o_gf_tl','₺'+eur2tl(gfVal).toFixed(2));
+  // Son Toplam EUR → TL
+  const stEl=document.getElementById('o_st');
+  const stText=stEl.textContent.replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');
+  const stVal=parseFloat(stText)||0;
+  T('o_st_tl',fTL(eur2tl(stVal)));
+  // Son KG EUR → TL
+  const kg2El=document.getElementById('o_kg2');
+  const kg2Val=parseFloat(kg2El.textContent)||0;
+  T('o_kg2_tl',fTL(eur2tl(kg2Val)));
+  // Laminasyon: Grand Total USD → TL
+  const lgEl=document.getElementById('lo_grand');
+  const lgText=lgEl.textContent.replace(/[^\d,.-]/g,'').replace(/\./g,'').replace(',','.');
+  const lgVal=parseFloat(lgText)||0;
+  T('lo_grand_tl',fTL(usd2tl(lgVal)));
+  // Laminasyon: per kg USD → TL
+  const lpEl=document.getElementById('lo_perKg');
+  const lpVal=parseFloat(lpEl.textContent)||0;
+  T('lo_perKg_tl',fTL(usd2tl(lpVal)));
+}
+
+// ===== TABS =====
+document.querySelectorAll('.tab').forEach(t=>t.onclick=()=>{
+  document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.tp').forEach(x=>x.classList.remove('active'));
+  t.classList.add('active');
+  document.getElementById('p-'+t.dataset.t).classList.add('active');
+});
+
+// ===== MATERIALS DB =====
+const MATS=[
+  {n:'PET',d:1.40,mic:12},{n:'OPP / BOPP',d:0.91,mic:20},{n:'Metalize PET',d:1.40,mic:12},
+  {n:'Metalize OPP',d:0.91,mic:20},{n:'CPP Natural',d:0.91,mic:25},{n:'Metalize CPP',d:0.91,mic:25},
+  {n:'LD / LDPE',d:0.92,mic:50},{n:'Nylon (PA)',d:1.16,mic:15},{n:'Al Foil',d:2.71,mic:7},
+  {n:'BOPP Mat',d:0.91,mic:20},{n:'PVC',d:1.45,mic:25},{n:'Pearlized OPP',d:0.90,mic:20},
+  {n:'Milky OPP',d:0.91,mic:20},{n:'Yok',d:0,mic:0}
+];
+const DEF_RATES={'PET':2.5,'OPP / BOPP':1.8,'Metalize PET':3.0,'Metalize OPP':2.2,'CPP Natural':1.6,'Metalize CPP':2.0,'LD / LDPE':1.5,'Nylon (PA)':4.0,'Al Foil':5.0,'BOPP Mat':2.0,'PVC':1.8,'Pearlized OPP':2.2,'Milky OPP':1.9,'Yok':0};
+const LAYER_COLORS=['#3b82f6','#f59e0b','#8b5cf6','#22c55e'];
+const LAYER_DEFAULTS=[{mat:'PET',mic:12},{mat:'CPP Natural',mic:25},{mat:'Yok',mic:0},{mat:'Yok',mic:0}];
+
+// ===== COLORS =====
+const COLORS=[
+  {name:'Beyaz',rate:.08,bp:61.5,on:true,dot:'#fff'},{name:'Beyaz',rate:.08,bp:61.5,on:false,dot:'#ddd'},
+  {name:'Siyah',rate:.02,bp:61.5,on:true,dot:'#333'},{name:'Siyah',rate:.02,bp:61.5,on:false,dot:'#555'},
+  {name:'Sarı',rate:.04,bp:61.5,on:true,dot:'#facc15'},{name:'Mavi',rate:.04,bp:61.5,on:true,dot:'#3b82f6'},
+  {name:'Magenta',rate:.04,bp:61.5,on:true,dot:'#ec4899'},{name:'Turuncu',rate:.04,bp:61.5,on:false,dot:'#f97316'},
+  {name:'Yeşil',rate:.04,bp:61.5,on:false,dot:'#22c55e'},{name:'Mor',rate:.04,bp:61.5,on:false,dot:'#8b5cf6'}
+];
+let colors=JSON.parse(JSON.stringify(COLORS));
+function renderClr(){
+  const g=document.getElementById('clrG');g.innerHTML='';let tot=0;
+  colors.forEach((c,i)=>{if(c.on)tot+=c.rate*c.bp;const d=document.createElement('div');d.className='ci'+(c.on?' on':'');d.innerHTML=`<div class="cdot" style="background:${c.dot}"></div><span class="cn">${c.name}</span><span class="cr">${c.rate}</span><span class="cc">${c.on?f2(c.rate*c.bp):'-'}</span>`;d.onclick=()=>{colors[i].on=!colors[i].on;renderClr();calcB()};g.appendChild(d)});
+  document.getElementById('clrLbl').textContent='Toplam: '+f2(tot)+' EUR';
+}
+
+// ===== BASKI =====
+function calcB(){
+  const fe=V('b_filmEni'),fo=V('b_fotocel'),te=V('b_tablaEn'),tb=V('b_tablaBoy'),fe2=V('b_filmEni2');
+  const bf=V('b_bf'),ig=V('b_ig'),gb=V('b_gb'),so=V('b_so'),bg=V('b_bg'),kc=V('b_kc');
+  const sm=V('b_siparis'),hz=V('b_hazirlik'),cs=V('b_coldSeal'),kf=V('b_kenarFire')/100;
+  const eA=fe>0?Math.floor(te/fe):0,bA=fo>0?Math.floor(tb/fo):0,tA=eA*bA;
+  T('o_enA',eA);T('o_boA',bA);T('o_topA',tA);T('o_topAl',f2(tA*fe*fo/1e6)+' m²');
+  let cs_=0;colors.forEach(c=>{if(c.on)cs_+=c.rate*c.bp});
+  const klik=cs_*kc,klikF=tb>0?((tb-fo)/tb)*klik:0,topK=klik+klikF;
+  T('o_klik',f2(klik));T('o_klikF',f2(klikF));T('o_topK',f2(topK));
+  const tM1=bf+topK,igM=ig*gb,pay=ig+bg,tM2=pay>0?((bg*tM1)+igM)/pay:0;
+  const malO=tA*te*tb/1e6,gF=malO>0?(tM2/malO)*so:0;
+  T('o_bk',f2(tM1));T('o_igm',f2(igM));T('o_bm',f2(tM2));T('o_mo',malO.toFixed(5));T('o_gf',f2(gF));
+  const tT=gF*sm,kfT=(tT+hz)*kf,fd=tT+hz+kfT,nh=tT+hz+cs,kg1=sm>0?fd/sm:0;
+  T('o_tt',fE(tT));T('o_hz',fE(hz));T('o_kft',fE(kfT));T('o_cst',fE(cs));T('o_fd',fE(fd));T('o_kg1',f2(kg1)+' EUR');
+  const gkf=fe2>0?(fe2-fe)/fe2:0,fEx=fd*gkf,st=fd+fEx,kg2=sm>0?st/sm:0;
+  T('o_gkf',(gkf*100).toFixed(2)+'%');T('o_ft',fE(fEx));T('o_nh',fE(nh));T('o_st',fE(st));T('o_kg2',f2(kg2)+' EUR');
+  document.getElementById('o_gkfW').classList.toggle('danger',gkf>.15);
+  const q=document.getElementById('bQty');q.innerHTML='';
+  [100,200,300,500,1000].forEach(n=>{const tt=gF*n,k=(tt+hz)*kf,d=tt+hz+k,e=d*gkf,s=d+e;const kgP=n>0?s/n:0;q.innerHTML+=`<div class="out"><span class="ol">${n} kg</span><span class="ov">${f2(kgP)} EUR${ratesLoaded?' <span class=tl-eq>'+fTL(eur2tl(kgP))+'</span>':''}</span></div>`});
+  updateTL();
+}
+
+// ===== LAMİNASYON =====
+function buildLayers(){
+  const c=document.getElementById('layerCards');c.innerHTML='';
+  for(let i=0;i<4;i++){
+    const def=LAYER_DEFAULTS[i];const col=LAYER_COLORS[i];
+    let opts=MATS.map(m=>`<option value="${m.n}" ${m.n===def.mat?'selected':''}>${m.n} (${m.d})</option>`).join('');
+    c.innerHTML+=`<div class="layer-card"><div class="lc-title"><div class="dot" style="background:${col}"></div>${i+1}. Kat ${i===0?'(Dış)':i===3?'(İç)':''}</div>
+    <div class="fg c4"><div class="fi"><label>Malzeme</label><select id="l${i}_mat" onchange="onLayerMat(${i})">${opts}</select></div>
+    <div class="fi hr"><label>Mikron</label><div class="iw"><input type="number" id="l${i}_mic" value="${def.mic}" step="1"><span class="ur">µ</span></div></div>
+    <div class="fi hr"><label>Fiyat</label><div class="iw"><input type="number" id="l${i}_rate" value="${DEF_RATES[def.mat]||0}" step="0.01"><span class="ur">$/kg</span></div></div></div>
+    <div class="og c4" style="margin-top:.4rem"><div class="out"><span class="ol">GSM</span><span class="ov" id="lo${i}_gsm">-</span></div><div class="out"><span class="ol">Gerekli (kg)</span><span class="ov" id="lo${i}_kg">-</span></div><div class="out"><span class="ol">Gerekli (m)</span><span class="ov" id="lo${i}_m">-</span></div><div class="out"><span class="ol">Maliyet</span><span class="ov" id="lo${i}_cost">-</span></div></div></div>`;
+  }
+}
+function onLayerMat(i){
+  const sel=document.getElementById('l'+i+'_mat').value;
+  const m=MATS.find(x=>x.n===sel);
+  if(m){S('l'+i+'_mic',m.mic);S('l'+i+'_rate',DEF_RATES[m.n]||0)}
+  calcL();
+}
+function calcL(){
+  const qty=V('l_qty'),reel=V('l_reel'),waste=V('l_waste')/100;
+  const inkGsm=V('l_inkGsm'),inkR=V('l_inkRate'),adhGsm=V('l_adhGsm'),adhR=V('l_adhRate');
+  // Layer GSMs
+  let layerGsm=[],layerKg=[],layerCost=[],totalGsm=0;
+  for(let i=0;i<4;i++){
+    const sel=document.getElementById('l'+i+'_mat').value;
+    const m=MATS.find(x=>x.n===sel);
+    const mic=V('l'+i+'_mic');
+    const gsm=m?mic*m.d:0;
+    layerGsm[i]=gsm;
+  }
+  // Adhesive GSM per join (between layers)
+  let adhGsmArr=[0,0,0,0];
+  for(let i=1;i<4;i++){if(layerGsm[i]>0)adhGsmArr[i]=adhGsm}
+  totalGsm=layerGsm.reduce((a,b)=>a+b,0)+inkGsm+adhGsmArr.reduce((a,b)=>a+b,0);
+  T('lo_tgsm',f2(totalGsm));
+  // Per layer
+  let matTotal=0;
+  for(let i=0;i<4;i++){
+    const gsm=layerGsm[i];
+    const kg=totalGsm>0?Math.round(gsm*qty/totalGsm):0;
+    const rate=V('l'+i+'_rate');
+    const cost=kg*rate;
+    const meter=reel>0&&gsm>0?Math.round(kg*1e6/(reel*gsm)):0;
+    layerKg[i]=kg;layerCost[i]=cost;matTotal+=cost;
+    T('lo'+i+'_gsm',f2(gsm));T('lo'+i+'_kg',kg);T('lo'+i+'_m',meter.toLocaleString('tr-TR'));T('lo'+i+'_cost',fD(cost));
+  }
+  // Ink
+  const inkDry=totalGsm>0?Math.round(inkGsm*qty/totalGsm):0;
+  const inkLiq=inkDry*4;
+  const inkCost=inkLiq*inkR;
+  T('lo_inkD',inkDry);T('lo_inkL',inkLiq);
+  // Adhesive
+  let adhTotalKg=0;
+  for(let i=1;i<4;i++){if(adhGsmArr[i]>0&&totalGsm>0)adhTotalKg+=Math.round(adhGsmArr[i]*qty/totalGsm)}
+  const adhCost=adhTotalKg*adhR;
+  T('lo_adhKg',adhTotalKg);
+  // Conversion
+  const convCost=qty*(V('l_printR')+V('l_lamR')+V('l_extraR'));
+  const grand=matTotal+inkCost+adhCost+convCost;
+  const perKg=qty>0?grand/qty:0;
+  const wGrand=grand*(1+waste);
+  const wPerKg=qty>0?wGrand/qty:0;
+  // Total meters (based on first layer)
+  const totalMeter=reel>0&&totalGsm>0?Math.round(qty*1e6/(reel*totalGsm)):0;
+  T('lo_matT',fD(matTotal));T('lo_inkT',fD(inkCost));T('lo_adhT',fD(adhCost));T('lo_convT',fD(convCost));
+  T('lo_grand',fD(grand));T('lo_perKg',f2(perKg)+' $/kg');
+  T('lo_wGrand',fD(wGrand));T('lo_wPerKg',f2(wPerKg)+' $/kg');T('lo_meter',totalMeter.toLocaleString('tr-TR')+' m');
+  updateTL();
+}
+
+// ===== POUCH =====
+function calcP(){
+  const w=V('p_w'),h=V('p_h'),g=V('p_g'),seal=V('p_seal');
+  const gsm=V('p_gsm'),rate=V('p_rate'),zipW=V('p_zip'),zipR=V('p_zipR');
+  const totalW=(w*2+g)+seal*2;
+  const totalH=h+seal*2;
+  const areaCm2=totalW*totalH/100; // mm² to cm²
+  const areaM2=totalW*totalH/1e6;
+  const wtG=areaM2*gsm*1000;
+  const zipG=zipW>0?(w/1000)*zipW:0;
+  const totalWtG=wtG+zipG;
+  const perKg=totalWtG>0?1000/totalWtG:0;
+  const matCost=totalWtG>0?(totalWtG/1000)*rate:0;
+  const zipCost=zipR>0?(w/1000)*zipR:0;
+  const unitCost=matCost+zipCost;
+  T('po_area',f2(areaCm2));T('po_wt',f2(totalWtG)+' gr');T('po_perKg',Math.floor(perKg));
+  T('po_matC',fD(matCost));T('po_zipC',fD(zipCost));T('po_unit',fD(unitCost));
+  T('po_1k',fD(unitCost*1000));T('po_10k',fD(unitCost*10000));T('po_100k',fD(unitCost*100000));
+}
+
+// ===== HAMMADDE =====
+let mats=[];let hSheets={};
+function defMats(){return [{u:'SOLID PAYET WAX',m:'LOXIOL G78',f:'YİMKA',kg:1.4,p:4.8},{u:'KAYDIRICI',m:'LOXIOL G32',f:'YİMKA',kg:1.4,p:3.1},{u:'POLİETİLEN WAX',m:'280-371',f:'polivinil',kg:0.4,p:3.5},{u:'ANTİOKSİDAN',m:'1076',f:'polivinil',kg:0,p:7},{u:'IMPACT MODIFIER',m:'2020',f:'POLİVİNİL',kg:15,p:2.9},{u:'STABİLİZER',m:'MARK 17 MOKD',f:'POLİVİNİL',kg:4.5,p:8},{u:'PVC K58',m:'PETKİM',f:'PETKİM',kg:187.5,p:0.9},{u:'PVC K67',m:'PETKİM',f:'PETKİM',kg:0,p:0.9},{u:'Toz boya',m:'',f:'ASİL KİMYA',kg:0.17,p:25},{u:'PA',m:'',f:'POLİVİNİL',kg:1,p:3.65},{u:'Mürekkep/navlun/işçilik',m:'',f:'',kg:1,p:175}]}
+function renderH(){
+  const tb=document.getElementById('hR');tb.innerHTML='';
+  mats.forEach((m,i)=>{const t=(m.kg||0)*(m.p||0);const tr=document.createElement('tr');tr.innerHTML=`<td><input value="${m.u||''}" onchange="mats[${i}].u=this.value"></td><td><input value="${m.m||''}" onchange="mats[${i}].m=this.value"></td><td><input value="${m.f||''}" onchange="mats[${i}].f=this.value"></td><td><input type="number" value="${m.kg}" step="0.01" oninput="mats[${i}].kg=parseFloat(this.value)||0;calcH()"></td><td><input type="number" value="${m.p}" step="0.01" oninput="mats[${i}].p=parseFloat(this.value)||0;calcH()"></td><td><div class="ro">${f2(t)}</div></td><td><button class="bdel" onclick="mats.splice(${i},1);renderH();calcH()">×</button></td>`;tb.appendChild(tr)});
+}
+function addMat(d){mats.push(d||{u:'',m:'',f:'',kg:0,p:0});renderH();calcH()}
+function calcH(){
+  let tkg=0,tmal=0;mats.forEach(m=>{tkg+=m.kg||0;tmal+=(m.kg||0)*(m.p||0)});
+  const bm=tkg>0?tmal/tkg:0,isc=bm*(V('h_isc')/100),fire=bm*(V('h_fire')/100),gen=bm+isc+fire;
+  T('ho_tkg',f2(tkg));T('ho_tmal',fT(tmal));T('ho_bm',f2(bm)+' TL');T('ho_isc',f2(isc)+' TL');T('ho_fire',f2(fire)+' TL');T('ho_gen',f2(gen));
+  renderH();
+}
+function selHS(n){document.querySelectorAll('#hSB .nav-btn').forEach(b=>b.style.borderColor=b.textContent===n?'var(--acc)':'');if(hSheets[n]){mats=JSON.parse(JSON.stringify(hSheets[n].m));S('h_isc',hSheets[n].i);S('h_fire',hSheets[n].f);renderH();calcH()}}
+
+// ===== ŞEFFAF =====
+function calcS(){
+  const bf=V('s_bf'),ig=V('s_ig'),gc=V('s_gc'),bg=V('s_bg'),so=V('s_so'),en=V('s_en'),boy=V('s_boy');
+  const igM=ig*gc,pay=bg+ig,tM=pay>0?((bf*bg)+igM)/pay:0,malO=en*boy/1e6,gF=malO>0?(tM/malO)*so:0;
+  T('so_igm',f2(igM)+' EUR');T('so_tm',f2(tM)+' EUR');T('so_mo',malO.toFixed(5));T('so_gf',f2(gF));
+}
+
+// ===== EXCEL =====
+function handleFile(file){
+  const r=new FileReader();r.onload=function(e){
+    try{
+      const wb=XLSX.read(new Uint8Array(e.target.result),{type:'array',cellFormula:true});let ld=[];
+      const rn=wb.SheetNames.find(s=>s.toLowerCase().includes('renkli'));
+      if(rn){const ws=wb.Sheets[rn];const c=r=>{const x=ws[r];return x?x.v:null};
+        [['b_filmEni','A2'],['b_fotocel','B2'],['b_tablaEn','J6'],['b_tablaBoy','K6'],['b_filmEni2','P2'],['b_bf','B16'],['b_ig','B18'],['b_so','B22'],['b_siparis','B25'],['b_hazirlik','B27'],['b_coldSeal','B28']].forEach(([id,ref])=>{const v=c(ref);if(v!=null&&typeof v==='number')S(id,v)});
+        const kfv=c('B29');if(kfv!=null&&typeof kfv==='number')S('b_kenarFire',(kfv*100).toFixed(2));
+        [9,10,11,12,13,16,17,18,19,20].forEach((row,i)=>{const nm=c('J'+row),rt=c('K'+row),bp=c('L'+row),ac=c('M'+row);if(nm!=null)colors[i].name=nm;if(rt!=null&&typeof rt==='number')colors[i].rate=rt;if(bp!=null&&typeof bp==='number')colors[i].bp=bp;if(ac!=null)colors[i].on=(ac===true||ac===1)});
+        renderClr();calcB();ld.push(rn)}
+      hSheets={};wb.SheetNames.forEach(sn=>{const ws=wb.Sheets[sn];const c=r=>{const x=ws[r];return x?x.v:null};
+        if((c('B2')==='Ürün Açılımı'||c('B1')==='Ürün Açılımı')&&!sn.toLowerCase().includes('renkli')){const sr=c('B2')==='Ürün Açılımı'?3:2;const ms=[];for(let r=sr;r<=sr+20;r++){const u=c('B'+r);if(!u||String(u).includes('SUM'))break;ms.push({u:String(u),m:String(c('C'+r)||''),f:String(c('D'+r)||''),kg:typeof c('E'+r)==='number'?c('E'+r):0,p:typeof c('F'+r)==='number'?c('F'+r):0})}let fr=3;for(let r=sr+12;r<=sr+25;r++){const ev=c('E'+r);if(ev!=null&&typeof ev==='number'&&ev>0&&ev<1){fr=ev*100;break}}if(ms.length>0){hSheets[sn]={m:ms,i:0,f:fr};ld.push(sn)}}
+        if(c('G41')==='Ürün Açılımı'||c('F41')==='Ürün Adı'){const ms=[];for(let r=42;r<=60;r++){const u=c('G'+r);if(!u||String(u).includes('TOPLAM'))break;ms.push({u:String(u),m:String(c('H'+r)||''),f:String(c('I'+r)||''),kg:typeof c('J'+r)==='number'?c('J'+r):0,p:typeof c('K'+r)==='number'?c('K'+r):0})}let fr=5;const jf=c('J59');if(jf!=null&&typeof jf==='number')fr=jf*100;if(ms.length>0){hSheets[sn]={m:ms,i:0,f:fr};ld.push(sn)}}});
+      const hb=document.getElementById('hSB');hb.innerHTML='';const hn=Object.keys(hSheets);
+      if(hn.length>0){hn.forEach(n=>{const b=document.createElement('button');b.className='nav-btn';b.textContent=n;b.onclick=()=>selHS(n);hb.appendChild(b)});selHS(hn[0])}
+      const sf=wb.SheetNames.find(s=>s.toLowerCase().includes('şeffaf')||s.toLowerCase().includes('seffaf'));
+      if(sf){const ws=wb.Sheets[sf];const c=r=>{const x=ws[r];return x?x.v:null};const bf=c('B2');if(bf!=null&&typeof bf==='number')S('s_bf',bf);const ig=c('B3');if(ig!=null&&typeof ig==='number')S('s_ig',ig);const so=c('B7');if(so!=null&&typeof so==='number')S('s_so',so);const en=c('C8');if(en!=null&&typeof en==='number')S('s_en',en);const boy=c('D8');if(boy!=null&&typeof boy==='number')S('s_boy',boy);calcS();ld.push(sf)}
+      if(ld.length>0)toast(ld.length+' sayfa yüklendi: '+ld.join(', '));
+      else toast('Tanınan yapı bulunamadı',true);
+    }catch(err){toast('Dosya okunamadı: '+err.message,true)}
+  };r.readAsArrayBuffer(file);
+}
+document.getElementById('fileInput').addEventListener('change',e=>{if(e.target.files[0])handleFile(e.target.files[0]);e.target.value=''});
+
+// ===== AUTO-CALC =====
+let dt;document.addEventListener('input',e=>{if(e.target.matches('input[type="number"]')){clearTimeout(dt);dt=setTimeout(()=>{calcB();calcL();calcP();calcH();calcS()},80)}});
+
+// ===== INIT =====
+mats=defMats();renderClr();renderH();buildLayers();
+calcB();calcL();calcP();calcH();calcS();
+fetchRates();
+// Her 30 dakikada kur güncelle
+setInterval(fetchRates,30*60*1000);
+</script>
+</body>
+</html>
