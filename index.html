@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Esnek Ambalaj Üretim Maliyet Sistemi</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -43,8 +44,42 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
 .g4{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:10px}
-@media(max-width:900px){.g2{grid-template-columns:1fr}.g3{grid-template-columns:1fr 1fr}.g4{grid-template-columns:1fr 1fr}}
-@media(max-width:480px){.g3,.g4{grid-template-columns:1fr}}
+@media(max-width:900px){
+.g2{grid-template-columns:1fr}
+.g3{grid-template-columns:1fr 1fr}
+.g4{grid-template-columns:1fr 1fr}
+.theme-toggle{top:auto;bottom:68px;right:8px;font-size:.72rem;padding:4px 8px}
+}
+@media(max-width:600px){
+.app{padding:10px}
+.hdr h1{font-size:1.3rem}
+.hdr p{font-size:.78rem}
+.cur-bar{flex-wrap:wrap;justify-content:center;gap:6px}
+.hero-result .hv{font-size:2rem}
+.hero-result{padding:18px}
+.pills{gap:6px}
+.pill{min-width:80px;padding:10px 8px;font-size:.78rem}
+.pill .pill-icon{font-size:1.1rem}
+.step-btn{padding:8px 10px;font-size:.75rem}
+.step-btn .num{width:18px;height:18px;font-size:.65rem}
+.chain-bar{padding:6px 8px;gap:3px}
+.chain-bar .cb-item{min-width:58px;padding:3px 6px}
+.chain-bar .cb-label{font-size:.55rem}
+.chain-bar .cb-val{font-size:.7rem}
+.chain-bar .cb-arrow{font-size:.7rem}
+.cd{padding:14px}
+.cd h2{font-size:.9rem}
+.rg{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
+.tbl{font-size:.76rem}
+.tbl th,.tbl td{padding:7px 4px}
+.btn{padding:10px 16px;font-size:.82rem}
+}
+@media(max-width:480px){
+.g3,.g4{grid-template-columns:1fr}
+.cur-bar .cur-manual input{width:50px}
+.hero-result .hv{font-size:1.6rem}
+.rg{grid-template-columns:1fr 1fr}
+}
 
 /* ─── CARD ─── */
 .cd{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:16px}
@@ -161,6 +196,60 @@ select option{background:var(--card);color:var(--t1)}
 .chain-bar .cb-arrow{color:var(--t3);font-size:.9rem;flex-shrink:0}
 body{padding-bottom:60px}
 
+/* ─── LIGHT THEME ─── */
+body.light{
+--bg:#f5f5f5;--bg2:#fff;--card:#fff;--card2:#fafafa;
+--border:#e0e0e0;--border2:#ccc;
+--t1:#1a1a1a;--t2:#555;--t3:#999;
+}
+body.light .hdr h1{-webkit-text-fill-color:var(--accent)}
+body.light .chain-bar{background:#fff;border-top:1px solid #e0e0e0}
+body.light select option{background:#fff;color:#1a1a1a}
+
+/* ─── THEME TOGGLE ─── */
+.theme-toggle{position:fixed;top:12px;right:16px;z-index:200;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.82rem;color:var(--t2);transition:all .2s}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+
+/* ─── CURRENCY BAR ─── */
+.cur-bar{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:6px 0;font-size:.78rem;color:var(--t2)}
+.cur-bar .cur-rate{font-weight:600;color:var(--accent)}
+.cur-bar .cur-src{font-size:.68rem;color:var(--t3);margin-left:4px}
+.cur-bar .cur-tl{background:var(--accent-bg);border:1px solid rgba(16,185,129,.2);border-radius:6px;padding:3px 8px;color:var(--accent);font-weight:600;font-size:.76rem;cursor:pointer}
+.cur-bar .cur-tl:hover{background:rgba(16,185,129,.15)}
+.cur-manual{display:inline-flex;align-items:center;gap:4px}
+.cur-manual input{width:60px;padding:3px 6px;background:var(--bg2);border:1px solid var(--border);border-radius:5px;color:var(--t1);font-family:inherit;font-size:.78rem;text-align:right}
+.cur-manual input:focus{outline:none;border-color:var(--accent)}
+
+/* ─── AUTH OVERLAY ─── */
+.auth-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+.auth-overlay.hidden{opacity:0;pointer-events:none}
+.auth-box{width:100%;max-width:400px;padding:32px;background:var(--card);border:1px solid var(--border);border-radius:16px}
+.auth-box h1{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px}
+.auth-box .auth-sub{text-align:center;color:var(--t2);font-size:.82rem;margin-bottom:24px}
+.auth-tabs{display:flex;gap:4px;margin-bottom:20px}
+.auth-tab{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--bg2);color:var(--t2);cursor:pointer;font-family:inherit;font-size:.88rem;font-weight:600;text-align:center;transition:all .2s}
+.auth-tab.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.auth-input{width:100%;padding:11px 14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;color:var(--t1);font-family:inherit;font-size:.88rem;margin-bottom:10px;transition:border .2s}
+.auth-input:focus{outline:none;border-color:var(--accent)}
+.auth-btn{width:100%;padding:12px;border-radius:9px;border:none;background:var(--accent);color:#fff;font-family:inherit;font-weight:700;font-size:.92rem;cursor:pointer;transition:background .2s;margin-top:6px}
+.auth-btn:hover{background:var(--accent2)}
+.auth-btn:disabled{opacity:.5;cursor:not-allowed}
+.auth-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;font-size:.82rem;color:var(--red);margin-top:12px;display:none}
+.auth-msg{background:var(--accent-bg);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px;font-size:.82rem;color:var(--accent);margin-top:12px;display:none}
+.auth-loading{text-align:center;padding:40px;color:var(--t2);font-size:.9rem}
+
+/* ─── USER BAR ─── */
+.user-bar{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:4px 0;font-size:.78rem}
+.user-bar .user-email{color:var(--t2);overflow:hidden;text-overflow:ellipsis;max-width:200px}
+.user-bar .user-company{color:var(--accent);font-weight:600}
+.user-logout{background:none;border:1px solid var(--border);color:var(--t2);border-radius:6px;padding:4px 10px;cursor:pointer;font-family:inherit;font-size:.75rem;transition:all .15s}
+.user-logout:hover{border-color:var(--red);color:var(--red)}
+
+/* ─── APP LOADING ─── */
+.app-loading{position:fixed;inset:0;z-index:9998;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;color:var(--t2);font-size:.9rem}
+.app-loading .spinner{width:32px;height:32px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .6s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
 /* ─── PRINT ─── */
 @media print{
 .chain-bar{display:none}
@@ -172,11 +261,57 @@ body{background:#fff;color:#000;padding-bottom:0}
 </style>
 </head>
 <body>
-<div class="app">
+<!-- AUTH OVERLAY -->
+<div id="authOverlay" class="auth-overlay">
+  <div class="auth-box">
+    <h1>FlexiCost</h1>
+    <div class="auth-sub">Esnek Ambalaj Üretim Maliyet Sistemi</div>
+    <div class="auth-tabs">
+      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Giriş Yap</button>
+      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
+    </div>
+    <div id="authLoginForm">
+      <input type="email" class="auth-input" id="auth-email" placeholder="E-posta adresi" autocomplete="email">
+      <input type="password" class="auth-input" id="auth-pass" placeholder="Şifre" autocomplete="current-password">
+      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
+    </div>
+    <div id="authRegisterForm" style="display:none">
+      <input type="email" class="auth-input" id="reg-email" placeholder="E-posta adresi" autocomplete="email">
+      <input type="text" class="auth-input" id="reg-company" placeholder="Firma Adı">
+      <input type="password" class="auth-input" id="reg-pass" placeholder="Şifre (min 6 karakter)" autocomplete="new-password">
+      <input type="password" class="auth-input" id="reg-pass2" placeholder="Şifre Tekrar" autocomplete="new-password">
+      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Kayıt Ol</button>
+    </div>
+    <div class="auth-error" id="authError"></div>
+    <div class="auth-msg" id="authMsg"></div>
+  </div>
+</div>
+
+<!-- APP LOADING -->
+<div id="appLoading" class="app-loading" style="display:none">
+  <div class="spinner"></div>
+  <span>Veriler yükleniyor...</span>
+</div>
+
+<button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️ Açık Tema</button>
+<div class="app" id="mainApp" style="display:none">
 
 <div class="hdr">
+  <div class="user-bar" id="userBar">
+    <span class="user-company" id="userCompany"></span>
+    <span class="user-email" id="userEmail"></span>
+    <button class="user-logout" onclick="doLogout()">Çıkış Yap</button>
+  </div>
   <h1>Esnek Ambalaj Üretim Maliyet Sistemi</h1>
   <p>Doypack / Flat Bottom / 3 Kenar Kaynak / Bobin — Endüstriyel maliyetlendirme ve üretim planlama (€)</p>
+  <div class="cur-bar">
+    <span>EUR/TRY:</span>
+    <div class="cur-manual">
+      <input type="number" id="eur-try-rate" step="0.01" value="36.50" oninput="onCurrencyChange()">
+    </div>
+    <button class="cur-tl" onclick="fetchEurTry(false)" title="Şimdi güncelle">↻ Şimdi Güncelle</button>
+    <span class="cur-src" id="cur-src">Yükleniyor...</span>
+  </div>
 </div>
 
 <!-- STEPS NAV -->
@@ -476,6 +611,16 @@ body{background:#fff;color:#000;padding-bottom:0}
           <div class="ri"><div class="rl">MOQ Kontrol</div><div class="rv" id="live-moq">—</div></div>
         </div>
       </div>
+
+      <div class="cd" style="background:var(--card2)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+          <h3 style="margin-top:0;color:var(--t2)">Ürün Şablonları</h3>
+          <button class="btn btn-out btn-sm" onclick="saveTemplate()">Şablon Kaydet</button>
+        </div>
+        <div id="template-list" style="max-height:200px;overflow-y:auto">
+          <div style="text-align:center;padding:10px;color:var(--t3);font-size:.82rem">Henüz şablon yok</div>
+        </div>
+      </div>
     </div>
   </div>
   <button class="btn btn-main" onclick="goStep('material')" style="max-width:300px;margin:16px auto;display:block">Malzeme Yapısına Geç →</button>
@@ -696,6 +841,14 @@ body{background:#fff;color:#000;padding-bottom:0}
       <div class="ri"><div class="rl">€ / 1.000 Adet</div><div class="rv ac" id="s-eurK">—</div></div>
     </div>
 
+    <!-- TL KARŞILIKLARI -->
+    <div class="rg" style="margin-bottom:20px">
+      <div class="ri" style="border-left:3px solid var(--orange)"><div class="rl">₺ Toplam</div><div class="rv or" id="s-tryTotal">—</div></div>
+      <div class="ri" style="border-left:3px solid var(--orange)"><div class="rl">₺ / KG</div><div class="rv or" id="s-tryKg">—</div></div>
+      <div class="ri" style="border-left:3px solid var(--orange)"><div class="rl">₺ / Adet</div><div class="rv or" id="s-tryPc">—</div></div>
+      <div class="ri" style="border-left:3px solid var(--orange)"><div class="rl">₺ / 1.000 Adet</div><div class="rv or" id="s-tryK">—</div></div>
+    </div>
+
     <div class="g2">
       <!-- SOL: TEKNİK BİLGİ -->
       <div>
@@ -770,9 +923,22 @@ body{background:#fff;color:#000;padding-bottom:0}
       </div>
     </div>
 
+    <!-- SİPARİŞ ADEDİ BAZLI FİYAT KIRILIMI -->
+    <div class="cd" style="margin-top:16px">
+      <h2><span class="ic" style="background:var(--cyan)">📊</span> Adet Bazlı Fiyat Kırılımı</h2>
+      <p style="color:var(--t2);font-size:.8rem;margin-bottom:12px">Farklı sipariş adetleri için tahmini birim fiyatlar (silindir maliyeti adet arttıkça azalır)</p>
+      <div style="overflow-x:auto">
+        <table class="tbl" id="s-qtyBreakdown">
+          <thead><tr><th>Adet</th><th class="right">€/Adet</th><th class="right">€/KG</th><th class="right">€/1000</th><th class="right">Toplam €</th><th class="right">₺ Toplam</th></tr></thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </div>
+
     <!-- AKSIYON BUTONLARI -->
     <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;flex-wrap:wrap">
       <button class="btn btn-out" onclick="exportFullPDF()">📄 PDF Teklif İndir</button>
+      <button class="btn btn-out" onclick="exportCSV()">📊 Excel (CSV)</button>
       <button class="btn btn-out" onclick="saveToHistory()">💾 Geçmişe Kaydet</button>
       <button class="btn btn-out btn-sm" onclick="goStep('product')">🔄 Yeni Hesaplama</button>
     </div>
@@ -819,20 +985,267 @@ body{background:#fff;color:#000;padding-bottom:0}
   <div class="cb-item" id="cb-eurkg"><div class="cb-label">€/kg</div><div class="cb-val" id="cv-eurkg">—</div></div>
   <div class="cb-arrow">→</div>
   <div class="cb-item" id="cb-eurpc"><div class="cb-label">€/adet</div><div class="cb-val" id="cv-eurpc">—</div></div>
+  <div class="cb-arrow">→</div>
+  <div class="cb-item" id="cb-trytotal"><div class="cb-label">₺ Toplam</div><div class="cb-val cv-orange" id="cv-trytotal">—</div></div>
 </div>
 
 <script>
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  ESNEK AMBALAJ ÜRETİM MALİYET SİSTEMİ — HESAP MOTORU      ║
 // ║  Tüm değişkenler birbirine bağlı, tek merkezi RECALC()     ║
+// ║  Supabase Auth + Database entegrasyonu                      ║
 // ╚══════════════════════════════════════════════════════════════╝
+
+// ═══════════ SUPABASE ═══════════
+const SUPABASE_URL = 'https://umdjiopeswguwcbbwvqo.supabase.co';
+const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVtZGppb3Blc3dndXdjYmJ3dnFvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYyMzUzNzMsImV4cCI6MjA5MTgxMTM3M30.ylxnnC0BchCEpaPd2M6lDTsuV1-N16LosMQVUMq0EN0';
+const sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// ═══════════ DB ABSTRACTION LAYER ═══════════
+const DB = {
+  uid: null,
+  cache: {
+    rates: null,
+    rateProfiles: [],
+    clients: [],
+    templates: [],
+    calculations: [],
+    quotations: [],
+    teklifSeq: 0
+  },
+
+  async loadAll() {
+    const { data: { user } } = await sb.auth.getUser();
+    if (!user) return;
+    this.uid = user.id;
+
+    const [r1, r2, r3, r4, r5, r6, r7] = await Promise.all([
+      sb.from('machine_rates').select('data').eq('user_id', this.uid).maybeSingle(),
+      sb.from('rate_profiles').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
+      sb.from('clients').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
+      sb.from('templates').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
+      sb.from('calculations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(20),
+      sb.from('quotations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(50),
+      sb.from('teklif_seq').select('seq').eq('user_id', this.uid).maybeSingle()
+    ]);
+
+    this.cache.rates = r1.data?.data || null;
+    this.cache.rateProfiles = r2.data || [];
+    this.cache.clients = r3.data || [];
+    this.cache.templates = r4.data || [];
+    this.cache.calculations = r5.data || [];
+    this.cache.quotations = r6.data || [];
+    this.cache.teklifSeq = r7.data?.seq || 0;
+  },
+
+  // Makine Fiyatları — debounced save
+  _ratesTimer: null,
+  saveRates(data) {
+    this.cache.rates = data;
+    if (this._ratesTimer) clearTimeout(this._ratesTimer);
+    this._ratesTimer = setTimeout(() => {
+      sb.from('machine_rates').upsert(
+        { user_id: this.uid, data, updated_at: new Date().toISOString() },
+        { onConflict: 'user_id' }
+      );
+    }, 2000);
+  },
+
+  // Fiyat Profilleri
+  async addRateProfile(name, data) {
+    const row = { user_id: this.uid, name, data, created_at: new Date().toISOString() };
+    const { data: inserted } = await sb.from('rate_profiles').insert(row).select().single();
+    if (inserted) this.cache.rateProfiles.unshift(inserted);
+    if (this.cache.rateProfiles.length > 10) this.cache.rateProfiles = this.cache.rateProfiles.slice(0, 10);
+    return inserted;
+  },
+  async deleteRateProfile(id) {
+    this.cache.rateProfiles = this.cache.rateProfiles.filter(x => x.id !== id);
+    await sb.from('rate_profiles').delete().eq('id', id);
+  },
+
+  // Müşteriler
+  async addClient(data) {
+    const row = { user_id: this.uid, ...data, created_at: new Date().toISOString() };
+    const { data: inserted } = await sb.from('clients').insert(row).select().single();
+    if (inserted) this.cache.clients.unshift(inserted);
+    return inserted;
+  },
+  async updateClient(id, data) {
+    const idx = this.cache.clients.findIndex(x => x.id === id);
+    if (idx >= 0) Object.assign(this.cache.clients[idx], data);
+    await sb.from('clients').update(data).eq('id', id);
+  },
+  async deleteClient(id) {
+    this.cache.clients = this.cache.clients.filter(x => x.id !== id);
+    await sb.from('clients').delete().eq('id', id);
+  },
+
+  // Şablonlar
+  async addTemplate(name, snapshot) {
+    const row = { user_id: this.uid, name, snapshot, created_at: new Date().toISOString() };
+    const { data: inserted } = await sb.from('templates').insert(row).select().single();
+    if (inserted) this.cache.templates.unshift(inserted);
+    if (this.cache.templates.length > 20) this.cache.templates = this.cache.templates.slice(0, 20);
+    return inserted;
+  },
+  async deleteTemplate(id) {
+    this.cache.templates = this.cache.templates.filter(x => x.id !== id);
+    await sb.from('templates').delete().eq('id', id);
+  },
+
+  // Hesaplama Geçmişi
+  async addCalculation(data) {
+    const row = { user_id: this.uid, ...data, created_at: new Date().toISOString() };
+    const { data: inserted } = await sb.from('calculations').insert(row).select().single();
+    if (inserted) this.cache.calculations.unshift(inserted);
+    if (this.cache.calculations.length > 20) this.cache.calculations = this.cache.calculations.slice(0, 20);
+    return inserted;
+  },
+  async deleteCalculation(id) {
+    this.cache.calculations = this.cache.calculations.filter(x => x.id !== id);
+    await sb.from('calculations').delete().eq('id', id);
+  },
+  async clearCalculations() {
+    this.cache.calculations = [];
+    await sb.from('calculations').delete().eq('user_id', this.uid);
+  },
+
+  // Teklifler
+  async addQuotation(data) {
+    const row = { user_id: this.uid, ...data, created_at: new Date().toISOString() };
+    const { data: inserted } = await sb.from('quotations').insert(row).select().single();
+    if (inserted) this.cache.quotations.unshift(inserted);
+    if (this.cache.quotations.length > 50) this.cache.quotations = this.cache.quotations.slice(0, 50);
+    return inserted;
+  },
+
+  // Teklif Numarası
+  async nextTeklifNo() {
+    const { data } = await sb.rpc('next_teklif_no');
+    this.cache.teklifSeq = data || 0;
+    const year = new Date().getFullYear();
+    return `EA-${year}-${String(this.cache.teklifSeq).padStart(4, '0')}`;
+  }
+};
+
+// ═══════════ AUTH ═══════════
+let currentUser = null;
+
+function switchAuthTab(tab) {
+  $('tabLogin').classList.toggle('active', tab === 'login');
+  $('tabRegister').classList.toggle('active', tab === 'register');
+  $('authLoginForm').style.display = tab === 'login' ? 'block' : 'none';
+  $('authRegisterForm').style.display = tab === 'register' ? 'block' : 'none';
+  $('authError').style.display = 'none';
+  $('authMsg').style.display = 'none';
+}
+
+function showAuthError(msg) {
+  const el = $('authError');
+  el.textContent = msg;
+  el.style.display = 'block';
+  $('authMsg').style.display = 'none';
+}
+
+function showAuthMsg(msg) {
+  const el = $('authMsg');
+  el.textContent = msg;
+  el.style.display = 'block';
+  $('authError').style.display = 'none';
+}
+
+async function doLogin() {
+  const email = $('auth-email').value.trim();
+  const pass = $('auth-pass').value;
+  if (!email || !pass) { showAuthError('E-posta ve şifre gerekli.'); return; }
+  $('loginBtn').disabled = true;
+  $('loginBtn').textContent = 'Giriş yapılıyor...';
+  const { error } = await sb.auth.signInWithPassword({ email, password: pass });
+  if (error) {
+    showAuthError(error.message === 'Invalid login credentials' ? 'E-posta veya şifre hatalı.' : error.message);
+    $('loginBtn').disabled = false;
+    $('loginBtn').textContent = 'Giriş Yap';
+  }
+}
+
+async function doRegister() {
+  const email = $('reg-email').value.trim();
+  const company = $('reg-company').value.trim();
+  const pass = $('reg-pass').value;
+  const pass2 = $('reg-pass2').value;
+  if (!email || !pass) { showAuthError('E-posta ve şifre gerekli.'); return; }
+  if (pass.length < 6) { showAuthError('Şifre en az 6 karakter olmalı.'); return; }
+  if (pass !== pass2) { showAuthError('Şifreler eşleşmiyor.'); return; }
+  $('registerBtn').disabled = true;
+  $('registerBtn').textContent = 'Kayıt oluşturuluyor...';
+  const { data, error } = await sb.auth.signUp({ email, password: pass, options: { data: { company_name: company } } });
+  if (error) {
+    showAuthError(error.message);
+  } else if (data.user && !data.session) {
+    showAuthMsg('Kayıt başarılı! E-posta adresinize gelen doğrulama linkini tıklayın.');
+  }
+  $('registerBtn').disabled = false;
+  $('registerBtn').textContent = 'Kayıt Ol';
+}
+
+async function doLogout() {
+  if (!confirm('Çıkış yapmak istediğinize emin misiniz?')) return;
+  await sb.auth.signOut();
+}
+
+async function onAuthReady(user) {
+  currentUser = user;
+  // Show loading
+  $('authOverlay').classList.add('hidden');
+  $('appLoading').style.display = 'flex';
+  $('mainApp').style.display = 'none';
+
+  // Load all data from Supabase
+  await DB.loadAll();
+
+  // Update user bar
+  $('userEmail').textContent = user.email;
+  const profile = await sb.from('profiles').select('company_name').eq('id', user.id).maybeSingle();
+  const companyName = user.user_metadata?.company_name || profile.data?.company_name || '';
+  $('userCompany').textContent = companyName;
+
+  // Initialize app
+  $('appLoading').style.display = 'none';
+  $('mainApp').style.display = 'block';
+  loadSavedRates();
+  renderRateProfiles();
+  initLayers();
+  bindInputs();
+  renderHist();
+  renderClients();
+  updateClientSelect();
+  renderTemplates();
+  startCurrencyAutoRefresh();
+  RECALC();
+}
+
+function showAuthOverlay() {
+  currentUser = null;
+  $('authOverlay').classList.remove('hidden');
+  $('mainApp').style.display = 'none';
+  $('appLoading').style.display = 'none';
+}
+
+// Enter key support for auth forms
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  if ($('authLoginForm').style.display !== 'none' && (e.target.id === 'auth-email' || e.target.id === 'auth-pass')) doLogin();
+  if ($('authRegisterForm').style.display !== 'none' && (e.target.id === 'reg-email' || e.target.id === 'reg-company' || e.target.id === 'reg-pass' || e.target.id === 'reg-pass2')) doRegister();
+});
 
 // ═══════════ STATE ═══════════
 const S = {
   pkgType: 'doypack',
   printType: 'roto',
   layers: [],
-  layerCounter: 0
+  layerCounter: 0,
+  eurTry: 36.50
 };
 
 // Global sonuç nesnesi — PDF export ve history tarafından kullanılır
@@ -851,7 +1264,6 @@ const FILMS = {
   'Alu Folyo':{ density: 2.70, micron: 7 }
 };
 
-const HIST_KEY = 'ambalaj-uretim-gecmis';
 const PKG_NAMES = { doypack: 'Doypack', flatbottom: 'Flat Bottom', '3sideseal': '3 Kenar Kaynak', rollstock: 'Bobin (Rollstock)' };
 const euro = (v, d=2) => '€' + v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
 const num = (v, d=2) => v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
@@ -1228,27 +1640,64 @@ function RECALC() {
   const errEl = $('summary-err');
   const contentEl = $('summary-content');
   const errors = [];
+  const warnings = [];
   if (!w || !h) errors.push('Ölçüler eksik (genişlik/yükseklik)');
+  if (w < 0 || h < 0) errors.push('Ölçüler negatif olamaz');
+  if (w > 1000) warnings.push('Genişlik 1000 mm üzerinde — kontrol edin');
+  if (h > 1000) warnings.push('Yükseklik 1000 mm üzerinde — kontrol edin');
   if (!qty) errors.push('Sipariş adedi girilmedi');
+  if (qty < 0) errors.push('Sipariş adedi negatif olamaz');
   if (!repeat) errors.push('Baskı çevresi (repeat) girilmedi — hesaplama yapılamaz ❗');
+  if (repeat < 0) errors.push('Repeat negatif olamaz');
   if (!up) errors.push('Up sayısı girilmedi ❗');
   if (!webw) errors.push('Baskı eni (web width) girilmedi');
+  if (webw > 0 && w > 0 && up > 0 && (w * up) > webw * 1.05) warnings.push(`Web width (${webw}mm) ${up} up için dar olabilir — (${w}×${up} = ${w*up}mm)`);
   if (layers.length === 0) errors.push('En az bir malzeme katmanı girilmeli');
   if (totalGSM === 0) errors.push('GSM hesaplanamıyor — katman mikron/yoğunluk eksik ❗');
   if (metraj === 0 && qty > 0) errors.push('Metraj = 0 — repeat veya up kontrol edin ❗');
+  layers.forEach(l => {
+    if (l.density > 0 && (l.density < 0.5 || l.density > 5)) warnings.push(`${l.film || 'Katman'} yoğunluğu (${l.density}) olağandışı — 0.5–3.0 g/cc beklenir`);
+    if (l.micron > 200) warnings.push(`${l.film || 'Katman'} mikron değeri (${l.micron}μ) çok yüksek`);
+    if (l.rate < 0) errors.push(`${l.film || 'Katman'} fiyatı negatif olamaz`);
+  });
+  if (waste > 25) warnings.push(`Fire oranı %${waste} — normalde %5–15 aralığındadır`);
 
   if (errors.length > 0) {
     errEl.style.display = 'block';
-    errEl.innerHTML = '⚠️ <strong>Kırılma noktaları:</strong><br>' + errors.map(e => '• ' + e).join('<br>');
+    let html = '⚠️ <strong>Kırılma noktaları:</strong><br>' + errors.map(e => '• ' + e).join('<br>');
+    if (warnings.length > 0) html += '<br><br><span style="color:var(--orange)">💡 <strong>Uyarılar:</strong></span><br>' + warnings.map(w => '• ' + w).join('<br>');
+    errEl.innerHTML = html;
     contentEl.style.display = 'none';
   } else {
     errEl.style.display = 'none';
     contentEl.style.display = 'block';
+    // Show warnings even when no errors
+    const warnPanel = $('summary-warnings');
+    if (warnings.length > 0) {
+      if (!warnPanel) {
+        const d = document.createElement('div');
+        d.id = 'summary-warnings';
+        d.className = 'warn';
+        contentEl.insertBefore(d, contentEl.firstChild);
+      }
+      $('summary-warnings').innerHTML = '💡 ' + warnings.join(' · ');
+      $('summary-warnings').style.display = 'flex';
+    } else if (warnPanel) {
+      warnPanel.style.display = 'none';
+    }
 
     tx('s-totalCost', euro(totalCost));
     tx('s-eurKg', euro(eurKg));
     tx('s-eurPc', euro(eurPc, 4));
     tx('s-eurK', euro(eurK));
+
+    // TL karşılıkları
+    const kur = getEurTry();
+    tx('s-tryTotal', tl(totalCost * kur));
+    tx('s-tryKg', tl(eurKg * kur));
+    tx('s-tryPc', tl(eurPc * kur, 4));
+    tx('s-tryK', tl(eurK * kur));
+    cb('cv-trytotal', totalCost > 0 ? tl(totalCost * kur) : '—', false);
 
     $('s-techInfo').innerHTML = `<div class="rg">
       <div class="ri"><div class="rl">Paket Tipi</div><div class="rv">${PKG_NAMES[S.pkgType]}</div></div>
@@ -1300,6 +1749,59 @@ function RECALC() {
       utbody.innerHTML += `<tr><td>${u.l}</td><td class="right">${euro(u.c / grossKg)}</td><td class="right">${euro(u.c / qty, 4)}</td></tr>`;
     });
     utbody.innerHTML += `<tr><td>TOPLAM</td><td class="right">${euro(eurKg)}</td><td class="right">${euro(eurPc, 4)}</td></tr>`;
+
+    // ─── Adet Bazlı Fiyat Kırılımı ───
+    const qtyBreaks = [25000, 50000, 100000, 250000, 500000].filter(q => q !== qty);
+    qtyBreaks.push(qty);
+    qtyBreaks.sort((a,b) => a - b);
+    const brkBody = document.querySelector('#s-qtyBreakdown tbody');
+    brkBody.innerHTML = '';
+    const kurVal = getEurTry();
+    qtyBreaks.forEach(bq => {
+      // Recalculate for this qty
+      const bMetraj = (bq * repeat / 1000) / up;
+      const bMetrajFire = bMetraj * (1 + waste / 100);
+      const bNetKg = (bq * pktGram) / 1000;
+      const bGrossKg = bNetKg * (1 + waste / 100);
+      const bTotalArea = area * bq * (1 + waste / 100);
+      let bRaw = 0;
+      layers.forEach(l => { bRaw += (l.gsm / 1000) * bTotalArea * l.rate; });
+      bRaw += (totalAdhGsm / 1000) * bTotalArea * adhRate;
+      if (lakGsm > 0) bRaw += (lakGsm / 1000) * bTotalArea * lakRate;
+      const bPrintArea = bMetraj * (webw / 1000);
+      const bInkKg = (bPrintArea * (coverage / 100) * laydown) / 1000;
+      const bInkCost = bInkKg * inkRate;
+      let bCyl = cylCost; // silindir sabit maliyet
+      const bPrintMachine = bMetrajFire * printRatePerMt;
+      let bPrintLabor;
+      if (S.printType === 'roto') {
+        bPrintLabor = bGrossKg * (pf('roto-laborKg') || 0) + bPrintMachine;
+      } else {
+        const dcm2 = pf('digi-costM2') || 0;
+        const dckg = pf('digi-costKg') || 0;
+        bPrintLabor = (dckg > 0 ? bGrossKg * dckg : bPrintArea * dcm2) + bPrintMachine;
+      }
+      const bLam = bGrossKg * (pf('lam-laborKg') || 0) + bMetrajFire * (rates.lPerMt || 0) + bGrossKg * (rates.lamAdhesive || 0);
+      const bSlit = bMetrajFire * (rates.sPerMt || 0);
+      const bConvLabor = bGrossKg * (pf('conv-laborKg') || 0);
+      const bConvMachine = (bq / 1000) * (pf('conv-machineK') || 0) + (bq / 1000) * convMachinePer1000;
+      const bConvExtras = bq * ((pf('conv-zipper')||0) + (pf('conv-valve')||0) + (pf('conv-spout')||0) + (pf('conv-other')||0));
+      const bBase = bRaw + bInkCost + bCyl + bPrintLabor + bLam + bSlit + bConvLabor + bConvMachine + bConvExtras;
+      const bOverhead = bBase * (overheadPct / 100);
+      const bProfit = (bBase + bOverhead) * (profitPct / 100);
+      const bTotal = bBase + bOverhead + bProfit;
+      const bEurPc = bTotal / bq;
+      const bEurKg = bGrossKg > 0 ? bTotal / bGrossKg : 0;
+      const isCurrent = bq === qty;
+      brkBody.innerHTML += `<tr style="${isCurrent ? 'background:var(--accent-bg);font-weight:700' : ''}">
+        <td>${isCurrent ? '→ ' : ''}${num(bq, 0)}</td>
+        <td class="right">${euro(bEurPc, 4)}</td>
+        <td class="right">${euro(bEurKg)}</td>
+        <td class="right">${euro(bEurPc * 1000)}</td>
+        <td class="right">${euro(bTotal)}</td>
+        <td class="right" style="color:var(--orange)">${tl(bTotal * kurVal)}</td>
+      </tr>`;
+    });
   }
 }
 
@@ -1314,7 +1816,8 @@ function scheduleRecalc() {
 const EXCLUDED_IDS = new Set([
   'cl-name','cl-contact','cl-phone','cl-email','cl-addr','cl-city','cl-country',
   'cl-vd','cl-vno','cl-notes','cl-search',
-  'cust-name','cust-addr','cust-city','cust-vd','cust-vno'
+  'cust-name','cust-addr','cust-city','cust-vd','cust-vno',
+  'auth-email','auth-pass','reg-email','reg-company','reg-pass','reg-pass2'
 ]);
 
 function bindInputs() {
@@ -1327,8 +1830,24 @@ function bindInputs() {
   });
 }
 
+// ═══════════ TEKLİF NUMARASI TAKİBİ ═══════════
+
+async function getNextTeklifNo() {
+  return await DB.nextTeklifNo();
+}
+
+async function saveTeklifToHistory(refNo, custName, totalCost, genelToplam, items) {
+  await DB.addQuotation({
+    ref_no: refNo,
+    customer: custName,
+    total_eur: totalCost,
+    genel_toplam: genelToplam,
+    item_count: items.length
+  });
+}
+
 // ═══════════ PDF EXPORT ═══════════
-function exportFullPDF() {
+async function exportFullPDF() {
   RECALC(); // son durumu garantile
   // R nesnesinden tüm değerleri al (tek merkezi hesap)
   const { qty, repeat, webw, up, w, h, g, waste, metraj, totalGSM: gsm,
@@ -1346,7 +1865,7 @@ function exportFullPDF() {
   const now = new Date();
   const dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   const dateShort = now.toLocaleDateString('tr-TR');
-  const refNo = 'EA-' + Date.now().toString(36).toUpperCase();
+  const refNo = await getNextTeklifNo();
 
   // layerStr zaten R'den geliyor, tekrar tanımlamaya gerek yok
   const productDesc = `${PKG_NAMES[S.pkgType]} ${w}×${h}${g > 0 ? '+' + g : ''} mm\n${layerStr}\nToplam GSM: ${num(gsm,2)} | ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'} Baskı`;
@@ -1534,6 +2053,10 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
         <span class="t-label">GENEL TOPLAM</span>
         <span class="t-val mono">${num(genelToplam, 2)} €</span>
       </div>
+      <div class="total-row" style="border-top:none;padding-top:4px">
+        <span class="t-label" style="color:#f59e0b">₺ KARŞILIĞI (1€ = ${num(getEurTry(),2)} ₺)</span>
+        <span class="t-val mono" style="color:#f59e0b">${num(genelToplam * getEurTry(), 2)} ₺</span>
+      </div>
     </div>
   </div>
 
@@ -1578,29 +2101,126 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 </body></html>`);
   win.document.close();
   setTimeout(() => win.print(), 600);
+
+  // Teklif geçmişine kaydet
+  saveTeklifToHistory(refNo, custName, totalCost, genelToplam, items);
 }
 
 // ═══════════ HISTORY ═══════════
-function saveToHistory() {
+function collectAllInputs() {
+  return {
+    pkgType: S.pkgType,
+    printType: S.printType,
+    dims: { w: pf('dim-w'), h: pf('dim-h'), g: pf('dim-g') },
+    order: { qty: pf('order-qty'), waste: pf('waste-pct') },
+    print: {
+      repeat: pf('print-repeat'), webw: pf('print-webw'),
+      cutoff: pf('print-cutoff'), up: pf('print-up'),
+      rotoColors: pf('roto-colors'), rotoCylPrice: pf('roto-cylPrice'), rotoLaborKg: pf('roto-laborKg'),
+      digiCostM2: pf('digi-costM2'), digiCostKg: pf('digi-costKg')
+    },
+    ink: { coverage: pf('ink-coverage'), laydown: pf('ink-laydown'), rate: pf('ink-rate') },
+    lam: { laborKg: pf('lam-laborKg') },
+    mat: { adhGsm: pf('mat-adhGsm'), adhRate: pf('mat-adhRate'), lakGsm: pf('mat-lakGsm'), lakRate: pf('mat-lakRate') },
+    conv: {
+      laborKg: pf('conv-laborKg'), machineK: pf('conv-machineK'),
+      zipper: pf('conv-zipper'), valve: pf('conv-valve'), spout: pf('conv-spout'), other: pf('conv-other')
+    },
+    layers: S.layers.map(id => {
+      const sel = document.querySelector('#layer-' + id + ' select');
+      return {
+        film: sel ? sel.value : '',
+        micron: pf('ly-mic-' + id),
+        density: pf('ly-den-' + id),
+        rate: pf('ly-rate-' + id)
+      };
+    })
+  };
+}
+
+function restoreAllInputs(d) {
+  // Package type
+  if (d.pkgType) {
+    S.pkgType = d.pkgType;
+    document.querySelectorAll('#pkgType .pill').forEach(p => {
+      p.classList.toggle('active', p.dataset.type === d.pkgType);
+    });
+    $('gusset-group').style.display = (d.pkgType === 'rollstock') ? 'none' : 'block';
+  }
+  // Print type
+  if (d.printType) {
+    S.printType = d.printType;
+    document.querySelectorAll('#printTypeToggle .tgl').forEach(t => {
+      t.classList.toggle('active', t.dataset.val === d.printType);
+    });
+    $('roto-fields').style.display = d.printType === 'roto' ? 'block' : 'none';
+    $('digital-fields').style.display = d.printType === 'digital' ? 'block' : 'none';
+  }
+  // Dims
+  if (d.dims) { $('dim-w').value = d.dims.w||''; $('dim-h').value = d.dims.h||''; $('dim-g').value = d.dims.g||0; }
+  // Order
+  if (d.order) { $('order-qty').value = d.order.qty||''; $('waste-pct').value = d.order.waste||8; }
+  // Print
+  if (d.print) {
+    $('print-repeat').value = d.print.repeat||''; $('print-webw').value = d.print.webw||'';
+    $('print-cutoff').value = d.print.cutoff||''; $('print-up').value = d.print.up||4;
+    $('roto-colors').value = d.print.rotoColors||8; $('roto-cylPrice').value = d.print.rotoCylPrice||350;
+    $('roto-laborKg').value = d.print.rotoLaborKg||0.15;
+    $('digi-costM2').value = d.print.digiCostM2||0.80; $('digi-costKg').value = d.print.digiCostKg||'';
+  }
+  // Ink
+  if (d.ink) { $('ink-coverage').value = d.ink.coverage||60; $('ink-laydown').value = d.ink.laydown||1.5; $('ink-rate').value = d.ink.rate||12; }
+  // Lam
+  if (d.lam) { $('lam-laborKg').value = d.lam.laborKg||0.12; }
+  // Mat
+  if (d.mat) { $('mat-adhGsm').value = d.mat.adhGsm||2.5; $('mat-adhRate').value = d.mat.adhRate||8; $('mat-lakGsm').value = d.mat.lakGsm||0; $('mat-lakRate').value = d.mat.lakRate||6; }
+  // Conv
+  if (d.conv) {
+    $('conv-laborKg').value = d.conv.laborKg||0.20; $('conv-machineK').value = d.conv.machineK||0;
+    $('conv-zipper').value = d.conv.zipper||0; $('conv-valve').value = d.conv.valve||0;
+    $('conv-spout').value = d.conv.spout||0; $('conv-other').value = d.conv.other||0;
+  }
+  // Layers — rebuild
+  if (d.layers && d.layers.length > 0) {
+    $('layers-container').innerHTML = '';
+    S.layers = [];
+    S.layerCounter = 0;
+    d.layers.forEach(l => addLayer(l.film, l.micron, l.rate));
+    // Set density after addLayer (addLayer auto-fills from FILMS, but saved density might differ)
+    d.layers.forEach((l, i) => {
+      const lid = S.layers[i];
+      if (lid && l.density) $('ly-den-' + lid).value = l.density;
+    });
+  }
+  bindInputs();
+  RECALC();
+}
+
+async function saveToHistory() {
   if (!R.qty || !R.totalCost) { alert('Önce hesaplama yapın.'); return; }
-  let hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
-  hist.unshift({
-    id: 'h_' + Date.now(),
+  await DB.addCalculation({
     pkg: PKG_NAMES[S.pkgType],
     size: `${R.w}×${R.h}`,
     qty: num(R.qty, 0),
     total: euro(R.totalCost),
-    eurKg: euro(R.eurKg),
-    date: new Date().toISOString()
+    eur_kg: euro(R.eurKg),
+    layer_str: R.layerStr || '',
+    snapshot: collectAllInputs()
   });
-  if (hist.length > 15) hist = hist.slice(0, 15);
-  localStorage.setItem(HIST_KEY, JSON.stringify(hist));
   renderHist();
   alert('Geçmişe kaydedildi.');
 }
 
+function restoreHist(id) {
+  const h = DB.cache.calculations.find(x => x.id === id);
+  if (!h || !h.snapshot) { alert('Bu kayıt geri yüklenemiyor (eski format).'); return; }
+  if (!confirm('Mevcut değerler bu kaydın verileriyle değiştirilecek. Devam?')) return;
+  restoreAllInputs(h.snapshot);
+  goStep('summary');
+}
+
 function renderHist() {
-  const hist = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
+  const hist = DB.cache.calculations;
   const el = $('hist-scroll');
   if (!el) return;
   if (hist.length === 0) {
@@ -1608,27 +2228,30 @@ function renderHist() {
     return;
   }
   el.innerHTML = hist.map(h => {
-    const d = new Date(h.date);
-    return `<div style="min-width:200px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;flex-shrink:0;position:relative">
-      <button onclick="delHist('${h.id}')" style="position:absolute;top:6px;right:6px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.75rem;opacity:.5">✕</button>
+    const d = new Date(h.created_at);
+    const hasSnap = !!h.snapshot;
+    return `<div style="min-width:220px;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;flex-shrink:0;position:relative;cursor:${hasSnap?'pointer':'default'}" ${hasSnap ? `onclick="restoreHist('${h.id}')"` : ''}>
+      <button onclick="event.stopPropagation();delHist('${h.id}')" style="position:absolute;top:6px;right:6px;background:none;border:none;color:var(--t3);cursor:pointer;font-size:.75rem;opacity:.5" title="Sil">✕</button>
       <div style="font-weight:600;font-size:.88rem;margin-bottom:2px">${h.pkg || '—'}</div>
+      <div style="font-size:.72rem;color:var(--t2);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:190px" title="${h.layer_str||''}">${h.layer_str || ''}</div>
       <div style="font-size:.75rem;color:var(--accent);margin-bottom:6px">${h.size || '—'} mm — ${h.qty || '—'} adet</div>
       <div style="font-size:1.15rem;font-weight:700;color:var(--accent)">${h.total || '—'}</div>
-      <div style="font-size:.72rem;color:var(--t3);margin-top:4px">${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-top:4px">
+        <span style="font-size:.72rem;color:var(--t3)">${d.toLocaleDateString('tr-TR')} ${d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'})}</span>
+        ${hasSnap ? '<span style="font-size:.65rem;color:var(--accent);opacity:.7">↩ Yükle</span>' : ''}
+      </div>
     </div>`;
   }).join('');
 }
 
-function delHist(id) {
-  let h = JSON.parse(localStorage.getItem(HIST_KEY) || '[]');
-  h = h.filter(x => x.id !== id);
-  localStorage.setItem(HIST_KEY, JSON.stringify(h));
+async function delHist(id) {
+  await DB.deleteCalculation(id);
   renderHist();
 }
 
-function clearHist() {
+async function clearHist() {
   if (confirm('Tüm geçmiş silinecek?')) {
-    localStorage.removeItem(HIST_KEY);
+    await DB.clearCalculations();
     renderHist();
   }
 }
@@ -1636,49 +2259,36 @@ function clearHist() {
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  MAKİNE FİYATLARI — €/mt hesaplama ve RECALC entegrasyonu  ║
 // ╚══════════════════════════════════════════════════════════════╝
-const RATES_KEY = 'flexicost-rates';
-const RATES_PROFILES_KEY = 'flexicost-rate-profiles';
-
 function calcMachineRates() {
-  // Gravür: €/mt = saat_ücreti / (hız_mt_dk × 60)
   const gSpeed = pf('rate-gravure-speed') || 1;
   const gHourly = pf('rate-gravure-hourly') || 0;
   const gPerMt = gHourly / (gSpeed * 60);
   tx('rc-gravure', gPerMt.toFixed(4));
-
-  // Dijital: €/mt
   const dSpeed = pf('rate-digital-speed') || 1;
   const dHourly = pf('rate-digital-hourly') || 0;
   const dPerMt = dHourly / (dSpeed * 60);
   tx('rc-digital', dPerMt.toFixed(4));
-
-  // Laminasyon: €/mt
   const lSpeed = pf('rate-lam-speed') || 1;
   const lHourly = pf('rate-lam-hourly') || 0;
   const lPerMt = lHourly / (lSpeed * 60);
   tx('rc-lam', lPerMt.toFixed(4));
-
-  // Kesim: €/mt
   const sSpeed = pf('rate-slit-speed') || 1;
   const sHourly = pf('rate-slit-hourly') || 0;
   const sPerMt = sHourly / (sSpeed * 60);
   tx('rc-slit', sPerMt.toFixed(4));
-
-  // Konverting: €/1000 adet
   const cSpeed = pf('rate-conv-speed') || 1;
   const cHourly = pf('rate-conv-hourly') || 0;
   const cPer1000 = (cHourly / (cSpeed * 60)) * 1000;
   tx('rc-conv', cPer1000.toFixed(2));
 
-  // Store rates for RECALC to use
   S.rates = { gPerMt, dPerMt, lPerMt, sPerMt, cPer1000,
     overhead: pf('rate-overhead') || 0,
     profitMargin: pf('rate-profit-margin') || 0,
     lamAdhesive: pf('rate-lam-adhesive') || 0
   };
 
-  // Save to localStorage
-  localStorage.setItem(RATES_KEY, JSON.stringify({
+  // Save to Supabase (debounced)
+  if (DB.uid) DB.saveRates({
     'rate-gravure-speed': pf('rate-gravure-speed'),
     'rate-gravure-hourly': pf('rate-gravure-hourly'),
     'rate-digital-speed': pf('rate-digital-speed'),
@@ -1692,11 +2302,11 @@ function calcMachineRates() {
     'rate-conv-hourly': pf('rate-conv-hourly'),
     'rate-overhead': pf('rate-overhead'),
     'rate-profit-margin': pf('rate-profit-margin')
-  }));
+  });
 }
 
 function loadSavedRates() {
-  const saved = JSON.parse(localStorage.getItem(RATES_KEY) || 'null');
+  const saved = DB.cache.rates;
   if (saved) {
     Object.keys(saved).forEach(id => {
       const el = $(id);
@@ -1706,40 +2316,34 @@ function loadSavedRates() {
   calcMachineRates();
 }
 
-function saveRateProfile() {
+async function saveRateProfile() {
   const name = prompt('Profil adı girin:');
   if (!name) return;
-  let profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
-  const data = JSON.parse(localStorage.getItem(RATES_KEY) || '{}');
-  profiles.unshift({ id: 'rp_' + Date.now(), name, data, date: new Date().toISOString() });
-  if (profiles.length > 10) profiles = profiles.slice(0, 10);
-  localStorage.setItem(RATES_PROFILES_KEY, JSON.stringify(profiles));
+  const data = DB.cache.rates || {};
+  await DB.addRateProfile(name, data);
   renderRateProfiles();
 }
 
 function loadRateProfile(id) {
-  const profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
-  const p = profiles.find(x => x.id === id);
+  const p = DB.cache.rateProfiles.find(x => x.id === id);
   if (!p) return;
   Object.keys(p.data).forEach(k => { const el = $(k); if (el) el.value = p.data[k]; });
   calcMachineRates();
   RECALC();
 }
 
-function deleteRateProfile(id) {
-  let profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
-  profiles = profiles.filter(x => x.id !== id);
-  localStorage.setItem(RATES_PROFILES_KEY, JSON.stringify(profiles));
+async function deleteRateProfile(id) {
+  await DB.deleteRateProfile(id);
   renderRateProfiles();
 }
 
 function renderRateProfiles() {
-  const profiles = JSON.parse(localStorage.getItem(RATES_PROFILES_KEY) || '[]');
+  const profiles = DB.cache.rateProfiles;
   const el = $('rate-profiles');
   if (!el) return;
   if (profiles.length === 0) { el.innerHTML = '<div style="color:var(--t3);font-size:.82rem;text-align:center;padding:10px">Henüz profil kaydedilmedi</div>'; return; }
   el.innerHTML = profiles.map(p => {
-    const d = new Date(p.date);
+    const d = new Date(p.created_at);
     return `<div class="rp-card" onclick="loadRateProfile('${p.id}')">
       <div><div class="rp-name">${p.name}</div><div class="rp-date">${d.toLocaleDateString('tr-TR')}</div></div>
       <div class="rp-actions"><button class="cl-btn del" onclick="event.stopPropagation();deleteRateProfile('${p.id}')" title="Sil">✕</button></div>
@@ -1748,14 +2352,12 @@ function renderRateProfiles() {
 }
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║  MÜŞTERİ YÖNETİMİ — localStorage ile CRUD                 ║
+// ║  MÜŞTERİ YÖNETİMİ — Supabase CRUD                        ║
 // ╚══════════════════════════════════════════════════════════════╝
-const CLIENTS_KEY = 'flexicost-clients';
 
-function saveClient() {
+async function saveClient() {
   const name = $('cl-name').value.trim();
   if (!name) { alert('Firma adı zorunludur.'); return; }
-  let clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
   const editId = $('cl-name').dataset.editId;
   const clientData = {
     name, contact: $('cl-contact').value.trim(), phone: $('cl-phone').value.trim(),
@@ -1765,14 +2367,11 @@ function saveClient() {
     notes: $('cl-notes').value.trim()
   };
   if (editId) {
-    const idx = clients.findIndex(c => c.id === editId);
-    if (idx >= 0) clients[idx] = { ...clients[idx], ...clientData };
+    await DB.updateClient(editId, clientData);
     delete $('cl-name').dataset.editId;
   } else {
-    clients.push({ id: 'cl_' + Date.now(), ...clientData, createdAt: new Date().toISOString() });
+    await DB.addClient(clientData);
   }
-  localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
-  // Clear form
   ['cl-name','cl-contact','cl-phone','cl-email','cl-addr','cl-city','cl-vd','cl-vno','cl-notes'].forEach(id => $(id).value = '');
   $('cl-country').value = 'Türkiye';
   renderClients();
@@ -1780,8 +2379,7 @@ function saveClient() {
 }
 
 function editClient(id) {
-  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
-  const c = clients.find(x => x.id === id);
+  const c = DB.cache.clients.find(x => x.id === id);
   if (!c) return;
   $('cl-name').value = c.name; $('cl-name').dataset.editId = id;
   $('cl-contact').value = c.contact || '';
@@ -1796,17 +2394,15 @@ function editClient(id) {
   goStep('clients');
 }
 
-function deleteClient(id) {
+async function deleteClient(id) {
   if (!confirm('Bu müşteriyi silmek istediğinize emin misiniz?')) return;
-  let clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
-  clients = clients.filter(c => c.id !== id);
-  localStorage.setItem(CLIENTS_KEY, JSON.stringify(clients));
+  await DB.deleteClient(id);
   renderClients();
   updateClientSelect();
 }
 
 function renderClients() {
-  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const clients = DB.cache.clients;
   const search = ($('cl-search')?.value || '').toLowerCase();
   const filtered = search ? clients.filter(c => c.name.toLowerCase().includes(search)) : clients;
   const el = $('clients-list');
@@ -1828,7 +2424,7 @@ function renderClients() {
 }
 
 function updateClientSelect() {
-  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
+  const clients = DB.cache.clients;
   const sel = $('cust-select');
   if (!sel) return;
   sel.innerHTML = '<option value="">— Manuel giriş veya müşteri seçin —</option>' +
@@ -1838,8 +2434,7 @@ function updateClientSelect() {
 function fillClientFromSelect() {
   const id = $('cust-select').value;
   if (!id) return;
-  const clients = JSON.parse(localStorage.getItem(CLIENTS_KEY) || '[]');
-  const c = clients.find(x => x.id === id);
+  const c = DB.cache.clients.find(x => x.id === id);
   if (!c) return;
   $('cust-name').value = c.name;
   $('cust-addr').value = c.addr || '';
@@ -1848,15 +2443,200 @@ function fillClientFromSelect() {
   $('cust-vno').value = c.vno || '';
 }
 
+// ═══════════ CSV EXPORT ═══════════
+function exportCSV() {
+  RECALC();
+  if (!R.qty || !R.totalCost) { alert('Önce hesaplama yapın.'); return; }
+  const kur = getEurTry();
+  const sep = ';'; // Excel TR uyumlu
+  const rows = [
+    ['ESNEK AMBALAJ MALİYET RAPORU'],
+    ['Tarih', new Date().toLocaleDateString('tr-TR')],
+    [],
+    ['ÜRÜN BİLGİLERİ'],
+    ['Paket Tipi', PKG_NAMES[S.pkgType]],
+    ['Ölçü (mm)', `${R.w}×${R.h}${R.g > 0 ? '+' + R.g : ''}`],
+    ['Yapı', R.layerStr],
+    ['Toplam GSM', R.totalGSM.toFixed(2)],
+    ['Baskı Tipi', S.printType === 'roto' ? 'Rotogravür' : 'Dijital'],
+    [],
+    ['ÜRETİM VERİLERİ'],
+    ['Sipariş Adedi', R.qty],
+    ['Fire Oranı (%)', R.waste],
+    ['Toplam Metraj (mt)', R.metraj.toFixed(0)],
+    ['Net KG', R.netKg.toFixed(1)],
+    ['Fire Dahil KG', R.grossKg.toFixed(1)],
+    ['Paket Gramajı (gr)', R.pktGram.toFixed(2)],
+    ['Adet/KG', R.pcsPerKg.toFixed(0)],
+    [],
+    ['MALİYET DAĞILIMI', 'EUR', 'TRY'],
+    ['Hammadde', R.rawMatCost.toFixed(2), (R.rawMatCost * kur).toFixed(2)],
+    ['Mürekkep', R.inkCost.toFixed(2), (R.inkCost * kur).toFixed(2)],
+    ['Silindir/Dijital Baskı', R.cylCost.toFixed(2), (R.cylCost * kur).toFixed(2)],
+    ['Baskı İşçilik+Makine', R.printLabor.toFixed(2), (R.printLabor * kur).toFixed(2)],
+    ['Laminasyon', R.lamCost.toFixed(2), (R.lamCost * kur).toFixed(2)],
+    ['Kesim', R.slitCost.toFixed(2), (R.slitCost * kur).toFixed(2)],
+    ['Konverting', R.totalConvCost.toFixed(2), (R.totalConvCost * kur).toFixed(2)],
+    ['Genel Gider', R.overheadAmount.toFixed(2), (R.overheadAmount * kur).toFixed(2)],
+    ['Kâr Marjı', R.profitAmount.toFixed(2), (R.profitAmount * kur).toFixed(2)],
+    ['TOPLAM', R.totalCost.toFixed(2), (R.totalCost * kur).toFixed(2)],
+    [],
+    ['BİRİM FİYATLAR', 'EUR', 'TRY'],
+    ['€/KG', R.eurKg.toFixed(2), (R.eurKg * kur).toFixed(2)],
+    ['€/Adet', R.eurPc.toFixed(4), (R.eurPc * kur).toFixed(4)],
+    ['€/1000 Adet', R.eurK.toFixed(2), (R.eurK * kur).toFixed(2)],
+    [],
+    ['KUR', `1 EUR = ${kur.toFixed(2)} TRY`]
+  ];
+  const bom = '\uFEFF';
+  const csv = bom + rows.map(r => r.join(sep)).join('\n');
+  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+  const link = document.createElement('a');
+  link.href = URL.createObjectURL(blob);
+  link.download = `maliyet_${PKG_NAMES[S.pkgType]}_${R.w}x${R.h}_${new Date().toISOString().slice(0,10)}.csv`;
+  link.click();
+  URL.revokeObjectURL(link.href);
+}
+
+// ═══════════ THEME ═══════════
+function toggleTheme() {
+  const isLight = document.body.classList.toggle('light');
+  $('themeBtn').textContent = isLight ? '🌙 Koyu Tema' : '☀️ Açık Tema';
+  localStorage.setItem('flexicost-theme', isLight ? 'light' : 'dark');
+}
+
+// ═══════════ TEMPLATES ═══════════
+
+async function saveTemplate() {
+  const name = prompt('Şablon adı girin (örn: "Doypack 180×260 PET/PE"):');
+  if (!name) return;
+  const snap = collectAllInputs();
+  await DB.addTemplate(name, snap);
+  renderTemplates();
+}
+
+function loadTemplate(id) {
+  const t = DB.cache.templates.find(x => x.id === id);
+  if (!t) return;
+  if (!confirm(`"${t.name}" şablonu yüklensin mi?`)) return;
+  restoreAllInputs(t.snapshot);
+}
+
+async function deleteTemplate(id) {
+  await DB.deleteTemplate(id);
+  renderTemplates();
+}
+
+function renderTemplates() {
+  const templates = DB.cache.templates;
+  const el = $('template-list');
+  if (!el) return;
+  if (templates.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:10px;color:var(--t3);font-size:.82rem">Henüz şablon yok</div>';
+    return;
+  }
+  el.innerHTML = templates.map(t => {
+    const s = t.snapshot;
+    const info = s ? `${s.dims?.w||'?'}×${s.dims?.h||'?'} mm` : '';
+    return `<div class="rp-card" onclick="loadTemplate('${t.id}')">
+      <div><div class="rp-name">${t.name}</div><div class="rp-date">${info}</div></div>
+      <div class="rp-actions"><button class="cl-btn del" onclick="event.stopPropagation();deleteTemplate('${t.id}')" title="Sil">✕</button></div>
+    </div>`;
+  }).join('');
+}
+
+// ═══════════ CURRENCY ═══════════
+const EUR_TRY_KEY = 'flexicost-eurtry';
+const CURRENCY_INTERVAL = 10 * 60 * 1000; // 10 dakika
+let _currencyTimer = null;
+
+function getEurTry() {
+  return parseFloat($('eur-try-rate')?.value) || 36.50;
+}
+
+function onCurrencyChange() {
+  S.eurTry = getEurTry();
+  localStorage.setItem(EUR_TRY_KEY, JSON.stringify({ rate: S.eurTry, date: new Date().toISOString(), source: 'manual' }));
+  tx('cur-src', 'Manuel');
+  RECALC();
+}
+
+function fetchEurTry(silent) {
+  const btn = document.querySelector('.cur-tl');
+  if (!silent) { btn.textContent = '⏳ Çekiliyor...'; btn.disabled = true; }
+  fetch('https://api.frankfurter.app/latest?from=EUR&to=TRY')
+    .then(r => r.json())
+    .then(data => {
+      if (data.rates && data.rates.TRY) {
+        S.eurTry = data.rates.TRY;
+        $('eur-try-rate').value = S.eurTry.toFixed(2);
+        const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
+        tx('cur-src', 'Canlı — ' + timeStr + ' (her 10dk)');
+        localStorage.setItem(EUR_TRY_KEY, JSON.stringify({ rate: S.eurTry, date: new Date().toISOString(), source: 'live' }));
+        RECALC();
+      }
+    })
+    .catch(() => {
+      if (!silent) tx('cur-src', 'Bağlantı hatası — tekrar denenecek');
+    })
+    .finally(() => {
+      btn.textContent = '↻ Canlı Kur';
+      btn.disabled = false;
+    });
+}
+
+function startCurrencyAutoRefresh() {
+  if (_currencyTimer) clearInterval(_currencyTimer);
+  fetchEurTry(true); // ilk yüklemede hemen çek
+  _currencyTimer = setInterval(() => fetchEurTry(true), CURRENCY_INTERVAL);
+}
+
+function loadSavedCurrency() {
+  const saved = JSON.parse(localStorage.getItem(EUR_TRY_KEY) || 'null');
+  if (saved && saved.rate) {
+    S.eurTry = saved.rate;
+    $('eur-try-rate').value = saved.rate;
+    // Kayıtlı kur 10 dakikadan eskiyse hemen güncelle, değilse göster
+    const age = Date.now() - new Date(saved.date).getTime();
+    if (age > CURRENCY_INTERVAL) {
+      tx('cur-src', 'Güncelleniyor...');
+    } else {
+      const timeStr = new Date(saved.date).toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+      tx('cur-src', 'Canlı — ' + timeStr + ' (her 10dk)');
+    }
+  }
+}
+
+function tl(v, d=2) { return '₺' + v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/g, '.'); }
+
 // ═══════════ INIT ═══════════
-loadSavedRates();
-renderRateProfiles();
-initLayers();
-bindInputs();
-renderHist();
-renderClients();
-updateClientSelect();
-RECALC();
+// Theme (local only — UI preference)
+(function initThemeOnLoad() {
+  const saved = localStorage.getItem('flexicost-theme');
+  if (saved === 'light') {
+    document.body.classList.add('light');
+    const btn = document.getElementById('themeBtn');
+    if (btn) btn.textContent = '🌙 Koyu Tema';
+  }
+})();
+
+// Auth flow — check session and start app
+(async function boot() {
+  const { data: { session } } = await sb.auth.getSession();
+  if (session) {
+    await onAuthReady(session.user);
+  } else {
+    showAuthOverlay();
+  }
+
+  sb.auth.onAuthStateChange(async (event, session) => {
+    if (event === 'SIGNED_IN' && session) {
+      await onAuthReady(session.user);
+    } else if (event === 'SIGNED_OUT') {
+      showAuthOverlay();
+    }
+  });
+})();
 </script>
 </body>
 </html>
