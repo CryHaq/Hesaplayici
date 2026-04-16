@@ -1572,23 +1572,28 @@ async function doLogout() {
   await sb.auth.signOut();
 }
 
+let _appInitialized = false;
 async function onAuthReady(user) {
+  // Aynı kullanıcı için zaten init edilmişse sadece auth overlay'i gizle, tekrar yükleme yapma
+  // Bu, Supabase'in tab visibility / token refresh nedeniyle SIGNED_IN event'ini tekrar
+  // firelemesine karşı koruma — "Veriler yükleniyor" döngüsünü önler
+  if (_appInitialized && currentUser && currentUser.id === user.id) {
+    $('authOverlay').classList.add('hidden');
+    return;
+  }
+
   currentUser = user;
-  // Show loading
   $('authOverlay').classList.add('hidden');
   $('appLoading').style.display = 'flex';
   $('mainApp').style.display = 'none';
 
-  // Load all data from Supabase
   await DB.loadAll();
 
-  // Update user bar
   $('userEmail').textContent = user.email;
   const profile = await sb.from('profiles').select('company_name').eq('id', user.id).maybeSingle();
   const companyName = user.user_metadata?.company_name || profile.data?.company_name || '';
   $('userCompany').textContent = companyName;
 
-  // Initialize app
   $('appLoading').style.display = 'none';
   $('mainApp').style.display = 'block';
   loadSavedRates();
@@ -1603,10 +1608,12 @@ async function onAuthReady(user) {
   refreshPrintMachineSelect();
   startCurrencyAutoRefresh();
   RECALC();
+  _appInitialized = true;
 }
 
 function showAuthOverlay() {
   currentUser = null;
+  _appInitialized = false;  // çıkışta flag sıfırlansın ki yeniden giriş init çalıştırsın
   $('authOverlay').classList.remove('hidden');
   $('mainApp').style.display = 'none';
   $('appLoading').style.display = 'none';
