@@ -1331,25 +1331,40 @@ const DB = {
     if (!user) return;
     this.uid = user.id;
 
-    const [r1, r2, r3, r4, r5, r6, r7, r8] = await Promise.all([
-      sb.from('machine_rates').select('data').eq('user_id', this.uid).maybeSingle(),
-      sb.from('rate_profiles').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
-      sb.from('clients').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
-      sb.from('templates').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
-      sb.from('calculations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(20),
-      sb.from('quotations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(50),
-      sb.from('teklif_seq').select('seq').eq('user_id', this.uid).maybeSingle(),
-      sb.from('machines').select('*').eq('user_id', this.uid).order('created_at', { ascending: true })
-    ]);
+    // Promise.allSettled — tek query fail olsa bile diğerleri yüklensin
+    // 10 saniyelik timeout — ağ yavaşsa sonsuza kadar beklemesin
+    const timeout = (ms) => new Promise((_, r) => setTimeout(() => r(new Error('timeout')), ms));
+    const withTimeout = (p) => Promise.race([p, timeout(10000)]);
 
-    this.cache.rates = r1.data?.data || null;
-    this.cache.rateProfiles = r2.data || [];
-    this.cache.clients = r3.data || [];
-    this.cache.templates = r4.data || [];
-    this.cache.calculations = r5.data || [];
-    this.cache.quotations = r6.data || [];
-    this.cache.teklifSeq = r7.data?.seq || 0;
-    this.cache.machines = r8.data || [];
+    const queries = [
+      withTimeout(sb.from('machine_rates').select('data').eq('user_id', this.uid).maybeSingle()),
+      withTimeout(sb.from('rate_profiles').select('*').eq('user_id', this.uid).order('created_at', { ascending: false })),
+      withTimeout(sb.from('clients').select('*').eq('user_id', this.uid).order('created_at', { ascending: false })),
+      withTimeout(sb.from('templates').select('*').eq('user_id', this.uid).order('created_at', { ascending: false })),
+      withTimeout(sb.from('calculations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(20)),
+      withTimeout(sb.from('quotations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(50)),
+      withTimeout(sb.from('teklif_seq').select('seq').eq('user_id', this.uid).maybeSingle()),
+      withTimeout(sb.from('machines').select('*').eq('user_id', this.uid).order('created_at', { ascending: true }))
+    ];
+
+    const results = await Promise.allSettled(queries);
+    const get = (i) => results[i].status === 'fulfilled' ? results[i].value : { data: null, error: results[i].reason };
+
+    // Hata varsa console'a yaz ama uygulamayı durdurma
+    const labels = ['machine_rates','rate_profiles','clients','templates','calculations','quotations','teklif_seq','machines'];
+    results.forEach((r, i) => {
+      if (r.status === 'rejected') console.warn(`DB.loadAll: ${labels[i]} yüklenemedi:`, r.reason);
+      else if (r.value?.error) console.warn(`DB.loadAll: ${labels[i]} hata:`, r.value.error);
+    });
+
+    this.cache.rates = get(0).data?.data || null;
+    this.cache.rateProfiles = get(1).data || [];
+    this.cache.clients = get(2).data || [];
+    this.cache.templates = get(3).data || [];
+    this.cache.calculations = get(4).data || [];
+    this.cache.quotations = get(5).data || [];
+    this.cache.teklifSeq = get(6).data?.seq || 0;
+    this.cache.machines = get(7).data || [];
   },
 
   // ═══════════ MAKİNE KARTLARI (v5) ═══════════
@@ -3384,28 +3399,53 @@ function onCurrencyChange() {
   RECALC();
 }
 
-function fetchEurTry(silent) {
+// Çoklu kur API'leri — biri fail olursa sırayla dener
+const CURRENCY_APIS = [
+  { url: 'https://api.frankfurter.app/latest?from=EUR&to=TRY', parse: d => d?.rates?.TRY },
+  { url: 'https://api.exchangerate.host/latest?base=EUR&symbols=TRY', parse: d => d?.rates?.TRY },
+  { url: 'https://open.er-api.com/v6/latest/EUR', parse: d => d?.rates?.TRY }
+];
+
+async function tryFetchRate() {
+  for (const api of CURRENCY_APIS) {
+    try {
+      const res = await fetch(api.url, { mode: 'cors' });
+      if (!res.ok) continue;
+      const data = await res.json();
+      const rate = api.parse(data);
+      if (rate && rate > 0) return rate;
+    } catch (e) {
+      console.warn('Kur API fail:', api.url, e.message);
+    }
+  }
+  return null;  // hiçbiri çalışmadı
+}
+
+async function fetchEurTry(silent) {
   const btn = document.querySelector('.cur-tl');
-  if (!silent) { btn.textContent = '⏳ Çekiliyor...'; btn.disabled = true; }
-  fetch('https://api.frankfurter.app/latest?from=EUR&to=TRY')
-    .then(r => r.json())
-    .then(data => {
-      if (data.rates && data.rates.TRY) {
-        S.eurTry = data.rates.TRY;
-        $('eur-try-rate').value = S.eurTry.toFixed(2);
-        const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
-        tx('cur-src', 'Canlı — ' + timeStr + ' (her 10dk)');
-        localStorage.setItem(EUR_TRY_KEY, JSON.stringify({ rate: S.eurTry, date: new Date().toISOString(), source: 'live' }));
-        RECALC();
-      }
-    })
-    .catch(() => {
-      if (!silent) tx('cur-src', 'Bağlantı hatası — tekrar denenecek');
-    })
-    .finally(() => {
+  if (!silent && btn) { btn.textContent = '⏳ Çekiliyor...'; btn.disabled = true; }
+  try {
+    const rate = await tryFetchRate();
+    if (rate) {
+      S.eurTry = rate;
+      const inp = $('eur-try-rate');
+      if (inp) inp.value = S.eurTry.toFixed(2);
+      const timeStr = new Date().toLocaleTimeString('tr-TR', {hour:'2-digit',minute:'2-digit'});
+      tx('cur-src', 'Canlı — ' + timeStr + ' (her 10dk)');
+      localStorage.setItem(EUR_TRY_KEY, JSON.stringify({ rate: S.eurTry, date: new Date().toISOString(), source: 'live' }));
+      if (typeof RECALC === 'function') RECALC();
+    } else {
+      if (!silent) tx('cur-src', 'Bağlantı hatası — manuel giriş kullanın');
+    }
+  } catch (e) {
+    console.warn('fetchEurTry hata:', e);
+    if (!silent) tx('cur-src', 'Bağlantı hatası');
+  } finally {
+    if (btn) {
       btn.textContent = '↻ Canlı Kur';
       btn.disabled = false;
-    });
+    }
+  }
 }
 
 function startCurrencyAutoRefresh() {
