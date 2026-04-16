@@ -807,6 +807,17 @@ body{background:#fff;color:#000;padding-bottom:0}
           <button class="tgl active" data-val="roto" onclick="setPrintType(this)">Rotogravür</button>
           <button class="tgl" data-val="digital" onclick="setPrintType(this)">Dijital (HP Indigo vb.)</button>
         </div>
+
+        <!-- Makine Seçici (v5) -->
+        <div class="fg" id="print-machine-wrap">
+          <label>Kullanılacak Makine</label>
+          <div class="iw">
+            <select id="print-machine-select" onchange="onPrintMachineChange()">
+              <option value="">-- Makine seçilmedi (eski fiyat sistemi) --</option>
+            </select>
+          </div>
+          <div class="fg-help" id="print-machine-info" style="margin-top:6px"></div>
+        </div>
         <div class="g2">
           <div class="fg">
             <label>Baskı Çevresi (Repeat) <span class="req">*</span></label>
@@ -1534,6 +1545,7 @@ async function onAuthReady(user) {
   updateClientSelect();
   renderTemplates();
   renderMachines();
+  refreshPrintMachineSelect();
   startCurrencyAutoRefresh();
   RECALC();
 }
@@ -1558,7 +1570,8 @@ const S = {
   printType: 'roto',
   layers: [],
   layerCounter: 0,
-  eurTry: 36.50
+  eurTry: 36.50,
+  selectedMachineId: null  // v5: hesaplamada kullanılacak makine kartı ID'si
 };
 
 // Global sonuç nesnesi — PDF export ve history tarafından kullanılır
@@ -1803,17 +1816,20 @@ async function saveMachineForm() {
     t.classList.toggle('active', t.dataset.tech === data.technology);
   });
   renderMachines();
+  refreshPrintMachineSelect();
 }
 
 async function setMachineDefault(id, tech) {
   await DB.setDefaultMachine(id, tech);
   renderMachines();
+  refreshPrintMachineSelect();
 }
 
 async function confirmDeleteMachine(id, name) {
   if (!confirm(`"${name}" makinesini silmek istediğinize emin misiniz?`)) return;
   await DB.deleteMachine(id);
   renderMachines();
+  refreshPrintMachineSelect();
 }
 
 // ═══════════ MIGRATION (eski machine_rates → yeni machines) ═══════════
@@ -1871,6 +1887,7 @@ async function migrateOldRates() {
 
   localStorage.setItem('flexi-migrate-dismissed', '1');
   renderMachines();
+  refreshPrintMachineSelect();
   alert('Eski makine fiyatlarınız 2 makine kartına dönüştürüldü. Gerekirse ayrıntıları düzenleyebilirsiniz.');
 }
 
@@ -1895,7 +1912,73 @@ function setPrintType(el) {
   S.printType = el.dataset.val;
   $('roto-fields').style.display = S.printType === 'roto' ? 'block' : 'none';
   $('digital-fields').style.display = S.printType === 'digital' ? 'block' : 'none';
+  refreshPrintMachineSelect();
   RECALC();
+}
+
+// ═══════════ MAKİNE SEÇİCİ (v5) ═══════════
+// printType'a göre o teknolojinin makinelerini dropdown'a yükle
+function refreshPrintMachineSelect() {
+  const sel = $('print-machine-select');
+  if (!sel) return;
+  const techMap = { roto: 'rotogravur', digital: 'dijital' };
+  const tech = techMap[S.printType];
+  const machines = DB.getMachinesByTech ? DB.getMachinesByTech(tech) : [];
+
+  // Dropdown içeriğini yenile
+  let html = '<option value="">-- Makine seçilmedi (eski fiyat sistemi) --</option>';
+  machines.forEach(m => {
+    const star = m.is_default ? '⭐ ' : '';
+    html += `<option value="${m.id}">${star}${escapeHtml(m.name)} · ${m.web_width||0}mm · ${m.rec_speed||0} m/dk</option>`;
+  });
+  sel.innerHTML = html;
+
+  // Mevcut seçim geçerli mi?
+  const currentValid = machines.some(m => m.id === S.selectedMachineId);
+  if (currentValid) {
+    sel.value = S.selectedMachineId;
+  } else {
+    // Varsayılanı seç, yoksa ilkini seç, hiç makine yoksa boş bırak
+    const def = machines.find(m => m.is_default) || machines[0];
+    if (def) {
+      S.selectedMachineId = def.id;
+      sel.value = def.id;
+    } else {
+      S.selectedMachineId = null;
+      sel.value = '';
+    }
+  }
+
+  // Bilgi metni
+  const info = $('print-machine-info');
+  if (!info) return;
+  if (machines.length === 0) {
+    info.innerHTML = `⚠️ Bu teknoloji için makine tanımlı değil. <a href="#" onclick="goStep('machines');return false" style="color:var(--accent)">Makine Parkı</a>'ndan ekleyin veya eski fiyat sistemi kullanılacak.`;
+    info.style.color = 'var(--orange)';
+  } else if (S.selectedMachineId) {
+    const m = machines.find(x => x.id === S.selectedMachineId);
+    if (m) {
+      const hourly = (+m.hourly_labor||0) + (+m.hourly_energy||0) + (+m.hourly_overhead||0);
+      info.innerHTML = `✓ "<strong>${escapeHtml(m.name)}</strong>" seçildi · €${num(hourly,2)}/saat · %${m.efficiency_pct||0} verimlilik`;
+      info.style.color = 'var(--accent)';
+    }
+  } else {
+    info.textContent = 'Eski fiyat sistemi kullanılıyor (Makine Fiyatları sekmesindeki değerler).';
+    info.style.color = 'var(--t3)';
+  }
+}
+
+function onPrintMachineChange() {
+  const sel = $('print-machine-select');
+  S.selectedMachineId = sel.value || null;
+  refreshPrintMachineSelect();
+  RECALC();
+}
+
+// RECALC'ın kullanacağı yardımcı: aktif makineyi döner (seçili ya da varsayılan)
+function getActivePrintMachine() {
+  if (!S.selectedMachineId || !DB.cache.machines) return null;
+  return DB.cache.machines.find(m => m.id === S.selectedMachineId) || null;
 }
 
 // ═══════════ LAYERS ═══════════
@@ -2082,21 +2165,64 @@ function RECALC() {
   const inkKg = (printAreaM2 * (coverage / 100) * laydown) / 1000;
   const inkCost = inkKg * inkRate;
 
-  let cylCost = 0, printLabor = 0;
-  // Makine fiyatı bazlı baskı maliyeti (metraj × €/mt)
-  const rates = S.rates || {};
-  const printRatePerMt = S.printType === 'roto' ? (rates.gPerMt || 0) : (rates.dPerMt || 0);
-  const printMachineCost = metrajFire * printRatePerMt;
+  // ┌─ v5 YENI BASKI FORMÜLÜ (makine kartı bazlı) ─┐
+  // │ cylCost        = Silindir (roto) / Click charge (dijital) — sabit kalem     │
+  // │ printMachineCost = metrajFire × €/mt (makinenin hızı ve saatlik giderinden) │
+  // │ printSetupCost  = setup süresi + renk hazırlığı × saatlik gider             │
+  // │ Setup maliyeti adete bağlı değil — iş başına sabit                          │
+  // └────────────────────────────────────────────────────────────────────────────┘
+  let cylCost = 0;
+  let printMachineCost = 0;
+  let printSetupCost = 0;
+  let printLaborFromKg = 0;  // Eski roto-laborKg (sadece makine seçilmediğinde kullanılır)
+  let activeMachineRateMt = 0;  // adet kırılımında kullanmak için (makine bazlı €/mt)
 
+  // Silindir (rotogravür) veya click charge (dijital) - her zaman ayrı kalem
   if (S.printType === 'roto') {
     const colors = pf('roto-colors') || 0;
     cylCost = colors * (pf('roto-cylPrice') || 0);
-    printLabor = grossKg * (pf('roto-laborKg') || 0) + printMachineCost;
   } else {
     const dcm2 = pf('digi-costM2') || 0;
     const dckg = pf('digi-costKg') || 0;
-    printLabor = (dckg > 0 ? grossKg * dckg : printAreaM2 * dcm2) + printMachineCost;
+    cylCost = dckg > 0 ? grossKg * dckg : printAreaM2 * dcm2;
   }
+
+  const activeMachine = (typeof getActivePrintMachine === 'function') ? getActivePrintMachine() : null;
+  const rates = S.rates || {};
+
+  if (activeMachine) {
+    // v5: Makine kartından parametreler
+    const recSpeed = +activeMachine.rec_speed || 0;           // m/dk
+    const efficiency = +activeMachine.efficiency_pct || 85;   // %
+    const effectiveSpeed = recSpeed * (efficiency / 100);     // m/dk (gerçek üretim hızı)
+    const hourlyRate = (+activeMachine.hourly_labor || 0)
+                     + (+activeMachine.hourly_energy || 0)
+                     + (+activeMachine.hourly_overhead || 0); // €/saat
+
+    // Üretim zaman maliyeti: fire dahil metraj × €/mt
+    activeMachineRateMt = effectiveSpeed > 0 ? hourlyRate / (effectiveSpeed * 60) : 0;
+    printMachineCost = metrajFire * activeMachineRateMt;
+
+    // Setup maliyeti: sabit zaman + renk başına ek süre (roto)
+    const setupTimeMin = +activeMachine.setup_time_min || 0;
+    const colorPrepMin = +activeMachine.color_prep_time_min || 0;
+    const colorCount = S.printType === 'roto' ? (pf('roto-colors') || 0) : 0;
+    const totalSetupMin = setupTimeMin + (colorCount * colorPrepMin);
+    printSetupCost = (totalSetupMin / 60) * hourlyRate;
+
+    // NOT: Makine seçildiğinde roto-laborKg artık kullanılmıyor (işçilik saatlik gidere dahil)
+  } else {
+    // Geri uyumluluk: eski S.rates sistemi
+    const printRatePerMt = S.printType === 'roto' ? (rates.gPerMt || 0) : (rates.dPerMt || 0);
+    activeMachineRateMt = printRatePerMt;
+    printMachineCost = metrajFire * printRatePerMt;
+    if (S.printType === 'roto') {
+      printLaborFromKg = grossKg * (pf('roto-laborKg') || 0);
+    }
+  }
+
+  // printLabor: tek toplam (UI breakdown bu değişkeni kullanıyor)
+  const printLabor = printMachineCost + printSetupCost + printLaborFromKg;
   const totalPrintCost = inkCost + cylCost + printLabor;
 
   // ═══ 8. LAMİNASYON MALİYETİ (kg + makine fiyatı bazlı) ═══
@@ -2134,9 +2260,12 @@ function RECALC() {
     totalGSM, pktGram, pcsPerKg, netKg, grossKg, fireKg,
     layers, totalAdhGsm, adhRate, lakGsm, lakRate,
     rawMatCost, inkKg, inkCost, cylCost, printLabor, totalPrintCost,
+    printMachineCost, printSetupCost,
     lamCost, slitCost, convLabor, convMachine, convZipper, convValve, convSpout, convOther, totalConvCost,
     baseCost, overheadAmount,
     totalCost, eurKg, eurPc, eurK,
+    machineName: activeMachine ? activeMachine.name : null,
+    machineTech: activeMachine ? activeMachine.technology : null,
     layerStr: layers.map(l => `${l.micron}μ ${l.film}`).join(' / ')
   };
 
@@ -2308,11 +2437,17 @@ function RECALC() {
     tx('s-leadtime', S.printType === 'roto' ? '20 – 30 gün' : '7 – 10 gün');
 
     // Cost breakdown bar + table
+    // v5: Makine seçilmişse setup ayrı gösterilir (setup sabit maliyettir, adetten bağımsız)
     const costItems = [
       { label: 'Hammadde', cost: rawMatCost, color: '#3b82f6' },
       { label: 'Mürekkep', cost: inkCost, color: '#8b5cf6' },
       { label: S.printType === 'roto' ? 'Silindir' : 'Dijital Baskı', cost: cylCost, color: '#06b6d4' },
-      { label: 'Baskı (işçilik+makine)', cost: printLabor, color: '#ec4899' },
+      activeMachine
+        ? { label: 'Baskı Makine Zamanı', cost: printMachineCost, color: '#ec4899' }
+        : { label: 'Baskı (işçilik+makine)', cost: printLabor, color: '#ec4899' },
+      ...(activeMachine && printSetupCost > 0
+        ? [{ label: 'Baskı Setup (sabit)', cost: printSetupCost, color: '#f43f5e' }]
+        : []),
       { label: 'Laminasyon', cost: lamCost, color: '#f59e0b' },
       { label: 'Kesim (Slitting)', cost: slitCost, color: '#14b8a6' },
       { label: 'Konverting', cost: totalConvCost, color: '#22c55e' },
@@ -2360,15 +2495,27 @@ function RECALC() {
       const bPrintArea = bMetraj * (webw / 1000);
       const bInkKg = (bPrintArea * (coverage / 100) * laydown) / 1000;
       const bInkCost = bInkKg * inkRate;
-      let bCyl = cylCost; // silindir sabit maliyet
-      const bPrintMachine = bMetrajFire * printRatePerMt;
-      let bPrintLabor;
+      // Silindir (roto) sabit / Dijital click (adet-alana bağlı)
+      let bCyl;
       if (S.printType === 'roto') {
-        bPrintLabor = bGrossKg * (pf('roto-laborKg') || 0) + bPrintMachine;
+        bCyl = cylCost; // silindir sabit maliyet (adet değişse de aynı)
       } else {
         const dcm2 = pf('digi-costM2') || 0;
         const dckg = pf('digi-costKg') || 0;
-        bPrintLabor = (dckg > 0 ? bGrossKg * dckg : bPrintArea * dcm2) + bPrintMachine;
+        bCyl = dckg > 0 ? bGrossKg * dckg : bPrintArea * dcm2;
+      }
+      // Baskı makine zamanı: metraj × €/mt (makine kartından veya eski rate'ten)
+      const bPrintMachine = bMetrajFire * activeMachineRateMt;
+      let bPrintLabor;
+      if (activeMachine) {
+        // v5: setup sabit — tüm adet senaryoları aynı setup maliyetini paylaşır
+        // Bu sayede yüksek adetlerde birim setup maliyeti düşer (rotogravürün avantajı)
+        bPrintLabor = bPrintMachine + printSetupCost;
+      } else {
+        // Eski sistem: işçilik kg bazlı (geri uyumluluk)
+        bPrintLabor = S.printType === 'roto'
+          ? bGrossKg * (pf('roto-laborKg') || 0) + bPrintMachine
+          : bPrintMachine;
       }
       const bLam = bGrossKg * (pf('lam-laborKg') || 0) + bMetrajFire * (rates.lPerMt || 0) + bGrossKg * (rates.lamAdhesive || 0);
       const bSlit = bMetrajFire * (rates.sPerMt || 0);
