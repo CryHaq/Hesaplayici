@@ -368,7 +368,6 @@ body{background:#fff;color:#000;padding-bottom:0}
 <!-- STEPS NAV -->
 <div class="steps" id="stepsNav">
   <button class="step-btn" data-step="machines"><span class="num">🏭</span>Makine Parkı</button>
-  <button class="step-btn" data-step="rates"><span class="num">⚙</span>Makine Fiyatları</button>
   <button class="step-btn" data-step="clients"><span class="num">👤</span>Müşteriler</button>
   <button class="step-btn active" data-step="product"><span class="num">1</span>Ürün Tanımı</button>
   <button class="step-btn" data-step="material"><span class="num">2</span>Malzeme Yapısı</button>
@@ -612,116 +611,6 @@ body{background:#fff;color:#000;padding-bottom:0}
   </div>
 </div>
 
-<!-- ═══════════════ PANEL: MAKİNE FİYATLARI (RATES) ═══════════════ -->
-<div class="panel" id="p-rates">
-  <div class="g2">
-    <div>
-      <div class="cd">
-        <h2><span class="ic" style="background:var(--cyan)">🖨️</span> Baskı Makine Fiyatları</h2>
-        <p style="color:var(--t2);font-size:.82rem;margin-bottom:14px">Baskı makinenizin metre/saat bazlı maliyet parametreleri. Bu değerler tüm hesaplamalarda kullanılır.</p>
-        <div class="g2">
-          <div class="fg">
-            <label>Gravür Baskı Hızı</label>
-            <div class="iw hr"><input type="number" id="rate-gravure-speed" step="1" value="150"><span class="ur">mt/dk</span></div>
-          </div>
-          <div class="fg">
-            <label>Gravür Makine Saat Ücreti</label>
-            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-gravure-hourly" step="1" value="85"></div>
-          </div>
-        </div>
-        <div class="g2">
-          <div class="fg">
-            <label>Dijital Baskı Hızı</label>
-            <div class="iw hr"><input type="number" id="rate-digital-speed" step="1" value="30"><span class="ur">mt/dk</span></div>
-          </div>
-          <div class="fg">
-            <label>Dijital Makine Saat Ücreti</label>
-            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-digital-hourly" step="1" value="120"></div>
-          </div>
-        </div>
-        <div class="info-box" id="rate-print-calc" style="margin-top:10px">
-          Gravür: <strong id="rc-gravure">—</strong> €/mt | Dijital: <strong id="rc-digital">—</strong> €/mt
-        </div>
-      </div>
-
-      <div class="cd">
-        <h2><span class="ic" style="background:var(--purple)">🧪</span> Laminasyon Makine Fiyatları</h2>
-        <div class="g2">
-          <div class="fg">
-            <label>Laminasyon Hızı</label>
-            <div class="iw hr"><input type="number" id="rate-lam-speed" step="1" value="120"><span class="ur">mt/dk</span></div>
-          </div>
-          <div class="fg">
-            <label>Laminasyon Makine Saat Ücreti</label>
-            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-lam-hourly" step="1" value="65"></div>
-          </div>
-        </div>
-        <div class="fg">
-          <label>Yapıştırıcı Maliyeti (sabit ekleme, €/kg laminat)</label>
-          <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-lam-adhesive" step="0.01" value="0.30"></div>
-        </div>
-        <div class="info-box" id="rate-lam-calc" style="margin-top:10px">
-          Laminasyon: <strong id="rc-lam">—</strong> €/mt
-        </div>
-      </div>
-    </div>
-
-    <div>
-      <div class="cd">
-        <h2><span class="ic" style="background:var(--orange)">✂️</span> Kesim / Dilimleme (Slitting)</h2>
-        <div class="g2">
-          <div class="fg">
-            <label>Kesim Hızı</label>
-            <div class="iw hr"><input type="number" id="rate-slit-speed" step="1" value="200"><span class="ur">mt/dk</span></div>
-          </div>
-          <div class="fg">
-            <label>Kesim Makine Saat Ücreti</label>
-            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-slit-hourly" step="1" value="45"></div>
-          </div>
-        </div>
-        <div class="info-box" id="rate-slit-calc" style="margin-top:10px">
-          Kesim: <strong id="rc-slit">—</strong> €/mt
-        </div>
-      </div>
-
-      <div class="cd">
-        <h2><span class="ic" style="background:var(--green)">🛍️</span> Poşet Yapım (Konverting)</h2>
-        <div class="g2">
-          <div class="fg">
-            <label>Konverting Hızı</label>
-            <div class="iw hr"><input type="number" id="rate-conv-speed" step="1" value="80"><span class="ur">adet/dk</span></div>
-          </div>
-          <div class="fg">
-            <label>Konverting Makine Saat Ücreti</label>
-            <div class="iw hl"><span class="ul">€</span><input type="number" id="rate-conv-hourly" step="1" value="55"></div>
-          </div>
-        </div>
-        <div class="info-box" id="rate-conv-calc" style="margin-top:10px">
-          Konverting: <strong id="rc-conv">—</strong> €/1000 adet
-        </div>
-      </div>
-
-      <div class="cd">
-        <h2><span class="ic" style="background:var(--pink)">📊</span> Genel Giderler (Overhead)</h2>
-        <div class="g2">
-          <div class="fg">
-            <label>Genel Gider Yüzdesi</label>
-            <div class="iw hr"><input type="number" id="rate-overhead" step="0.5" value="8"><span class="ur">%</span></div>
-          </div>
-        </div>
-      </div>
-
-      <div class="cd" style="background:var(--card2)">
-        <div style="display:flex;justify-content:space-between;align-items:center">
-          <h3 style="margin-top:0;color:var(--t2)">Fiyat Profilleri</h3>
-          <button class="btn btn-out btn-sm" onclick="saveRateProfile()">Profil Kaydet</button>
-        </div>
-        <div id="rate-profiles" style="margin-top:10px"></div>
-      </div>
-    </div>
-  </div>
-  <button class="btn btn-main" onclick="goStep('product')" style="max-width:300px;margin:16px auto;display:block">Ürün Tanımına Geç →</button>
-</div>
 
 <!-- ═══════════════ PANEL: MÜŞTERİ YÖNETİMİ ═══════════════ -->
 <div class="panel" id="p-clients">
@@ -1304,6 +1193,14 @@ body{background:#fff;color:#000;padding-bottom:0}
           <div class="fg"><label>Vergi No</label><div class="iw"><input type="text" id="cust-vno" placeholder="7350832435"></div></div>
           <div class="fg"><label>KDV Oranı (%)</label><div class="iw hr"><input type="number" id="cust-kdv" value="20" step="1"><span class="ur">%</span></div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- AKILLI UYARILAR (v5 Faz C) -->
+    <div class="cd" style="margin-top:16px" id="smart-warnings-card">
+      <h2><span class="ic" style="background:var(--purple)">💡</span> Akıllı Analiz ve Uyarılar</h2>
+      <div id="smart-warnings">
+        <p style="color:var(--t2);font-size:.82rem">Sipariş hesaplandığında otomatik analiz ve uyarılar burada görünür.</p>
       </div>
     </div>
 
@@ -2766,6 +2663,8 @@ function _RECALC_BODY() {
 
     // v5 Faz 4: Fire dağılım paneli
     renderWasteAnalysis(wasteBreakdown, totalCost, qty, netKg);
+    // v5 Faz C: Akıllı uyarılar
+    renderSmartWarnings();
 
     // Cost breakdown bar + table
     // v5: Makine seçilmişse setup ayrı gösterilir (setup sabit maliyettir, adetten bağımsız)
@@ -3337,97 +3236,43 @@ async function clearHist() {
 }
 
 // ╔══════════════════════════════════════════════════════════════╗
-// ║  MAKİNE FİYATLARI — €/mt hesaplama ve RECALC entegrasyonu  ║
+// ║  LEGACY RATES — eski Makine Fiyatları panelinin kalıntısı    ║
+// ║  v5 Faz 5'ten itibaren makine kartları kullanılıyor.         ║
+// ║  Bu fonksiyonlar sadece geri uyumluluk için mevcut — eski   ║
+// ║  kullanıcıların kaydettiği rates jsonb'ı S.rates'e aktarır  ║
+// ║  ki makine kartı olmayan prosesler için fallback çalışsın.  ║
 // ╚══════════════════════════════════════════════════════════════╝
-function calcMachineRates() {
-  const gSpeed = pf('rate-gravure-speed') || 1;
-  const gHourly = pf('rate-gravure-hourly') || 0;
-  const gPerMt = gHourly / (gSpeed * 60);
-  tx('rc-gravure', gPerMt.toFixed(4));
-  const dSpeed = pf('rate-digital-speed') || 1;
-  const dHourly = pf('rate-digital-hourly') || 0;
-  const dPerMt = dHourly / (dSpeed * 60);
-  tx('rc-digital', dPerMt.toFixed(4));
-  const lSpeed = pf('rate-lam-speed') || 1;
-  const lHourly = pf('rate-lam-hourly') || 0;
-  const lPerMt = lHourly / (lSpeed * 60);
-  tx('rc-lam', lPerMt.toFixed(4));
-  const sSpeed = pf('rate-slit-speed') || 1;
-  const sHourly = pf('rate-slit-hourly') || 0;
-  const sPerMt = sHourly / (sSpeed * 60);
-  tx('rc-slit', sPerMt.toFixed(4));
-  const cSpeed = pf('rate-conv-speed') || 1;
-  const cHourly = pf('rate-conv-hourly') || 0;
-  const cPer1000 = (cHourly / (cSpeed * 60)) * 1000;
-  tx('rc-conv', cPer1000.toFixed(2));
-
-  S.rates = { gPerMt, dPerMt, lPerMt, sPerMt, cPer1000,
-    overhead: pf('rate-overhead') || 0,
-    lamAdhesive: pf('rate-lam-adhesive') || 0
-  };
-
-  // Save to Supabase (debounced)
-  if (DB.uid) DB.saveRates({
-    'rate-gravure-speed': pf('rate-gravure-speed'),
-    'rate-gravure-hourly': pf('rate-gravure-hourly'),
-    'rate-digital-speed': pf('rate-digital-speed'),
-    'rate-digital-hourly': pf('rate-digital-hourly'),
-    'rate-lam-speed': pf('rate-lam-speed'),
-    'rate-lam-hourly': pf('rate-lam-hourly'),
-    'rate-lam-adhesive': pf('rate-lam-adhesive'),
-    'rate-slit-speed': pf('rate-slit-speed'),
-    'rate-slit-hourly': pf('rate-slit-hourly'),
-    'rate-conv-speed': pf('rate-conv-speed'),
-    'rate-conv-hourly': pf('rate-conv-hourly'),
-    'rate-overhead': pf('rate-overhead')
-  });
-}
-
 function loadSavedRates() {
-  const saved = DB.cache.rates;
-  if (saved) {
-    Object.keys(saved).forEach(id => {
-      const el = $(id);
-      if (el) el.value = saved[id];
-    });
-  }
-  calcMachineRates();
+  // Supabase'den gelen eski rates jsonb'ını S.rates'e topla — RECALC fallback için
+  const saved = DB.cache.rates || {};
+  const gSpeed = (+saved['rate-gravure-speed']) || 0;
+  const gHourly = (+saved['rate-gravure-hourly']) || 0;
+  const dSpeed = (+saved['rate-digital-speed']) || 0;
+  const dHourly = (+saved['rate-digital-hourly']) || 0;
+  const lSpeed = (+saved['rate-lam-speed']) || 0;
+  const lHourly = (+saved['rate-lam-hourly']) || 0;
+  const sSpeed = (+saved['rate-slit-speed']) || 0;
+  const sHourly = (+saved['rate-slit-hourly']) || 0;
+  const cSpeed = (+saved['rate-conv-speed']) || 0;
+  const cHourly = (+saved['rate-conv-hourly']) || 0;
+
+  S.rates = {
+    gPerMt: gSpeed > 0 ? gHourly / (gSpeed * 60) : 0,
+    dPerMt: dSpeed > 0 ? dHourly / (dSpeed * 60) : 0,
+    lPerMt: lSpeed > 0 ? lHourly / (lSpeed * 60) : 0,
+    sPerMt: sSpeed > 0 ? sHourly / (sSpeed * 60) : 0,
+    cPer1000: cSpeed > 0 ? (cHourly / (cSpeed * 60)) * 1000 : 0,
+    overhead: (+saved['rate-overhead']) || 0,
+    lamAdhesive: (+saved['rate-lam-adhesive']) || 0
+  };
 }
 
-async function saveRateProfile() {
-  const name = prompt('Profil adı girin:');
-  if (!name) return;
-  const data = DB.cache.rates || {};
-  await DB.addRateProfile(name, data);
-  renderRateProfiles();
-}
-
-function loadRateProfile(id) {
-  const p = DB.cache.rateProfiles.find(x => x.id === id);
-  if (!p) return;
-  Object.keys(p.data).forEach(k => { const el = $(k); if (el) el.value = p.data[k]; });
-  calcMachineRates();
-  RECALC();
-}
-
-async function deleteRateProfile(id) {
-  await DB.deleteRateProfile(id);
-  renderRateProfiles();
-}
-
-function renderRateProfiles() {
-  const profiles = DB.cache.rateProfiles;
-  const el = $('rate-profiles');
-  if (!el) return;
-  if (profiles.length === 0) { el.innerHTML = '<div style="color:var(--t3);font-size:.82rem;text-align:center;padding:10px">Henüz profil kaydedilmedi</div>'; return; }
-  el.innerHTML = profiles.map(p => {
-    const d = new Date(p.created_at);
-    return `<div class="rp-card" onclick="loadRateProfile('${p.id}')">
-      <div><div class="rp-name">${p.name}</div><div class="rp-date">${d.toLocaleDateString('tr-TR')}</div></div>
-      <div class="rp-actions"><button class="cl-btn del" onclick="event.stopPropagation();deleteRateProfile('${p.id}')" title="Sil">✕</button></div>
-    </div>`;
-  }).join('');
-}
+// Hiçbir şey yapmayan stub — eski koddaki çağrıların kırılmaması için
+function calcMachineRates() { /* v5: artık gereksiz */ }
+function renderRateProfiles() { /* v5: UI kaldırıldı */ }
+async function saveRateProfile() { /* v5: UI kaldırıldı */ }
+function loadRateProfile() { /* v5: UI kaldırıldı */ }
+async function deleteRateProfile() { /* v5: UI kaldırıldı */ }
 
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  MÜŞTERİ YÖNETİMİ — Supabase CRUD                        ║
@@ -3768,6 +3613,169 @@ function renderWasteAnalysis(breakdown, totalCost, qty, netKg) {
       ${insight}
     </div>
   `;
+}
+
+// ═══════════ AKILLI UYARI / KARAR MOTORU (v5 Faz C) ═══════════
+// RECALC'tan sonra çağrılır — R nesnesine ve S state'ine bakıp
+// teknik/ekonomik uyarılar üretir. Kullanıcıya yüzeysel hesap yerine
+// yorumlu bir deneyim sunar.
+
+function generateWarnings() {
+  if (!R || !R.qty || R.qty === 0) return [];
+  const out = [];
+  const qty = R.qty;
+  const totalPrintCost = R.totalPrintCost || 0;
+  const cylCost = R.cylCost || 0;
+  const printSetupCost = R.printSetupCost || 0;
+  const totalCost = R.totalCost || 0;
+  const totalConvCost = R.totalConvCost || 0;
+  const accessoriesCost = (R.convZipper || 0) + (R.convValve || 0) + (R.convSpout || 0) + (R.convOther || 0);
+  const activeMachine = (typeof getActivePrintMachine === 'function') ? getActivePrintMachine() : null;
+
+  // 1. Makine kartı yok (eski fallback kullanılıyor)
+  if (!activeMachine) {
+    out.push({
+      sev: 'warn',
+      title: 'Baskı makinesi seçilmedi',
+      text: 'Seçili baskı teknolojisi için makine kartı yok. Hesap eski fiyat sistemine düştü — makine kartı eklerseniz setup/verim/hız parametreleri hesaba dahil olur, sonuç daha kesin çıkar. <a href="#" onclick="goStep(\'machines\');return false" style="color:var(--accent)">Makine Parkı</a>\'ndan ekleyebilirsiniz.'
+    });
+  }
+
+  // 2. Proses makine kartı eksik olanlar
+  const processList = [
+    { tech: 'laminasyon', label: 'Laminasyon', icon: '🧪' },
+    { tech: 'kesim', label: 'Kesim', icon: '✂️' },
+    { tech: 'konverting', label: 'Konverting', icon: '🛍️' }
+  ];
+  const missingProcesses = processList.filter(p => !DB.getDefaultMachine(p.tech));
+  if (missingProcesses.length > 0 && totalCost > 0) {
+    out.push({
+      sev: 'info',
+      title: 'Eksik proses makineleri',
+      text: `${missingProcesses.map(p => p.icon + ' ' + p.label).join(', ')} için varsayılan makine tanımlı değil. Bu prosesler eski fiyat sistemine düşüyor — Makine Parkı'ndan ekleyerek daha kesin hesap alabilirsiniz.`
+    });
+  }
+
+  // 3. Düşük tirajda rotogravür — silindir maliyeti birim fiyatı boğuyor
+  if (S.printType === 'roto' && qty > 0 && qty < 25000 && cylCost > 0) {
+    const cylPerUnit = cylCost / qty;
+    const cylPctOfTotal = (cylCost / totalCost) * 100;
+    out.push({
+      sev: 'warn',
+      title: 'Rotogravür için düşük tiraj',
+      text: `Bu adet (${num(qty,0)}) rotogravür için tipik olarak düşüktür. Silindir maliyeti birim fiyata <strong>€${num(cylPerUnit,4)}</strong> (%${num(cylPctOfTotal,1)}) olarak yansıyor — dijital veya fleksografi bu tirajda daha ekonomik olabilir. "3 Teknolojiyi Karşılaştır" ile kontrol edin.`
+    });
+  }
+
+  // 4. Yüksek tirajda dijital — machine cost per unit baskın
+  if (S.printType === 'digital' && qty >= 100000) {
+    out.push({
+      sev: 'warn',
+      title: 'Dijital için yüksek tiraj',
+      text: `Bu adet (${num(qty,0)}) dijital baskı için yüksektir. Setup maliyeti düşük ama click charge + makine zamanı adet ile orantılı artar — bu noktada rotogravür veya fleksografi setup maliyetini adede dağıtarak daha ekonomik sonuç verir.`
+    });
+  }
+
+  // 5. Aksesuar baskınlığı (valf, zipper, spout)
+  if (accessoriesCost > 0 && totalCost > 0) {
+    const accPct = (accessoriesCost / totalCost) * 100;
+    if (accPct > 30) {
+      out.push({
+        sev: 'warn',
+        title: 'Aksesuar maliyeti baskın',
+        text: `Aksesuarlar (zipper/valf/spout/diğer) toplam maliyetin <strong>%${num(accPct,1)}</strong>'ini oluşturuyor. Özellikle düşük tirajlarda aksesuarlar birim fiyatı sürüklüyor — müşteriyle aksesuar opsiyonları ve MOQ tartışması değerli olabilir.`
+      });
+    }
+  }
+
+  // 6. Setup baskınlığı
+  if (printSetupCost > 0 && totalCost > 0) {
+    const setupPct = (printSetupCost / totalCost) * 100;
+    if (setupPct > 15) {
+      out.push({
+        sev: 'info',
+        title: 'Setup maliyeti önemli pay',
+        text: `Baskı setup (hazırlık) maliyeti toplamın <strong>%${num(setupPct,1)}</strong>'i. Bu sabit bir kalem — adet artarsa birim setup maliyeti dramatik düşer. Tirajı artırmak birim fiyatı önemli ölçüde iyileştirir.`
+      });
+    }
+  }
+
+  // 7. Yüksek fire oranı
+  const wasteFactor = typeof getWasteChainFactor === 'function' ? getWasteChainFactor() : 1;
+  const wastePct = (wasteFactor - 1) * 100;
+  if (wastePct > 15) {
+    out.push({
+      sev: 'warn',
+      title: 'Yüksek toplam fire',
+      text: `Toplam fire oranı <strong>%${num(wastePct,2)}</strong>. Sektörde tipik %6–12 aralığındadır. Detaylı Fire Analizi panelindeki en yüksek kaynağa odaklanarak azaltma fırsatları değerlendirilebilir.`
+    });
+  } else if (wastePct < 3 && qty > 0) {
+    out.push({
+      sev: 'info',
+      title: 'Düşük fire oranı',
+      text: `Toplam fire %${num(wastePct,2)} — çok düşük. Gerçek üretimde genelde %6+ olur. Hesabınızın doğru yansıdığından emin olun; düşük fire birim fiyatı iyimser hesaplayabilir.`
+    });
+  }
+
+  // 8. Laminasyon kürlenme uyarısı
+  if (R.lamCost > 0) {
+    out.push({
+      sev: 'info',
+      title: 'Laminasyon termine etki eder',
+      text: 'Laminasyon sonrası tutkalın kürlenmesi tipik 24–72 saat alır. Bu süreç termin hesabına eklenmelidir — solvent bazlı sistemlerde daha uzun, solventsiz sistemlerde daha kısadır.'
+    });
+  }
+
+  // 9. Makinenin min ekonomik sipariş eşiğinin altında
+  if (activeMachine && activeMachine.min_economic_qty && qty < activeMachine.min_economic_qty) {
+    out.push({
+      sev: 'critical',
+      title: 'Makine ekonomik eşiğinin altında',
+      text: `"${escapeHtml(activeMachine.name)}" için minimum ekonomik sipariş <strong>${num(activeMachine.min_economic_qty,0)} adet</strong>. Sipariş (${num(qty,0)}) bu eşiğin altında — makine fiili verimine ulaşamayabilir, gerçek maliyet hesaplanandan yüksek çıkabilir.`
+    });
+  }
+
+  // 10. Web width kullanım verimi (düşük kullanım alert)
+  if (activeMachine && R.webw && activeMachine.web_width) {
+    const usage = (R.webw / +activeMachine.web_width) * 100;
+    if (usage < 60) {
+      out.push({
+        sev: 'info',
+        title: 'Düşük baskı eni kullanımı',
+        text: `Makinenin baskı eni ${activeMachine.web_width}mm, ürün için kullanılan ${R.webw}mm — sadece <strong>%${num(usage,1)}</strong>. Kenar trim firesi ve birim maliyet üzerine yansıyabilir. Up sayısını artırarak ya da dar web'li makine seçerek verim yükseltilebilir.`
+      });
+    }
+  }
+
+  return out;
+}
+
+function renderSmartWarnings() {
+  const el = $('smart-warnings');
+  if (!el) return;
+  const warnings = generateWarnings();
+
+  if (warnings.length === 0) {
+    el.innerHTML = '<p style="color:var(--t2);font-size:.82rem">Sipariş hesaplandığında otomatik analiz ve uyarılar burada görünür.</p>';
+    return;
+  }
+
+  const sevColor = { info: 'var(--accent)', warn: 'var(--orange)', critical: 'var(--red)' };
+  const sevIcon = { info: 'ℹ️', warn: '⚠️', critical: '🔴' };
+  const sevBg = {
+    info: 'rgba(16,185,129,.06)',
+    warn: 'rgba(245,158,11,.06)',
+    critical: 'rgba(239,68,68,.06)'
+  };
+
+  el.innerHTML = warnings.map(w => `
+    <div style="padding:12px 14px;background:${sevBg[w.sev]};border-left:3px solid ${sevColor[w.sev]};border-radius:6px;margin-bottom:10px">
+      <div style="font-weight:700;color:${sevColor[w.sev]};margin-bottom:4px;font-size:.9rem">
+        ${sevIcon[w.sev]} ${w.title}
+      </div>
+      <div style="font-size:.85rem;line-height:1.6;color:var(--t1)">${w.text}</div>
+    </div>
+  `).join('');
 }
 
 // ═══════════ KARŞILAŞTIRMA MOTORU (v5 Faz 3) ═══════════
