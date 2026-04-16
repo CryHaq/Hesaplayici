@@ -2895,6 +2895,13 @@ async function saveTeklifToHistory(refNo, custName, totalCost, genelToplam, item
 // ═══════════ PDF EXPORT ═══════════
 async function exportFullPDF() {
   RECALC(); // son durumu garantile
+
+  // v5: R boşsa ya da temel alanlar yoksa erken çıkış + uyarı
+  if (!R || !R.qty || !R.totalCost) {
+    alert('Teklif üretmeden önce sipariş adedi, ölçü ve baskı parametrelerini tamamlayın.');
+    return;
+  }
+
   // R nesnesinden tüm değerleri al (tek merkezi hesap)
   const { qty, repeat, webw, up, w, h, g, waste, metraj, totalGSM: gsm,
     pktGram, pcsPerKg, netKg, grossKg, layers, layerStr,
@@ -2908,10 +2915,21 @@ async function exportFullPDF() {
   const custVno = ($('cust-vno')?.value) || '—';
   const kdvRate = pf('cust-kdv') || 20;
 
+  // v5 ek bilgiler
+  const designCount = Math.max(1, pf('design-count') || 1);
+  const sameCylinder = $('same-cylinder')?.checked || false;
+  const selCust = getSelectedCustomer ? getSelectedCustomer() : null;
+
   const now = new Date();
   const dateStr = now.toLocaleDateString('tr-TR', { day: 'numeric', month: 'long', year: 'numeric' });
   const dateShort = now.toLocaleDateString('tr-TR');
-  const refNo = await getNextTeklifNo();
+  let refNo;
+  try {
+    refNo = await getNextTeklifNo();
+  } catch (e) {
+    console.warn('Teklif no alınamadı:', e);
+    refNo = 'TEKLIF-' + Date.now().toString().slice(-6);
+  }
 
   // layerStr zaten R'den geliyor, tekrar tanımlamaya gerek yok
   const productDesc = `${PKG_NAMES[S.pkgType]} ${w}×${h}${g > 0 ? '+' + g : ''} mm\n${layerStr}\nToplam GSM: ${num(gsm,2)} | ${printTypeLabel()} Baskı`;
@@ -2934,6 +2952,10 @@ async function exportFullPDF() {
 
 
   const win = window.open('', '_blank');
+  if (!win) {
+    alert('PDF penceresi açılamadı. Tarayıcınızın pop-up engelleyicisini bu site için kapatın, sonra tekrar deneyin.');
+    return;
+  }
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Teklif - ${refNo}</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -3116,6 +3138,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
       <div class="spec-item"><strong>Yapı:</strong> ${layerStr}</div>
       <div class="spec-item"><strong>Toplam GSM:</strong> ${num(gsm, 2)} g/m²</div>
       <div class="spec-item"><strong>Baskı:</strong> ${printTypeLabel()}</div>
+      <div class="spec-item"><strong>Tasarım Sayısı:</strong> ${designCount}${designCount > 1 ? (sameCylinder ? ' (aynı silindir)' : ' (ayrı silindir)') : ''}</div>
       <div class="spec-item"><strong>Repeat:</strong> ${repeat} mm</div>
       <div class="spec-item"><strong>Web Width:</strong> ${webw} mm</div>
       <div class="spec-item"><strong>Up Sayısı:</strong> ${up}</div>
@@ -3135,7 +3158,10 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
     <div class="note-line">• Fiyatlar ${kdvRate > 0 ? 'KDV hariç' : ''} Euro (€) bazlıdır.</div>
     <div class="note-line">• Tahmini termin: ${printTypeLeadtime()} iş günü</div>
     <div class="note-line">• Teklif geçerlilik süresi: 15 gündür.</div>
-    <div class="note-line">• Fire oranı %${waste} olarak hesaplanmıştır.</div>
+    <div class="note-line">• Fire oranı %${num(waste,1)} olarak hesaplanmıştır.</div>
+    ${designCount > 1 ? `<div class="note-line">• Bu teklifte ${designCount} farklı tasarım bulunmaktadır.</div>` : ''}
+    ${selCust && selCust.payment_days > 0 ? `<div class="note-line">• Ödeme koşulu: ${selCust.payment_days} gün vadeli.</div>` : ''}
+    ${selCust && selCust.segment === 'ihracat' ? `<div class="note-line">• İhracat siparişi — KDV muafiyeti uygulanabilir, nakliye/gümrük ayrı görüşülecektir.</div>` : ''}
   </div>
 
   <!-- FOOTER -->
