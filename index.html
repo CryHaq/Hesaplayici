@@ -792,8 +792,58 @@ body{background:#fff;color:#000;padding-bottom:0}
             <div class="iw hr"><input type="number" id="order-qty" step="1000" placeholder="100000"><span class="ur">adet</span></div>
           </div>
           <div class="fg">
-            <label>Fire Oranı <span class="req">*</span></label>
+            <label>Toplam Fire Oranı <span class="req">*</span></label>
             <div class="iw hr"><input type="number" id="waste-pct" step="0.5" value="8" min="0" max="30"><span class="ur">%</span></div>
+            <div class="fg-help">Basit mod — tek toplam oran. Proses bazlı detay için aşağıdaki panele aç.</div>
+          </div>
+        </div>
+
+        <!-- FIRE MOTORU — Proses Bazlı Detay (v5 Faz 4) -->
+        <button type="button" class="mch-adv-toggle" id="waste-detail-toggle" onclick="toggleWasteDetail()">
+          <span>🔬 Detaylı Fire Analizi (proses bazlı)</span>
+          <span class="mch-adv-arrow">▶</span>
+        </button>
+        <div class="mch-adv-content" id="waste-detail-content">
+          <div class="info-box" style="margin:10px 0;color:var(--t2);font-size:.78rem;line-height:1.5">
+            Her proses kendisinden önceki firenin üzerine kendi firesini ekler (zincirleme). Toplam fire otomatik hesaplanır; üstteki alan senkronize olur.<br>
+            <strong>Tipik değerler:</strong> Baskı hazırlık %2–3 · Baskı süreç %1–2 · Laminasyon %1 · Dilme %0.5 · Poşet %2 · Kalite %0.5
+          </div>
+          <div class="g3">
+            <div class="fg">
+              <label>Baskı Hazırlık Firesi</label>
+              <div class="iw hr"><input type="number" id="waste-print-setup" step="0.1" value="2.5" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Register/renk ayarı sırasındaki fire</div>
+            </div>
+            <div class="fg">
+              <label>Baskı Süreç Firesi</label>
+              <div class="iw hr"><input type="number" id="waste-print-process" step="0.1" value="1.5" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Üretim esnasında oluşan fire</div>
+            </div>
+            <div class="fg">
+              <label>Laminasyon Firesi</label>
+              <div class="iw hr"><input type="number" id="waste-lam" step="0.1" value="1" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Laminasyon başlangıç/geçiş firesi</div>
+            </div>
+          </div>
+          <div class="g3">
+            <div class="fg">
+              <label>Dilme Firesi</label>
+              <div class="iw hr"><input type="number" id="waste-slit" step="0.1" value="0.5" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Kenar trim ve dilimleme</div>
+            </div>
+            <div class="fg">
+              <label>Poşet/Konverting Firesi</label>
+              <div class="iw hr"><input type="number" id="waste-pouch" step="0.1" value="2" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Poşet yapım hattı</div>
+            </div>
+            <div class="fg">
+              <label>Kalite Ayıklama</label>
+              <div class="iw hr"><input type="number" id="waste-quality" step="0.1" value="0.5" min="0" max="20"><span class="ur">%</span></div>
+              <div class="fg-help">Son kontrol ayıklaması</div>
+            </div>
+          </div>
+          <div class="info-box" id="waste-chain-info" style="margin-top:10px">
+            Toplam zincirleme fire: <strong id="waste-chain-total">—</strong>
           </div>
         </div>
       </div>
@@ -1231,6 +1281,14 @@ body{background:#fff;color:#000;padding-bottom:0}
           <div class="fg"><label>Vergi No</label><div class="iw"><input type="text" id="cust-vno" placeholder="7350832435"></div></div>
           <div class="fg"><label>KDV Oranı (%)</label><div class="iw hr"><input type="number" id="cust-kdv" value="20" step="1"><span class="ur">%</span></div></div>
         </div>
+      </div>
+    </div>
+
+    <!-- FIRE DAĞILIM PANELİ (v5 Faz 4) -->
+    <div class="cd" style="margin-top:16px">
+      <h2><span class="ic" style="background:var(--orange)">🔬</span> Fire Dağılım Analizi</h2>
+      <div id="waste-analysis">
+        <p style="color:var(--t2);font-size:.82rem">Sipariş hesaplandığında proses bazlı fire dağılımı burada görünür.</p>
       </div>
     </div>
 
@@ -2265,17 +2323,20 @@ function _RECALC_BODY() {
   // ═══ 4. METRAJ (SİSTEMİN KALBİ) ═══
   //    Metre = (Adet × Repeat_mm / 1000) / Up
   const metraj = (qty > 0 && repeat > 0 && up > 0) ? (qty * repeat / 1000) / up : 0;
-  const metrajFire = metraj * (1 + waste / 100);
+  // v5 Faz 4: Zincirleme fire çarpanı (detay modu açıkken proses bazlı, kapalıyken tek oran)
+  const wasteFactor = getWasteChainFactor();  // 1 + toplam% (örn: 1.08 → %8 toplam fire)
+  const metrajFire = metraj * wasteFactor;
 
   // ═══ 5. GRAMAJ & KG ZİNCİRİ ═══
   const pktGram = area * totalGSM;          // gram/adet
   const pcsPerKg = pktGram > 0 ? 1000 / pktGram : 0;
   const netKg = (qty * pktGram) / 1000;
-  const grossKg = netKg * (1 + waste / 100);
+  const grossKg = netKg * wasteFactor;
   const fireKg = grossKg - netKg;
+  const wasteBreakdown = getWasteBreakdown(netKg);  // proses bazlı dağılım (özet için)
 
   // ═══ 6. HAMMADDE MALİYETİ (kg bazlı) ═══
-  const totalAreaGross = area * qty * (1 + waste / 100);
+  const totalAreaGross = area * qty * wasteFactor;
   let rawMatCost = 0;
   layers.forEach(l => {
     rawMatCost += (l.gsm / 1000) * totalAreaGross * l.rate;
@@ -2577,6 +2638,9 @@ function _RECALC_BODY() {
     tx('s-printType', printTypeLabel());
     tx('s-leadtime', printTypeLeadtime());
 
+    // v5 Faz 4: Fire dağılım paneli
+    renderWasteAnalysis(wasteBreakdown, totalCost, qty, netKg);
+
     // Cost breakdown bar + table
     // v5: Makine seçilmişse setup ayrı gösterilir (setup sabit maliyettir, adetten bağımsız)
     const costItems = [
@@ -2625,10 +2689,10 @@ function _RECALC_BODY() {
     qtyBreaks.forEach(bq => {
       // Recalculate for this qty
       const bMetraj = (bq * repeat / 1000) / up;
-      const bMetrajFire = bMetraj * (1 + waste / 100);
+      const bMetrajFire = bMetraj * wasteFactor;
       const bNetKg = (bq * pktGram) / 1000;
-      const bGrossKg = bNetKg * (1 + waste / 100);
-      const bTotalArea = area * bq * (1 + waste / 100);
+      const bGrossKg = bNetKg * wasteFactor;
+      const bTotalArea = area * bq * wasteFactor;
       let bRaw = 0;
       layers.forEach(l => { bRaw += (l.gsm / 1000) * bTotalArea * l.rate; });
       bRaw += (totalAdhGsm / 1000) * bTotalArea * adhRate;
@@ -3430,6 +3494,154 @@ function renderTemplates() {
       <div class="rp-actions"><button class="cl-btn del" onclick="event.stopPropagation();deleteTemplate('${t.id}')" title="Sil">✕</button></div>
     </div>`;
   }).join('');
+}
+
+// ═══════════ FIRE MOTORU (v5 Faz 4) ═══════════
+// Proses bazlı fire oranları zincirleme uygulanır:
+//   netKg → baskı hazırlık fire → baskı süreç fire → laminasyon → dilme → poşet → kalite
+// Her adım kendinden önceki miktarın üstüne (1 + fire%) çarpımı uygular.
+
+let _wasteDetailActive = false;
+
+function toggleWasteDetail() {
+  _wasteDetailActive = !_wasteDetailActive;
+  $('waste-detail-content').classList.toggle('active', _wasteDetailActive);
+  $('waste-detail-toggle').classList.toggle('active', _wasteDetailActive);
+  syncWasteFields();
+  RECALC();
+}
+
+// Zincirleme toplam fire oranını hesapla ve üstteki tek alanı güncelle
+function syncWasteFields() {
+  if (!_wasteDetailActive) return;  // detay açık değilse tek alan manuel
+  const rates = getWasteRates();
+  const chainedFactor =
+    (1 + rates.printSetup/100) *
+    (1 + rates.printProcess/100) *
+    (1 + rates.lam/100) *
+    (1 + rates.slit/100) *
+    (1 + rates.pouch/100) *
+    (1 + rates.quality/100);
+  const totalPct = (chainedFactor - 1) * 100;
+  $('waste-pct').value = totalPct.toFixed(2);
+  $('waste-pct').disabled = true;  // detay modunda düzenlenemez
+  tx('waste-chain-total', totalPct.toFixed(2) + '% (zincirleme)');
+}
+
+// Proses bazlı oranlar; detay kapalıyken toplam fireyi eşit dağıtır
+function getWasteRates() {
+  if (_wasteDetailActive) {
+    return {
+      printSetup: pf('waste-print-setup') || 0,
+      printProcess: pf('waste-print-process') || 0,
+      lam: pf('waste-lam') || 0,
+      slit: pf('waste-slit') || 0,
+      pouch: pf('waste-pouch') || 0,
+      quality: pf('waste-quality') || 0
+    };
+  }
+  // Detay kapalı: toplam % eşit dağıtılmış proses firesi olarak sayılır
+  // (geriye uyumluluk — eski RECALC davranışı korunur)
+  const total = pf('waste-pct') || 0;
+  return { printSetup: 0, printProcess: total, lam: 0, slit: 0, pouch: 0, quality: 0 };
+}
+
+// Zincirleme çarpan: netKg × factor = grossKg
+function getWasteChainFactor() {
+  const r = getWasteRates();
+  return (1 + r.printSetup/100) *
+         (1 + r.printProcess/100) *
+         (1 + r.lam/100) *
+         (1 + r.slit/100) *
+         (1 + r.pouch/100) *
+         (1 + r.quality/100);
+}
+
+// Proses bazlı fire dağılımını kg cinsinden döndür (yorum için)
+function getWasteBreakdown(netKg) {
+  const r = getWasteRates();
+  const stages = [
+    { key: 'printSetup', label: 'Baskı Hazırlık', pct: r.printSetup },
+    { key: 'printProcess', label: 'Baskı Süreç', pct: r.printProcess },
+    { key: 'lam', label: 'Laminasyon', pct: r.lam },
+    { key: 'slit', label: 'Dilme', pct: r.slit },
+    { key: 'pouch', label: 'Poşet/Konverting', pct: r.pouch },
+    { key: 'quality', label: 'Kalite Ayıklama', pct: r.quality }
+  ];
+  let running = netKg;
+  const out = stages.map(s => {
+    const before = running;
+    const loss = before * (s.pct / 100);
+    running += loss;  // fire = girdiye eklenir (çıktı = girdi × (1+fire%))
+    return { ...s, lossKg: loss, runningKg: running };
+  });
+  return { stages: out, finalKg: running, totalLoss: running - netKg };
+}
+
+// Fire analiz panelini render et (yazılı, tablo yok)
+function renderWasteAnalysis(breakdown, totalCost, qty, netKg) {
+  const el = $('waste-analysis');
+  if (!el) return;
+
+  if (!breakdown.stages || netKg === 0 || totalCost === 0) {
+    el.innerHTML = '<p style="color:var(--t2);font-size:.82rem">Sipariş hesaplandığında proses bazlı fire dağılımı burada görünür.</p>';
+    return;
+  }
+
+  const active = breakdown.stages.filter(s => s.pct > 0);
+  const totalLoss = breakdown.totalLoss;
+  const totalPct = (totalLoss / netKg) * 100;
+
+  // En yüksek fire kaynağı
+  const highest = active.reduce((a, b) => a.lossKg > b.lossKg ? a : b, active[0]);
+
+  // Fire olmadığındaki teorik birim maliyet (yaklaşık)
+  // Fire hammadde + süreç maliyetine yansır; kaba tahmin: toplam × (1 - totalLoss/grossKg)
+  const grossKg = netKg + totalLoss;
+  const savingFactor = grossKg > 0 ? totalLoss / grossKg : 0;
+  const potentialSaving = totalCost * savingFactor;
+  const perUnitSaving = qty > 0 ? potentialSaving / qty : 0;
+
+  // Yazılı stage listesi
+  const stagesHtml = active.map(s => {
+    const pctOfTotal = totalLoss > 0 ? (s.lossKg / totalLoss) * 100 : 0;
+    const isHighest = s.key === highest.key && active.length > 1;
+    return `<div style="padding:8px 12px;background:var(--bg2);border:1px solid ${isHighest ? 'var(--orange)' : 'var(--border)'};border-radius:6px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;font-size:.85rem">
+      <div>
+        ${isHighest ? '🔴 ' : '• '}<strong>${s.label}</strong>
+        <span style="color:var(--t3);margin-left:6px">%${num(s.pct, 1)}</span>
+      </div>
+      <div style="color:var(--t2);font-size:.82rem">
+        <strong>${num(s.lossKg, 2)} kg</strong>
+        <span style="color:var(--t3);margin-left:6px">(toplam firenin %${num(pctOfTotal, 1)}'i)</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Yorum metni
+  const insight = active.length === 0
+    ? '<p style="color:var(--t3)">Fire oranı sıfır girildi — gerçek üretimde bu nadirdir, tipik %6–12 arasıdır.</p>'
+    : `
+      <p style="margin:0 0 8px">
+        <strong>Net üretim:</strong> ${num(netKg, 1)} kg → <strong>Brüt üretim ihtiyacı:</strong> ${num(breakdown.finalKg, 1)} kg.
+        Toplam fire: <strong>${num(totalLoss, 2)} kg</strong> (%${num(totalPct, 2)}).
+      </p>
+      ${active.length > 1 ? `<p style="margin:0 0 8px">
+        <strong>🔴 En yüksek fire kaynağı:</strong> <strong>${highest.label}</strong> — ${num(highest.lossKg, 2)} kg (%${num((highest.lossKg/totalLoss)*100, 1)}'i).
+        Bu aşamada iyileştirme toplam fireye en büyük etkiyi yapar.
+      </p>` : ''}
+      <p style="margin:0">
+        <strong>Potansiyel tasarruf:</strong> Fire tamamen ortadan kalksa bu siparişte toplam maliyet yaklaşık
+        <strong>€${num(potentialSaving, 2)}</strong> düşerdi — birim başına <strong>€${num(perUnitSaving, 5)}</strong>.
+        Elbette fire gerçekte sıfır olmaz; ama bu rakam fire azaltma yatırımlarının potansiyel getirisini gösterir.
+      </p>`;
+
+  el.innerHTML = `
+    <div style="margin-bottom:12px">${stagesHtml}</div>
+    <div style="padding:12px;background:var(--accent-bg);border:1px solid rgba(16,185,129,.2);border-radius:8px;font-size:.88rem;line-height:1.7;color:var(--t1)">
+      ${insight}
+    </div>
+  `;
 }
 
 // ═══════════ KARŞILAŞTIRMA MOTORU (v5 Faz 3) ═══════════
