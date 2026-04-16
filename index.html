@@ -3399,26 +3399,37 @@ function onCurrencyChange() {
   RECALC();
 }
 
-// Çoklu kur API'leri — biri fail olursa sırayla dener
+// Çoklu kur API'leri — en CORS-dostu olan ilk sırada
 const CURRENCY_APIS = [
-  { url: 'https://api.frankfurter.app/latest?from=EUR&to=TRY', parse: d => d?.rates?.TRY },
-  { url: 'https://api.exchangerate.host/latest?base=EUR&symbols=TRY', parse: d => d?.rates?.TRY },
-  { url: 'https://open.er-api.com/v6/latest/EUR', parse: d => d?.rates?.TRY }
+  { id: 'erapi', url: 'https://open.er-api.com/v6/latest/EUR', parse: d => d?.rates?.TRY },
+  { id: 'exhost', url: 'https://api.exchangerate.host/latest?base=EUR&symbols=TRY', parse: d => d?.rates?.TRY },
+  { id: 'frankfurter', url: 'https://api.frankfurter.app/latest?from=EUR&to=TRY', parse: d => d?.rates?.TRY }
 ];
+// Bir session'da kaç kez fail oldu — 2'den fazla ise artık deneme
+const _apiFailCount = {};
 
 async function tryFetchRate() {
   for (const api of CURRENCY_APIS) {
+    if ((_apiFailCount[api.id] || 0) >= 2) continue;  // kalıcı fail olan API'yi atla
     try {
       const res = await fetch(api.url, { mode: 'cors' });
-      if (!res.ok) continue;
+      if (!res.ok) { _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1; continue; }
       const data = await res.json();
       const rate = api.parse(data);
-      if (rate && rate > 0) return rate;
+      if (rate && rate > 0) {
+        _apiFailCount[api.id] = 0;  // başarılı → sayaç sıfırlansın
+        return rate;
+      }
+      _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1;
     } catch (e) {
-      console.warn('Kur API fail:', api.url, e.message);
+      _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1;
+      // Sadece ilk fail'de log at — sonraki denemelerde gürültüyü azalt
+      if (_apiFailCount[api.id] === 1) {
+        console.warn('Kur API fail (' + api.id + '):', e.message);
+      }
     }
   }
-  return null;  // hiçbiri çalışmadı
+  return null;
 }
 
 async function fetchEurTry(silent) {
