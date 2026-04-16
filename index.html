@@ -2131,7 +2131,36 @@ function initLayers() {
 // ║  Her input değişikliğinde bu fonksiyon çağrılır.             ║
 // ║  Hiçbir hesap bağımsız çalışmaz.                            ║
 // ╚══════════════════════════════════════════════════════════════╝
+// Loop detection — 1 saniye içinde 30+ RECALC çağrısı olursa durdur
+let _recalcCounter = 0;
+let _recalcWindowStart = 0;
+let _recalcInProgress = false;
+
 function RECALC() {
+  // Reentrancy guard: RECALC kendi içinde bir şey tetiklerse ikinci çağrıyı atla
+  if (_recalcInProgress) {
+    console.warn('RECALC reentry engellendi');
+    return;
+  }
+  const now = Date.now();
+  if (now - _recalcWindowStart > 1000) {
+    _recalcWindowStart = now;
+    _recalcCounter = 0;
+  }
+  _recalcCounter++;
+  if (_recalcCounter > 30) {
+    console.error('RECALC loop tespit edildi — 1sn içinde 30+ çağrı. Duruyor. Stack:', new Error().stack);
+    return;
+  }
+  _recalcInProgress = true;
+  try {
+    return _RECALC_BODY();
+  } finally {
+    _recalcInProgress = false;
+  }
+}
+
+function _RECALC_BODY() {
   // ═══ 0. MAKİNE FİYATLARINI HESAPLA ═══
   calcMachineRates();
 
