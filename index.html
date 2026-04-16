@@ -1697,17 +1697,21 @@ function renderMachineList() {
   if (!container) return;
   const machines = DB.getMachinesByTech(currentMachineTech);
 
-  if (machines.length === 0) {
-    container.innerHTML = `
-      <div class="mch-empty">
-        <div class="mch-empty-icon">🏭</div>
-        <h3>${TECH_LABELS[currentMachineTech]} makinesi tanımlı değil</h3>
-        <p>Bu teknoloji için ilk makinenizi ekleyerek başlayın. Baskı eni, hız ve saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır.</p>
-      </div>`;
-    return;
+  _suppressRecalc = true;
+  try {
+    if (machines.length === 0) {
+      container.innerHTML = `
+        <div class="mch-empty">
+          <div class="mch-empty-icon">🏭</div>
+          <h3>${TECH_LABELS[currentMachineTech]} makinesi tanımlı değil</h3>
+          <p>Bu teknoloji için ilk makinenizi ekleyerek başlayın. Baskı eni, hız ve saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır.</p>
+        </div>`;
+      return;
+    }
+    container.innerHTML = `<div class="mch-list">${machines.map(m => machineCardHtml(m)).join('')}</div>`;
+  } finally {
+    _suppressRecalc = false;
   }
-
-  container.innerHTML = `<div class="mch-list">${machines.map(m => machineCardHtml(m)).join('')}</div>`;
 }
 
 function machineCardHtml(m) {
@@ -1977,28 +1981,34 @@ function refreshPrintMachineSelect() {
   const tech = techMap[S.printType];
   const machines = DB.getMachinesByTech ? DB.getMachinesByTech(tech) : [];
 
-  // Dropdown içeriğini yenile
-  let html = '<option value="">-- Makine seçilmedi (eski fiyat sistemi) --</option>';
-  machines.forEach(m => {
-    const star = m.is_default ? '⭐ ' : '';
-    html += `<option value="${m.id}">${star}${escapeHtml(m.name)} · ${m.web_width||0}mm · ${m.rec_speed||0} m/dk</option>`;
-  });
-  sel.innerHTML = html;
+  // Programatik DOM manipülasyonu sırasında input/change event'leri RECALC tetiklemesin
+  _suppressRecalc = true;
+  try {
+    // Dropdown içeriğini yenile
+    let html = '<option value="">-- Makine seçilmedi (eski fiyat sistemi) --</option>';
+    machines.forEach(m => {
+      const star = m.is_default ? '⭐ ' : '';
+      html += `<option value="${m.id}">${star}${escapeHtml(m.name)} · ${m.web_width||0}mm · ${m.rec_speed||0} m/dk</option>`;
+    });
+    sel.innerHTML = html;
 
-  // Mevcut seçim geçerli mi?
-  const currentValid = machines.some(m => m.id === S.selectedMachineId);
-  if (currentValid) {
-    sel.value = S.selectedMachineId;
-  } else {
-    // Varsayılanı seç, yoksa ilkini seç, hiç makine yoksa boş bırak
-    const def = machines.find(m => m.is_default) || machines[0];
-    if (def) {
-      S.selectedMachineId = def.id;
-      sel.value = def.id;
+    // Mevcut seçim geçerli mi?
+    const currentValid = machines.some(m => m.id === S.selectedMachineId);
+    if (currentValid) {
+      sel.value = S.selectedMachineId;
     } else {
-      S.selectedMachineId = null;
-      sel.value = '';
+      // Varsayılanı seç, yoksa ilkini seç, hiç makine yoksa boş bırak
+      const def = machines.find(m => m.is_default) || machines[0];
+      if (def) {
+        S.selectedMachineId = def.id;
+        sel.value = def.id;
+      } else {
+        S.selectedMachineId = null;
+        sel.value = '';
+      }
     }
+  } finally {
+    _suppressRecalc = false;
   }
 
   // Bilgi metni
@@ -2609,7 +2619,9 @@ function RECALC() {
 
 // ═══════════ DEBOUNCED RECALC ═══════════
 let _recalcTimer = null;
+let _suppressRecalc = false;  // Programatik DOM değişiklikleri sırasında true
 function scheduleRecalc() {
+  if (_suppressRecalc) return;
   if (_recalcTimer) clearTimeout(_recalcTimer);
   _recalcTimer = setTimeout(RECALC, 60);
 }
