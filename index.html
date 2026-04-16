@@ -385,16 +385,25 @@ body{background:#fff;color:#000;padding-bottom:0}
       Fabrikanızdaki her makineyi ayrı kart olarak tanımlayın. Hız, setup süresi, saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır. Her teknoloji için bir makineyi <strong style="color:var(--accent)">varsayılan</strong> olarak işaretleyin.
     </p>
 
-    <!-- Teknoloji Sekmeleri -->
-    <div class="mch-tabs" id="mchTabs">
+    <!-- Teknoloji Sekmeleri — 3 baskı + 3 proses -->
+    <div class="mch-tabs" id="mchTabs" style="flex-wrap:wrap">
       <button class="mch-tab active" data-tech="rotogravur" onclick="switchMachineTech(this,'rotogravur')">
-        Rotogravür <span class="mch-count" id="mch-count-rotogravur">0</span>
+        🖨️ Rotogravür <span class="mch-count" id="mch-count-rotogravur">0</span>
       </button>
       <button class="mch-tab" data-tech="flekso" onclick="switchMachineTech(this,'flekso')">
-        Fleksografi <span class="mch-count" id="mch-count-flekso">0</span>
+        🖨️ Fleksografi <span class="mch-count" id="mch-count-flekso">0</span>
       </button>
       <button class="mch-tab" data-tech="dijital" onclick="switchMachineTech(this,'dijital')">
-        Dijital <span class="mch-count" id="mch-count-dijital">0</span>
+        🖨️ Dijital <span class="mch-count" id="mch-count-dijital">0</span>
+      </button>
+      <button class="mch-tab" data-tech="laminasyon" onclick="switchMachineTech(this,'laminasyon')">
+        🧪 Laminasyon <span class="mch-count" id="mch-count-laminasyon">0</span>
+      </button>
+      <button class="mch-tab" data-tech="kesim" onclick="switchMachineTech(this,'kesim')">
+        ✂️ Kesim <span class="mch-count" id="mch-count-kesim">0</span>
+      </button>
+      <button class="mch-tab" data-tech="konverting" onclick="switchMachineTech(this,'konverting')">
+        🛍️ Konverting <span class="mch-count" id="mch-count-konverting">0</span>
       </button>
     </div>
 
@@ -433,12 +442,26 @@ body{background:#fff;color:#000;padding-bottom:0}
     <div class="fg">
       <label>Teknoloji</label>
       <div class="iw">
-        <select id="mch-tech">
-          <option value="rotogravur">Rotogravür</option>
-          <option value="flekso">Fleksografi</option>
-          <option value="dijital">Dijital</option>
+        <select id="mch-tech" onchange="onMachineTechChange()">
+          <optgroup label="Baskı">
+            <option value="rotogravur">🖨️ Rotogravür</option>
+            <option value="flekso">🖨️ Fleksografi</option>
+            <option value="dijital">🖨️ Dijital</option>
+          </optgroup>
+          <optgroup label="Proses">
+            <option value="laminasyon">🧪 Laminasyon</option>
+            <option value="kesim">✂️ Kesim / Dilme</option>
+            <option value="konverting">🛍️ Konverting / Poşet</option>
+          </optgroup>
         </select>
       </div>
+    </div>
+
+    <!-- Laminasyon özel alanı — sadece laminasyon seçiliyken görünür -->
+    <div class="fg" id="mch-lam-adhesive-wrap" style="display:none">
+      <label>Tutkal Maliyeti (€/kg laminat)</label>
+      <div class="iw hl"><span class="ul">€</span><input type="number" id="mch-lam-adhesive" step="0.05" placeholder="0.30"></div>
+      <div class="fg-help">Laminasyon tutkalının kg başı maliyeti — sadece laminasyon makineleri için.</div>
     </div>
 
     <!-- Temel Bilgiler -->
@@ -1748,7 +1771,19 @@ document.querySelectorAll('.step-btn').forEach(b => {
 
 // ═══════════ MAKİNE PARKI (v5) ═══════════
 let currentMachineTech = 'rotogravur';
-const TECH_LABELS = { rotogravur: 'Rotogravür', flekso: 'Fleksografi', dijital: 'Dijital' };
+const TECH_LABELS = {
+  rotogravur: 'Rotogravür',
+  flekso: 'Fleksografi',
+  dijital: 'Dijital',
+  laminasyon: 'Laminasyon',
+  kesim: 'Kesim',
+  konverting: 'Konverting'
+};
+// Baskı vs proses ayrımı — UI'da hangi alanlar gösterilecek
+const PRINT_TECHS = ['rotogravur','flekso','dijital'];
+const PROCESS_TECHS = ['laminasyon','kesim','konverting'];
+function isPrintTech(t) { return PRINT_TECHS.includes(t); }
+function isProcessTech(t) { return PROCESS_TECHS.includes(t); }
 
 // printType (S state) → gösterim etiketi (Rotogravür / Fleksografi / Dijital)
 function printTypeLabel(pt) {
@@ -1770,7 +1805,7 @@ function switchMachineTech(btn, tech) {
 
 // Teknoloji sayaçlarını güncelle
 function updateMachineCounts() {
-  ['rotogravur','flekso','dijital'].forEach(tech => {
+  ['rotogravur','flekso','dijital','laminasyon','kesim','konverting'].forEach(tech => {
     const count = DB.getMachinesByTech(tech).length;
     const el = $('mch-count-' + tech);
     if (el) el.textContent = count;
@@ -1810,15 +1845,21 @@ function renderMachineList() {
 function machineCardHtml(m) {
   const isDefault = m.is_default;
   const totalHourly = (+m.hourly_labor || 0) + (+m.hourly_energy || 0) + (+m.hourly_overhead || 0);
+  const speedUnit = m.technology === 'konverting' ? 'adet/dk' : 'm/dk';
+  const widthLabel = isPrintTech(m.technology) ? 'baskı eni' : 'max en';
+  const extraInfo = m.technology === 'laminasyon' && m.lam_adhesive_rate
+    ? `<div style="color:var(--purple);font-size:.72rem;margin-top:4px">Tutkal: €${num(m.lam_adhesive_rate,2)}/kg</div>`
+    : '';
   return `
     <div class="mch-card ${isDefault ? 'is-default' : ''}">
       ${isDefault ? '<div class="mch-star" title="Varsayılan makine">⭐</div>' : ''}
       <div class="mch-name">${escapeHtml(m.name)}</div>
       <div class="mch-specs">
-        <div><strong>${m.web_width || 0}mm</strong> baskı eni · <strong>${m.rec_speed || 0}</strong> m/dk</div>
+        <div><strong>${m.web_width || 0}mm</strong> ${widthLabel} · <strong>${m.rec_speed || 0}</strong> ${speedUnit}</div>
         <div>Setup: <strong>${m.setup_time_min || 0} dk</strong> · Fire: <strong>${m.setup_waste_m || 0} mt</strong></div>
         <div>Saatlik: <strong>€${num(totalHourly,2)}</strong> · Verim: <strong>%${m.efficiency_pct || 0}</strong></div>
         ${m.min_economic_qty ? `<div style="color:var(--t3);font-size:.72rem;margin-top:4px">Min sipariş: ${num(m.min_economic_qty,0)} adet</div>` : ''}
+        ${extraInfo}
       </div>
       <div class="mch-actions">
         ${!isDefault ? `<button class="mch-btn def" onclick="setMachineDefault('${m.id}','${m.technology}')">Varsayılan Yap</button>` : ''}
@@ -1833,13 +1874,37 @@ function escapeHtml(s) {
 }
 
 // ═══════════ FORM İŞLEMLERİ ═══════════
+// Teknoloji değişince form etiketlerini ve özel alanları güncelle
+function onMachineTechChange() {
+  const tech = $('mch-tech').value;
+  const lamWrap = $('mch-lam-adhesive-wrap');
+  if (lamWrap) lamWrap.style.display = (tech === 'laminasyon') ? 'block' : 'none';
+
+  // Baskı Eni → Web Width (proseslerde de benzer şekilde işlev görür)
+  const webWidthLabel = document.querySelector('label[for=""]') || null;
+  // Hız birimi: konverting için adet/dk, diğerleri için m/dk
+  const recSpeedUr = document.querySelector('#mch-rec-speed + .ur, #mch-rec-speed ~ .ur');
+  const maxSpeedUr = document.querySelector('#mch-max-speed + .ur, #mch-max-speed ~ .ur');
+  const speedUnit = (tech === 'konverting') ? 'adet/dk' : 'm/dk';
+  if (recSpeedUr) recSpeedUr.textContent = speedUnit;
+  if (maxSpeedUr) maxSpeedUr.textContent = speedUnit;
+
+  // Renk başına hazırlık sadece baskı için anlamlı — proses için gizleyelim
+  const colorPrepRow = $('mch-color-prep');
+  if (colorPrepRow) {
+    const fg = colorPrepRow.closest('.fg');
+    if (fg) fg.style.display = PRINT_TECHS.includes(tech) ? 'block' : 'none';
+  }
+}
+
 function openMachineForm(tech) {
   $('mch-edit-id').value = '';
   $('mch-modal-title').textContent = 'Yeni Makine Ekle';
   // Formu sıfırla
   ['mch-name','mch-web-width','mch-rec-speed','mch-total-hourly','mch-hourly-labor','mch-hourly-energy','mch-hourly-overhead',
    'mch-setup-time','mch-setup-waste','mch-changeover-time','mch-color-prep','mch-min-print-length','mch-max-print-length',
-   'mch-max-speed','mch-efficiency','mch-yield','mch-downtime','mch-operator-count','mch-min-qty','mch-notes'
+   'mch-max-speed','mch-efficiency','mch-yield','mch-downtime','mch-operator-count','mch-min-qty','mch-notes',
+   'mch-lam-adhesive'
   ].forEach(id => { const el = $(id); if (el) el.value = ''; });
   $('mch-efficiency').value = 85;
   $('mch-yield').value = 95;
@@ -1847,6 +1912,7 @@ function openMachineForm(tech) {
   $('mch-operator-count').value = 1;
   $('mch-is-default').checked = false;
   $('mch-tech').value = tech || currentMachineTech;
+  onMachineTechChange();  // teknolojiye göre UI güncelle
   // Gelişmiş ayarları kapat
   $('mch-adv-content').classList.remove('active');
   $('mch-adv-toggle').classList.remove('active');
@@ -1890,7 +1956,9 @@ function editMachine(id) {
   $('mch-operator-count').value = m.operator_count || 1;
   $('mch-min-qty').value = m.min_economic_qty || '';
   $('mch-notes').value = m.notes || '';
+  $('mch-lam-adhesive').value = m.lam_adhesive_rate || '';
   $('mch-is-default').checked = !!m.is_default;
+  onMachineTechChange();  // laminasyon alanı görünür/gizli
   $('machineModal').classList.add('active');
 }
 
@@ -1940,7 +2008,8 @@ async function saveMachineForm() {
     yield_pct: +$('mch-yield').value || 95,
     planned_downtime_pct: +$('mch-downtime').value || 5,
     min_economic_qty: +$('mch-min-qty').value || 0,
-    notes: $('mch-notes').value.trim()
+    notes: $('mch-notes').value.trim(),
+    lam_adhesive_rate: +$('mch-lam-adhesive').value || 0
   };
 
   const editId = $('mch-edit-id').value;
@@ -2134,6 +2203,30 @@ function onPrintMachineChange() {
 function getActivePrintMachine() {
   if (!S.selectedMachineId || !DB.cache.machines) return null;
   return DB.cache.machines.find(m => m.id === S.selectedMachineId) || null;
+}
+
+// Proses makineleri — varsayılanı otomatik kullanır (kullanıcı baskı gibi seçmiyor)
+function getActiveProcessMachine(tech) {
+  if (!DB.getDefaultMachine) return null;
+  return DB.getDefaultMachine(tech);
+}
+
+// Proses makine kartından €/mt hesapla (baskı formülüyle aynı mantık)
+function machineRatePerMt(m) {
+  if (!m) return 0;
+  const recSpeed = +m.rec_speed || 0;
+  const efficiency = +m.efficiency_pct || 85;
+  const effSpeed = recSpeed * (efficiency / 100);
+  const hourly = (+m.hourly_labor || 0) + (+m.hourly_energy || 0) + (+m.hourly_overhead || 0);
+  return effSpeed > 0 ? hourly / (effSpeed * 60) : 0;
+}
+
+// Proses makine setup maliyeti
+function machineSetupCost(m) {
+  if (!m) return 0;
+  const setupMin = +m.setup_time_min || 0;
+  const hourly = (+m.hourly_labor || 0) + (+m.hourly_energy || 0) + (+m.hourly_overhead || 0);
+  return (setupMin / 60) * hourly;
 }
 
 // ═══════════ LAYERS ═══════════
@@ -2428,25 +2521,58 @@ function _RECALC_BODY() {
   const printLabor = printMachineCost + printSetupCost + printLaborFromKg;
   const totalPrintCost = inkCost + cylCost + printLabor;
 
-  // ═══ 8. LAMİNASYON MALİYETİ (kg + makine fiyatı bazlı) ═══
-  const lamManual = grossKg * (pf('lam-laborKg') || 0);
-  const lamMachine = metrajFire * (rates.lPerMt || 0);
-  const lamAdhExtra = grossKg * (rates.lamAdhesive || 0);
-  const lamCost = lamManual + lamMachine + lamAdhExtra;
+  // ═══ 8. LAMİNASYON MALİYETİ (v5 Faz 5: makine kartı + geri uyumluluk) ═══
+  const lamMachineCard = getActiveProcessMachine('laminasyon');
+  let lamMachine = 0, lamSetup = 0, lamAdhCost = 0, lamManual = 0;
+  if (lamMachineCard) {
+    // Yeni sistem — laminasyon makine kartı
+    lamMachine = metrajFire * machineRatePerMt(lamMachineCard);
+    lamSetup = machineSetupCost(lamMachineCard);
+    const adhRate = +lamMachineCard.lam_adhesive_rate || 0;
+    lamAdhCost = grossKg * adhRate;
+    // Eski "işçilik/kg" alanı hala girilmişse ek olarak dahil et (opsiyonel destek)
+    lamManual = grossKg * (pf('lam-laborKg') || 0);
+  } else {
+    // Eski sistem — S.rates fallback
+    lamManual = grossKg * (pf('lam-laborKg') || 0);
+    lamMachine = metrajFire * (rates.lPerMt || 0);
+    lamAdhCost = grossKg * (rates.lamAdhesive || 0);
+  }
+  const lamCost = lamManual + lamMachine + lamSetup + lamAdhCost;
 
-  // ═══ 9. KONVERTİNG MALİYETİ (kg + adet + makine bazlı) ═══
-  const convLabor   = grossKg * (pf('conv-laborKg') || 0);
-  const convMachinePer1000 = rates.cPer1000 || 0;
-  const convMachineFromRate = (qty / 1000) * convMachinePer1000;
-  const convMachine = (qty / 1000) * (pf('conv-machineK') || 0) + convMachineFromRate;
-  const convZipper  = qty * (pf('conv-zipper') || 0);
-  const convValve   = qty * (pf('conv-valve') || 0);
-  const convSpout   = qty * (pf('conv-spout') || 0);
-  const convOther   = qty * (pf('conv-other') || 0);
-  const totalConvCost = convLabor + convMachine + convZipper + convValve + convSpout + convOther;
+  // ═══ 9. KONVERTİNG MALİYETİ (v5 Faz 5: makine kartı + aksesuar) ═══
+  const convMachineCard = getActiveProcessMachine('konverting');
+  let convMachine = 0, convSetup = 0;
+  if (convMachineCard) {
+    // Konverting hızı adet/dk — makine zamanı adet üzerinden
+    const effSpeed = (+convMachineCard.rec_speed || 0) * ((+convMachineCard.efficiency_pct || 85) / 100);  // adet/dk
+    const hourly = (+convMachineCard.hourly_labor || 0) + (+convMachineCard.hourly_energy || 0) + (+convMachineCard.hourly_overhead || 0);
+    const ratePerPc = effSpeed > 0 ? hourly / (effSpeed * 60) : 0;  // €/adet
+    convMachine = qty * ratePerPc;
+    convSetup = machineSetupCost(convMachineCard);
+  } else {
+    // Eski sistem
+    const convMachinePer1000 = rates.cPer1000 || 0;
+    convMachine = (qty / 1000) * (pf('conv-machineK') || 0) + (qty / 1000) * convMachinePer1000;
+  }
+  // Aksesuarlar ve manuel işçilik — her iki sistemde de aynı (adet bazlı)
+  const convLabor  = grossKg * (pf('conv-laborKg') || 0);
+  const convZipper = qty * (pf('conv-zipper') || 0);
+  const convValve  = qty * (pf('conv-valve') || 0);
+  const convSpout  = qty * (pf('conv-spout') || 0);
+  const convOther  = qty * (pf('conv-other') || 0);
+  const totalConvCost = convLabor + convMachine + convSetup + convZipper + convValve + convSpout + convOther;
 
-  // ═══ 10. KESİM (SLITTING) MALİYETİ ═══
-  const slitCost = metrajFire * (rates.sPerMt || 0);
+  // ═══ 10. KESİM (SLITTING) MALİYETİ (v5 Faz 5: makine kartı + geri uyumluluk) ═══
+  const slitMachineCard = getActiveProcessMachine('kesim');
+  let slitMachine = 0, slitSetup = 0;
+  if (slitMachineCard) {
+    slitMachine = metrajFire * machineRatePerMt(slitMachineCard);
+    slitSetup = machineSetupCost(slitMachineCard);
+  } else {
+    slitMachine = metrajFire * (rates.sPerMt || 0);
+  }
+  const slitCost = slitMachine + slitSetup;
 
   // ═══ 11. TOPLAM MALİYET + OVERHEAD ═══
   const baseCost = rawMatCost + totalPrintCost + lamCost + totalConvCost + slitCost;
