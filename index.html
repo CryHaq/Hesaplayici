@@ -805,7 +805,8 @@ body{background:#fff;color:#000;padding-bottom:0}
         <div class="warn">⚠️ Repeat ve web width olmadan hesaplama yapılamaz.</div>
         <div class="toggle-group" id="printTypeToggle">
           <button class="tgl active" data-val="roto" onclick="setPrintType(this)">Rotogravür</button>
-          <button class="tgl" data-val="digital" onclick="setPrintType(this)">Dijital (HP Indigo vb.)</button>
+          <button class="tgl" data-val="flekso" onclick="setPrintType(this)">Fleksografi</button>
+          <button class="tgl" data-val="digital" onclick="setPrintType(this)">Dijital</button>
         </div>
 
         <!-- Makine Seçici (v5) -->
@@ -854,6 +855,45 @@ body{background:#fff;color:#000;padding-bottom:0}
             <div class="fg">
               <label>Baskı İşçilik / KG</label>
               <div class="iw hl"><span class="ul">€</span><input type="number" id="roto-laborKg" step="0.01" value="0.15" placeholder="0.15"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- FLEKSO FIELDS (v5) -->
+        <div id="flekso-fields" style="display:none">
+          <h3>Fleksografi Detay</h3>
+          <div class="g3">
+            <div class="fg">
+              <label>Renk Sayısı</label>
+              <div class="iw"><input type="number" id="flekso-colors" step="1" value="6" min="1" max="10"></div>
+              <div class="fg-help">Flekso'da tipik 4–8 renk</div>
+            </div>
+            <div class="fg">
+              <label>Klişe Birim Fiyat</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="flekso-platePrice" step="5" value="80" placeholder="80"></div>
+              <div class="fg-help">Polimer klişe (her renk için bir klişe)</div>
+            </div>
+            <div class="fg">
+              <label>Sleeve Amortisman</label>
+              <div class="iw hl"><span class="ul">€</span><input type="number" id="flekso-sleeveAmort" step="5" value="0" placeholder="0"></div>
+              <div class="fg-help">İş başına düşen sleeve maliyeti (opsiyonel)</div>
+            </div>
+          </div>
+          <div class="g2">
+            <div class="fg">
+              <label>Mürekkep Sistemi</label>
+              <div class="iw">
+                <select id="flekso-inkSystem">
+                  <option value="water">Su Bazlı</option>
+                  <option value="solvent" selected>Solvent Bazlı</option>
+                  <option value="uv">UV</option>
+                </select>
+              </div>
+            </div>
+            <div class="fg">
+              <label>Renk Geçiş / Wash-up</label>
+              <div class="iw hr"><input type="number" id="flekso-washupMin" step="1" value="8" placeholder="8"><span class="ur">dk/renk</span></div>
+              <div class="fg-help">Her renk için temizlik süresi</div>
             </div>
           </div>
         </div>
@@ -1617,6 +1657,17 @@ document.querySelectorAll('.step-btn').forEach(b => {
 let currentMachineTech = 'rotogravur';
 const TECH_LABELS = { rotogravur: 'Rotogravür', flekso: 'Fleksografi', dijital: 'Dijital' };
 
+// printType (S state) → gösterim etiketi (Rotogravür / Fleksografi / Dijital)
+function printTypeLabel(pt) {
+  const map = { roto: 'Rotogravür', flekso: 'Fleksografi', digital: 'Dijital' };
+  return map[pt || S.printType] || 'Dijital';
+}
+// printType → termin yorumu
+function printTypeLeadtime(pt) {
+  const map = { roto: '20 – 30 gün', flekso: '10 – 20 gün', digital: '7 – 10 gün' };
+  return map[pt || S.printType] || '7 – 10 gün';
+}
+
 function switchMachineTech(btn, tech) {
   currentMachineTech = tech;
   document.querySelectorAll('.mch-tab').forEach(t => t.classList.remove('active'));
@@ -1911,6 +1962,7 @@ function setPrintType(el) {
   el.classList.add('active');
   S.printType = el.dataset.val;
   $('roto-fields').style.display = S.printType === 'roto' ? 'block' : 'none';
+  $('flekso-fields').style.display = S.printType === 'flekso' ? 'block' : 'none';
   $('digital-fields').style.display = S.printType === 'digital' ? 'block' : 'none';
   refreshPrintMachineSelect();
   RECALC();
@@ -1921,7 +1973,7 @@ function setPrintType(el) {
 function refreshPrintMachineSelect() {
   const sel = $('print-machine-select');
   if (!sel) return;
-  const techMap = { roto: 'rotogravur', digital: 'dijital' };
+  const techMap = { roto: 'rotogravur', flekso: 'flekso', digital: 'dijital' };
   const tech = techMap[S.printType];
   const machines = DB.getMachinesByTech ? DB.getMachinesByTech(tech) : [];
 
@@ -2177,10 +2229,15 @@ function RECALC() {
   let printLaborFromKg = 0;  // Eski roto-laborKg (sadece makine seçilmediğinde kullanılır)
   let activeMachineRateMt = 0;  // adet kırılımında kullanmak için (makine bazlı €/mt)
 
-  // Silindir (rotogravür) veya click charge (dijital) - her zaman ayrı kalem
+  // Silindir (roto) / Klişe+Sleeve (flekso) / Click charge (dijital) - her zaman ayrı kalem
   if (S.printType === 'roto') {
     const colors = pf('roto-colors') || 0;
     cylCost = colors * (pf('roto-cylPrice') || 0);
+  } else if (S.printType === 'flekso') {
+    const colors = pf('flekso-colors') || 0;
+    const platePrice = pf('flekso-platePrice') || 0;
+    const sleeveAmort = pf('flekso-sleeveAmort') || 0;
+    cylCost = (colors * platePrice) + sleeveAmort;  // klişe × renk + sleeve amortisman
   } else {
     const dcm2 = pf('digi-costM2') || 0;
     const dckg = pf('digi-costKg') || 0;
@@ -2203,17 +2260,28 @@ function RECALC() {
     activeMachineRateMt = effectiveSpeed > 0 ? hourlyRate / (effectiveSpeed * 60) : 0;
     printMachineCost = metrajFire * activeMachineRateMt;
 
-    // Setup maliyeti: sabit zaman + renk başına ek süre (roto)
+    // Setup maliyeti: sabit zaman + teknolojiye özel renk başına ek süre
     const setupTimeMin = +activeMachine.setup_time_min || 0;
     const colorPrepMin = +activeMachine.color_prep_time_min || 0;
-    const colorCount = S.printType === 'roto' ? (pf('roto-colors') || 0) : 0;
-    const totalSetupMin = setupTimeMin + (colorCount * colorPrepMin);
+    let colorCount = 0;
+    let extraPerColorMin = colorPrepMin;  // makinenin kendi hazırlık süresi
+    if (S.printType === 'roto') {
+      colorCount = pf('roto-colors') || 0;
+    } else if (S.printType === 'flekso') {
+      colorCount = pf('flekso-colors') || 0;
+      // Flekso'da her renk geçişinde wash-up süresi vardır (form alanından)
+      extraPerColorMin = colorPrepMin + (pf('flekso-washupMin') || 0);
+    }
+    const totalSetupMin = setupTimeMin + (colorCount * extraPerColorMin);
     printSetupCost = (totalSetupMin / 60) * hourlyRate;
 
     // NOT: Makine seçildiğinde roto-laborKg artık kullanılmıyor (işçilik saatlik gidere dahil)
   } else {
     // Geri uyumluluk: eski S.rates sistemi
-    const printRatePerMt = S.printType === 'roto' ? (rates.gPerMt || 0) : (rates.dPerMt || 0);
+    // Flekso eski sistemde yok — fallback olarak rotogravür değerlerini kullan
+    let printRatePerMt;
+    if (S.printType === 'digital') printRatePerMt = rates.dPerMt || 0;
+    else printRatePerMt = rates.gPerMt || 0;  // roto + flekso ikisi de gPerMt
     activeMachineRateMt = printRatePerMt;
     printMachineCost = metrajFire * printRatePerMt;
     if (S.printType === 'roto') {
@@ -2329,13 +2397,12 @@ function RECALC() {
     $('print-summary').style.display = 'block';
     tx('ps-inkKg', num(inkKg, 2) + ' kg');
     tx('ps-inkCost', euro(inkCost));
-    if (S.printType === 'roto') {
-      tx('ps-cylCost', euro(cylCost));
-      tx('ps-printLabor', euro(printLabor));
+    if (S.printType === 'roto' || S.printType === 'flekso') {
+      tx('ps-cylCost', euro(cylCost));  // silindir (roto) veya klişe+sleeve (flekso)
     } else {
       tx('ps-cylCost', '—');
-      tx('ps-printLabor', euro(printLabor));
     }
+    tx('ps-printLabor', euro(printLabor));
     tx('ps-lamCost', euro(lamCost));
     tx('ps-total', euro(totalPrintCost + lamCost));
   } else {
@@ -2433,15 +2500,15 @@ function RECALC() {
     tx('s-grossKg', num(grossKg, 1) + ' kg');
     tx('s-pktGram', num(pktGram, 2) + ' gr');
     tx('s-pcsKg', num(pcsPerKg, 0) + ' adet');
-    tx('s-printType', S.printType === 'roto' ? 'Rotogravür' : 'Dijital');
-    tx('s-leadtime', S.printType === 'roto' ? '20 – 30 gün' : '7 – 10 gün');
+    tx('s-printType', printTypeLabel());
+    tx('s-leadtime', printTypeLeadtime());
 
     // Cost breakdown bar + table
     // v5: Makine seçilmişse setup ayrı gösterilir (setup sabit maliyettir, adetten bağımsız)
     const costItems = [
       { label: 'Hammadde', cost: rawMatCost, color: '#3b82f6' },
       { label: 'Mürekkep', cost: inkCost, color: '#8b5cf6' },
-      { label: S.printType === 'roto' ? 'Silindir' : 'Dijital Baskı', cost: cylCost, color: '#06b6d4' },
+      { label: S.printType === 'roto' ? 'Silindir' : (S.printType === 'flekso' ? 'Klişe + Sleeve' : 'Dijital Baskı'), cost: cylCost, color: '#06b6d4' },
       activeMachine
         ? { label: 'Baskı Makine Zamanı', cost: printMachineCost, color: '#ec4899' }
         : { label: 'Baskı (işçilik+makine)', cost: printLabor, color: '#ec4899' },
@@ -2495,10 +2562,10 @@ function RECALC() {
       const bPrintArea = bMetraj * (webw / 1000);
       const bInkKg = (bPrintArea * (coverage / 100) * laydown) / 1000;
       const bInkCost = bInkKg * inkRate;
-      // Silindir (roto) sabit / Dijital click (adet-alana bağlı)
+      // Silindir (roto) sabit / Klişe (flekso) sabit / Dijital click (adet-alana bağlı)
       let bCyl;
-      if (S.printType === 'roto') {
-        bCyl = cylCost; // silindir sabit maliyet (adet değişse de aynı)
+      if (S.printType === 'roto' || S.printType === 'flekso') {
+        bCyl = cylCost; // silindir veya klişe — adet değişse de aynı
       } else {
         const dcm2 = pf('digi-costM2') || 0;
         const dckg = pf('digi-costKg') || 0;
@@ -2603,7 +2670,7 @@ async function exportFullPDF() {
   const refNo = await getNextTeklifNo();
 
   // layerStr zaten R'den geliyor, tekrar tanımlamaya gerek yok
-  const productDesc = `${PKG_NAMES[S.pkgType]} ${w}×${h}${g > 0 ? '+' + g : ''} mm\n${layerStr}\nToplam GSM: ${num(gsm,2)} | ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'} Baskı`;
+  const productDesc = `${PKG_NAMES[S.pkgType]} ${w}×${h}${g > 0 ? '+' + g : ''} mm\n${layerStr}\nToplam GSM: ${num(gsm,2)} | ${printTypeLabel()} Baskı`;
 
   // Build line items for teklif table
   const items = [];
@@ -2755,7 +2822,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
           <strong>${PKG_NAMES[S.pkgType]} Ambalaj</strong><br>
           Ölçü: ${w}×${h}${g > 0 ? '+' + g : ''} mm<br>
           Yapı: ${layerStr}<br>
-          GSM: ${num(gsm, 2)} g/m² | ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'} Baskı
+          GSM: ${num(gsm, 2)} g/m² | ${printTypeLabel()} Baskı
         </td>
         <td class="right mono">${num(qty, 0)} adet</td>
         <td class="right mono">${eurPc.toFixed(4)} €</td>
@@ -2804,7 +2871,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
       <div class="spec-item"><strong>Ölçü:</strong> ${w}×${h}${g > 0 ? '+' + g : ''} mm</div>
       <div class="spec-item"><strong>Yapı:</strong> ${layerStr}</div>
       <div class="spec-item"><strong>Toplam GSM:</strong> ${num(gsm, 2)} g/m²</div>
-      <div class="spec-item"><strong>Baskı:</strong> ${S.printType === 'roto' ? 'Rotogravür' : 'Dijital'}</div>
+      <div class="spec-item"><strong>Baskı:</strong> ${printTypeLabel()}</div>
       <div class="spec-item"><strong>Repeat:</strong> ${repeat} mm</div>
       <div class="spec-item"><strong>Web Width:</strong> ${webw} mm</div>
       <div class="spec-item"><strong>Up Sayısı:</strong> ${up}</div>
@@ -2822,7 +2889,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
   <div class="notes-section">
     <div class="note-title">Notlar</div>
     <div class="note-line">• Fiyatlar ${kdvRate > 0 ? 'KDV hariç' : ''} Euro (€) bazlıdır.</div>
-    <div class="note-line">• Tahmini termin: ${S.printType === 'roto' ? '20 – 30 iş günü' : '7 – 10 iş günü'}</div>
+    <div class="note-line">• Tahmini termin: ${printTypeLeadtime()} iş günü</div>
     <div class="note-line">• Teklif geçerlilik süresi: 15 gündür.</div>
     <div class="note-line">• Fire oranı %${waste} olarak hesaplanmıştır.</div>
   </div>
@@ -2853,6 +2920,9 @@ function collectAllInputs() {
       repeat: pf('print-repeat'), webw: pf('print-webw'),
       cutoff: pf('print-cutoff'), up: pf('print-up'),
       rotoColors: pf('roto-colors'), rotoCylPrice: pf('roto-cylPrice'), rotoLaborKg: pf('roto-laborKg'),
+      fleksoColors: pf('flekso-colors'), fleksoPlatePrice: pf('flekso-platePrice'),
+      fleksoSleeveAmort: pf('flekso-sleeveAmort'), fleksoWashupMin: pf('flekso-washupMin'),
+      fleksoInkSystem: $('flekso-inkSystem') ? $('flekso-inkSystem').value : 'solvent',
       digiCostM2: pf('digi-costM2'), digiCostKg: pf('digi-costKg')
     },
     ink: { coverage: pf('ink-coverage'), laydown: pf('ink-laydown'), rate: pf('ink-rate') },
@@ -2890,6 +2960,7 @@ function restoreAllInputs(d) {
       t.classList.toggle('active', t.dataset.val === d.printType);
     });
     $('roto-fields').style.display = d.printType === 'roto' ? 'block' : 'none';
+    $('flekso-fields').style.display = d.printType === 'flekso' ? 'block' : 'none';
     $('digital-fields').style.display = d.printType === 'digital' ? 'block' : 'none';
   }
   // Dims
@@ -2902,6 +2973,13 @@ function restoreAllInputs(d) {
     $('print-cutoff').value = d.print.cutoff||''; $('print-up').value = d.print.up||4;
     $('roto-colors').value = d.print.rotoColors||8; $('roto-cylPrice').value = d.print.rotoCylPrice||350;
     $('roto-laborKg').value = d.print.rotoLaborKg||0.15;
+    if ($('flekso-colors')) {
+      $('flekso-colors').value = d.print.fleksoColors||6;
+      $('flekso-platePrice').value = d.print.fleksoPlatePrice||80;
+      $('flekso-sleeveAmort').value = d.print.fleksoSleeveAmort||0;
+      $('flekso-washupMin').value = d.print.fleksoWashupMin||8;
+      if ($('flekso-inkSystem')) $('flekso-inkSystem').value = d.print.fleksoInkSystem || 'solvent';
+    }
     $('digi-costM2').value = d.print.digiCostM2||0.80; $('digi-costKg').value = d.print.digiCostKg||'';
   }
   // Ink
@@ -3192,7 +3270,7 @@ function exportCSV() {
     ['Ölçü (mm)', `${R.w}×${R.h}${R.g > 0 ? '+' + R.g : ''}`],
     ['Yapı', R.layerStr],
     ['Toplam GSM', R.totalGSM.toFixed(2)],
-    ['Baskı Tipi', S.printType === 'roto' ? 'Rotogravür' : 'Dijital'],
+    ['Baskı Tipi', printTypeLabel()],
     [],
     ['ÜRETİM VERİLERİ'],
     ['Sipariş Adedi', R.qty],
