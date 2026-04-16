@@ -176,6 +176,57 @@ select option{background:var(--card);color:var(--t1)}
 .cl-card .cl-btn:hover{border-color:var(--accent);color:var(--accent)}
 .cl-card .cl-btn.del:hover{border-color:var(--red);color:var(--red)}
 
+/* ─── MACHINE CARDS (v5) ─── */
+.mch-tabs{display:flex;gap:6px;margin-bottom:18px;border-bottom:1px solid var(--border);padding-bottom:0}
+.mch-tab{background:none;border:none;color:var(--t2);padding:10px 16px;font-family:inherit;font-size:.88rem;font-weight:600;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;display:flex;align-items:center;gap:6px}
+.mch-tab:hover{color:var(--t1)}
+.mch-tab.active{color:var(--accent);border-bottom-color:var(--accent)}
+.mch-tab .mch-count{background:var(--border);color:var(--t2);font-size:.7rem;padding:1px 6px;border-radius:10px;font-weight:500}
+.mch-tab.active .mch-count{background:var(--accent-bg);color:var(--accent)}
+
+.mch-empty{text-align:center;padding:48px 24px;background:var(--bg2);border:1px dashed var(--border);border-radius:12px;margin-bottom:16px}
+.mch-empty .mch-empty-icon{font-size:3rem;margin-bottom:12px;opacity:.6}
+.mch-empty h3{font-size:1rem;color:var(--t1);margin-bottom:6px}
+.mch-empty p{font-size:.85rem;color:var(--t2);margin-bottom:18px;max-width:420px;margin-left:auto;margin-right:auto;line-height:1.5}
+
+.mch-list{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-bottom:16px}
+.mch-card{background:var(--card);border:1px solid var(--border);border-radius:10px;padding:14px;position:relative;transition:all .15s}
+.mch-card:hover{border-color:var(--accent)}
+.mch-card.is-default{border-color:var(--accent);background:linear-gradient(135deg,var(--accent-bg),transparent 40%)}
+.mch-card .mch-star{position:absolute;top:10px;right:10px;color:var(--accent);font-size:.9rem}
+.mch-card .mch-name{font-weight:700;font-size:1rem;margin-bottom:4px;color:var(--t1);padding-right:20px}
+.mch-card .mch-specs{font-size:.78rem;color:var(--t2);line-height:1.6;margin-bottom:10px}
+.mch-card .mch-specs strong{color:var(--t1);font-weight:500}
+.mch-card .mch-actions{display:flex;gap:6px;border-top:1px solid var(--border);padding-top:10px;margin-top:auto}
+.mch-card .mch-btn{flex:1;background:none;border:1px solid var(--border);color:var(--t2);padding:6px 8px;border-radius:6px;font-family:inherit;font-size:.75rem;cursor:pointer;transition:all .15s}
+.mch-card .mch-btn:hover{border-color:var(--accent);color:var(--accent)}
+.mch-card .mch-btn.del:hover{border-color:var(--red);color:var(--red)}
+.mch-card .mch-btn.def:hover{background:var(--accent);color:#fff;border-color:var(--accent)}
+
+/* Makine formu modal */
+.mch-modal{position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:200;display:none;align-items:flex-start;justify-content:center;padding:20px;overflow-y:auto}
+.mch-modal.active{display:flex}
+.mch-modal-box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:24px;max-width:640px;width:100%;margin:20px auto;position:relative}
+.mch-modal-box h2{font-size:1.2rem;margin-bottom:4px}
+.mch-modal-box .mch-modal-sub{color:var(--t2);font-size:.85rem;margin-bottom:20px}
+.mch-modal-close{position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border);color:var(--t2);width:32px;height:32px;border-radius:8px;cursor:pointer;font-size:1.1rem;transition:all .15s}
+.mch-modal-close:hover{border-color:var(--red);color:var(--red)}
+
+.mch-adv-toggle{background:var(--bg2);border:1px solid var(--border);color:var(--t2);padding:10px 14px;border-radius:8px;cursor:pointer;font-family:inherit;font-size:.85rem;width:100%;text-align:left;display:flex;justify-content:space-between;align-items:center;margin:16px 0 8px;transition:all .15s}
+.mch-adv-toggle:hover{border-color:var(--accent);color:var(--t1)}
+.mch-adv-content{display:none;padding-top:8px}
+.mch-adv-content.active{display:block}
+.mch-adv-toggle .mch-adv-arrow{transition:transform .2s;font-size:.8rem}
+.mch-adv-toggle.active .mch-adv-arrow{transform:rotate(90deg)}
+
+.fg-help{font-size:.72rem;color:var(--t3);margin-top:3px;line-height:1.4}
+
+/* Teknoloji rozet */
+.tech-badge{display:inline-block;padding:2px 8px;border-radius:10px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px}
+.tech-badge.roto{background:rgba(6,182,212,.15);color:var(--cyan)}
+.tech-badge.flekso{background:rgba(139,92,246,.15);color:var(--purple)}
+.tech-badge.dijital{background:rgba(245,158,11,.15);color:var(--orange)}
+
 /* ─── RATE PROFILE ─── */
 .rp-card{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;margin-bottom:6px;display:flex;justify-content:space-between;align-items:center;cursor:pointer;transition:border-color .15s}
 .rp-card:hover{border-color:var(--accent)}
@@ -316,6 +367,7 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- STEPS NAV -->
 <div class="steps" id="stepsNav">
+  <button class="step-btn" data-step="machines"><span class="num">🏭</span>Makine Parkı</button>
   <button class="step-btn" data-step="rates"><span class="num">⚙</span>Makine Fiyatları</button>
   <button class="step-btn" data-step="clients"><span class="num">👤</span>Müşteriler</button>
   <button class="step-btn active" data-step="product"><span class="num">1</span>Ürün Tanımı</button>
@@ -323,6 +375,218 @@ body{background:#fff;color:#000;padding-bottom:0}
   <button class="step-btn" data-step="print"><span class="num">3</span>Baskı</button>
   <button class="step-btn" data-step="converting"><span class="num">4</span>Konverting</button>
   <button class="step-btn" data-step="summary"><span class="num">5</span>Hesapla & Özet</button>
+</div>
+
+<!-- ═══════════════ PANEL: MAKİNE PARKI (v5 — Makine Kartları) ═══════════════ -->
+<div class="panel" id="p-machines">
+  <div class="cd">
+    <h2><span class="ic" style="background:var(--cyan)">🏭</span> Makine Parkı</h2>
+    <p style="color:var(--t2);font-size:.85rem;margin-bottom:18px;line-height:1.6">
+      Fabrikanızdaki her makineyi ayrı kart olarak tanımlayın. Hız, setup süresi, saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır. Her teknoloji için bir makineyi <strong style="color:var(--accent)">varsayılan</strong> olarak işaretleyin.
+    </p>
+
+    <!-- Teknoloji Sekmeleri -->
+    <div class="mch-tabs" id="mchTabs">
+      <button class="mch-tab active" data-tech="rotogravur" onclick="switchMachineTech(this,'rotogravur')">
+        Rotogravür <span class="mch-count" id="mch-count-rotogravur">0</span>
+      </button>
+      <button class="mch-tab" data-tech="flekso" onclick="switchMachineTech(this,'flekso')">
+        Fleksografi <span class="mch-count" id="mch-count-flekso">0</span>
+      </button>
+      <button class="mch-tab" data-tech="dijital" onclick="switchMachineTech(this,'dijital')">
+        Dijital <span class="mch-count" id="mch-count-dijital">0</span>
+      </button>
+    </div>
+
+    <!-- Makine Listesi -->
+    <div id="mch-list-container"></div>
+
+    <!-- Ekle Butonu -->
+    <button class="btn btn-main" onclick="openMachineForm()" style="max-width:300px;margin:8px auto;display:block">
+      + Yeni Makine Ekle
+    </button>
+  </div>
+
+  <!-- Migration bildirim kartı (eski makine_rates verisi varsa gösterilir) -->
+  <div class="cd" id="mch-migrate-box" style="display:none;border-color:var(--orange);background:rgba(245,158,11,.05)">
+    <h3 style="margin-top:0;color:var(--orange)">📦 Eski Makine Fiyatları Tespit Edildi</h3>
+    <p style="font-size:.85rem;color:var(--t2);line-height:1.6;margin-bottom:14px">
+      Eski sistemde girilmiş makine fiyatlarınız var. Bunları otomatik olarak <strong style="color:var(--accent)">Rotogravür</strong> ve <strong style="color:var(--accent)">Dijital</strong> makine kartlarına dönüştürmek ister misiniz?
+    </p>
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-main" onclick="migrateOldRates()" style="flex:1">Evet, Dönüştür</button>
+      <button class="btn btn-out" onclick="dismissMigrate()" style="flex:1">Hayır, Boş Başla</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ MAKİNE FORMU MODAL ═══════════════ -->
+<div class="mch-modal" id="machineModal">
+  <div class="mch-modal-box">
+    <button class="mch-modal-close" onclick="closeMachineForm()">×</button>
+    <h2 id="mch-modal-title">Yeni Makine Ekle</h2>
+    <div class="mch-modal-sub">Temel bilgileri girin. Detaylı parametreler için "Gelişmiş Ayarlar" bölümünü açın.</div>
+
+    <input type="hidden" id="mch-edit-id" value="">
+
+    <!-- Teknoloji -->
+    <div class="fg">
+      <label>Teknoloji</label>
+      <div class="iw">
+        <select id="mch-tech">
+          <option value="rotogravur">Rotogravür</option>
+          <option value="flekso">Fleksografi</option>
+          <option value="dijital">Dijital</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- Temel Bilgiler -->
+    <div class="fg">
+      <label>Makine Adı <span class="req">*</span></label>
+      <div class="iw"><input type="text" id="mch-name" placeholder="örn. Ana Gravür Hattı"></div>
+      <div class="fg-help">Kendi referansınız için — liste ve raporlarda görünür.</div>
+    </div>
+
+    <div class="g2">
+      <div class="fg">
+        <label>Baskı Eni <span class="req">*</span></label>
+        <div class="iw hr"><input type="number" id="mch-web-width" step="10" placeholder="1200"><span class="ur">mm</span></div>
+        <div class="fg-help">Makinenin maksimum baskı eni.</div>
+      </div>
+      <div class="fg">
+        <label>Tavsiye Üretim Hızı <span class="req">*</span></label>
+        <div class="iw hr"><input type="number" id="mch-rec-speed" step="5" placeholder="150"><span class="ur">m/dk</span></div>
+        <div class="fg-help">Günlük üretimde rahatça sürebilen hız (max mekanik hız değil).</div>
+      </div>
+    </div>
+
+    <div class="fg">
+      <label>Toplam Saatlik Gider <span class="req">*</span></label>
+      <div class="iw hl"><span class="ul">€</span><input type="number" id="mch-total-hourly" step="1" placeholder="85"></div>
+      <div class="fg-help">İşçilik + enerji + makine genel gideri toplamı (€/saat). Gelişmiş ayarlardan ayrıştırabilirsiniz.</div>
+    </div>
+
+    <!-- Gelişmiş Ayarlar -->
+    <button type="button" class="mch-adv-toggle" id="mch-adv-toggle" onclick="toggleAdvSettings()">
+      <span>Gelişmiş Ayarlar</span>
+      <span class="mch-adv-arrow">▶</span>
+    </button>
+
+    <div class="mch-adv-content" id="mch-adv-content">
+      <!-- İşçilik/Enerji/Genel Gider ayrıştırma -->
+      <h3 style="font-size:.85rem;color:var(--t2);margin-top:10px;margin-bottom:10px">Saatlik Gider Dağılımı</h3>
+      <div class="g3">
+        <div class="fg">
+          <label>İşçilik</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="mch-hourly-labor" step="1" placeholder="0"></div>
+        </div>
+        <div class="fg">
+          <label>Enerji</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="mch-hourly-energy" step="1" placeholder="0"></div>
+        </div>
+        <div class="fg">
+          <label>Genel Gider</label>
+          <div class="iw hl"><span class="ul">€</span><input type="number" id="mch-hourly-overhead" step="1" placeholder="0"></div>
+        </div>
+      </div>
+      <div class="fg-help" style="margin:-6px 0 12px">Bu 3 değerin toplamı ana ekrandaki "Toplam Saatlik Gider" alanına otomatik yazılır.</div>
+
+      <!-- Setup ve Değişim -->
+      <h3 style="font-size:.85rem;color:var(--t2);margin-top:10px;margin-bottom:10px">Setup ve İş Değişim</h3>
+      <div class="g2">
+        <div class="fg">
+          <label>Setup Süresi</label>
+          <div class="iw hr"><input type="number" id="mch-setup-time" step="1" placeholder="0"><span class="ur">dk</span></div>
+          <div class="fg-help">Bir iş başlatmak için hazırlık süresi.</div>
+        </div>
+        <div class="fg">
+          <label>Setup Firesi</label>
+          <div class="iw hr"><input type="number" id="mch-setup-waste" step="10" placeholder="0"><span class="ur">mt</span></div>
+          <div class="fg-help">Hazırlık sırasında harcanan metraj.</div>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="fg">
+          <label>İş Değişim Süresi</label>
+          <div class="iw hr"><input type="number" id="mch-changeover-time" step="1" placeholder="0"><span class="ur">dk</span></div>
+          <div class="fg-help">İki iş arasındaki geçiş süresi.</div>
+        </div>
+        <div class="fg">
+          <label>Renk Başına Ek Süre</label>
+          <div class="iw hr"><input type="number" id="mch-color-prep" step="1" placeholder="0"><span class="ur">dk</span></div>
+          <div class="fg-help">Her renk için ek hazırlık (rotogravürde geçerli).</div>
+        </div>
+      </div>
+
+      <!-- Geometri -->
+      <h3 style="font-size:.85rem;color:var(--t2);margin-top:10px;margin-bottom:10px">Baskı Geometrisi</h3>
+      <div class="g3">
+        <div class="fg">
+          <label>Min Baskı Boyu</label>
+          <div class="iw hr"><input type="number" id="mch-min-print-length" step="10" placeholder="0"><span class="ur">mm</span></div>
+        </div>
+        <div class="fg">
+          <label>Max Baskı Boyu</label>
+          <div class="iw hr"><input type="number" id="mch-max-print-length" step="10" placeholder="0"><span class="ur">mm</span></div>
+        </div>
+        <div class="fg">
+          <label>Max Mekanik Hız</label>
+          <div class="iw hr"><input type="number" id="mch-max-speed" step="5" placeholder="0"><span class="ur">m/dk</span></div>
+        </div>
+      </div>
+
+      <!-- Verimlilik -->
+      <h3 style="font-size:.85rem;color:var(--t2);margin-top:10px;margin-bottom:10px">Verimlilik ve İş Karakteri</h3>
+      <div class="g3">
+        <div class="fg">
+          <label>Verimlilik</label>
+          <div class="iw hr"><input type="number" id="mch-efficiency" step="1" placeholder="85"><span class="ur">%</span></div>
+          <div class="fg-help">Gerçek/teorik hız oranı.</div>
+        </div>
+        <div class="fg">
+          <label>Randıman</label>
+          <div class="iw hr"><input type="number" id="mch-yield" step="1" placeholder="95"><span class="ur">%</span></div>
+          <div class="fg-help">Kabul edilen üretim oranı.</div>
+        </div>
+        <div class="fg">
+          <label>Planlı Duruş</label>
+          <div class="iw hr"><input type="number" id="mch-downtime" step="1" placeholder="5"><span class="ur">%</span></div>
+          <div class="fg-help">Bakım/mola payı.</div>
+        </div>
+      </div>
+
+      <div class="g2">
+        <div class="fg">
+          <label>Operatör Sayısı</label>
+          <div class="iw"><input type="number" id="mch-operator-count" step="1" placeholder="1"></div>
+        </div>
+        <div class="fg">
+          <label>Min Ekonomik Sipariş</label>
+          <div class="iw hr"><input type="number" id="mch-min-qty" step="1000" placeholder="0"><span class="ur">adet</span></div>
+          <div class="fg-help">Bu adedin altı bu makinede kârsız kabul edilir.</div>
+        </div>
+      </div>
+
+      <!-- Notlar -->
+      <div class="fg">
+        <label>Notlar</label>
+        <div class="iw"><input type="text" id="mch-notes" placeholder="özel notlar, ayar detayları..."></div>
+      </div>
+    </div>
+
+    <!-- Varsayılan -->
+    <div class="fg" style="display:flex;align-items:center;gap:8px;padding:12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-top:16px">
+      <input type="checkbox" id="mch-is-default" style="width:auto;margin:0">
+      <label for="mch-is-default" style="margin:0;cursor:pointer">Bu makineyi bu teknoloji için <strong style="color:var(--accent)">varsayılan</strong> yap</label>
+    </div>
+
+    <!-- Aksiyonlar -->
+    <div style="display:flex;gap:8px;margin-top:20px">
+      <button class="btn btn-out" onclick="closeMachineForm()" style="flex:1">İptal</button>
+      <button class="btn btn-main" onclick="saveMachineForm()" style="flex:2">Kaydet</button>
+    </div>
+  </div>
 </div>
 
 <!-- ═══════════════ PANEL: MAKİNE FİYATLARI (RATES) ═══════════════ -->
@@ -420,10 +684,6 @@ body{background:#fff;color:#000;padding-bottom:0}
           <div class="fg">
             <label>Genel Gider Yüzdesi</label>
             <div class="iw hr"><input type="number" id="rate-overhead" step="0.5" value="8"><span class="ur">%</span></div>
-          </div>
-          <div class="fg">
-            <label>Kâr Marjı</label>
-            <div class="iw hr"><input type="number" id="rate-profit-margin" step="0.5" value="15"><span class="ur">%</span></div>
           </div>
         </div>
       </div>
@@ -1011,7 +1271,8 @@ const DB = {
     templates: [],
     calculations: [],
     quotations: [],
-    teklifSeq: 0
+    teklifSeq: 0,
+    machines: []
   },
 
   async loadAll() {
@@ -1019,14 +1280,15 @@ const DB = {
     if (!user) return;
     this.uid = user.id;
 
-    const [r1, r2, r3, r4, r5, r6, r7] = await Promise.all([
+    const [r1, r2, r3, r4, r5, r6, r7, r8] = await Promise.all([
       sb.from('machine_rates').select('data').eq('user_id', this.uid).maybeSingle(),
       sb.from('rate_profiles').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
       sb.from('clients').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
       sb.from('templates').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }),
       sb.from('calculations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(20),
       sb.from('quotations').select('*').eq('user_id', this.uid).order('created_at', { ascending: false }).limit(50),
-      sb.from('teklif_seq').select('seq').eq('user_id', this.uid).maybeSingle()
+      sb.from('teklif_seq').select('seq').eq('user_id', this.uid).maybeSingle(),
+      sb.from('machines').select('*').eq('user_id', this.uid).order('created_at', { ascending: true })
     ]);
 
     this.cache.rates = r1.data?.data || null;
@@ -1036,6 +1298,56 @@ const DB = {
     this.cache.calculations = r5.data || [];
     this.cache.quotations = r6.data || [];
     this.cache.teklifSeq = r7.data?.seq || 0;
+    this.cache.machines = r8.data || [];
+  },
+
+  // ═══════════ MAKİNE KARTLARI (v5) ═══════════
+  // Her kullanıcı birden fazla makine tanımlayabilir
+  // Her teknoloji için bir tanesi "varsayılan" olarak işaretlenir
+  async addMachine(data) {
+    const row = { user_id: this.uid, ...data, created_at: new Date().toISOString(), updated_at: new Date().toISOString() };
+    const { data: inserted, error } = await sb.from('machines').insert(row).select().single();
+    if (error) { console.error('addMachine:', error); return null; }
+    if (inserted) this.cache.machines.push(inserted);
+    return inserted;
+  },
+
+  async updateMachine(id, data) {
+    const patch = { ...data, updated_at: new Date().toISOString() };
+    const idx = this.cache.machines.findIndex(m => m.id === id);
+    if (idx >= 0) Object.assign(this.cache.machines[idx], patch);
+    const { error } = await sb.from('machines').update(patch).eq('id', id);
+    if (error) console.error('updateMachine:', error);
+  },
+
+  async deleteMachine(id) {
+    this.cache.machines = this.cache.machines.filter(m => m.id !== id);
+    const { error } = await sb.from('machines').delete().eq('id', id);
+    if (error) console.error('deleteMachine:', error);
+  },
+
+  // Bir teknoloji için varsayılanı değiştir — unique index var, önce eskisini false yap
+  async setDefaultMachine(id, technology) {
+    // Cache'te önce aynı teknolojideki diğerlerini false yap
+    this.cache.machines.forEach(m => {
+      if (m.technology === technology) m.is_default = (m.id === id);
+    });
+    // DB'de önce hepsini false yap, sonra seçileni true yap
+    await sb.from('machines').update({ is_default: false }).eq('user_id', this.uid).eq('technology', technology);
+    const { error } = await sb.from('machines').update({ is_default: true }).eq('id', id);
+    if (error) console.error('setDefaultMachine:', error);
+  },
+
+  // Bir teknoloji için varsayılan makineyi getir
+  getDefaultMachine(technology) {
+    return this.cache.machines.find(m => m.technology === technology && m.is_default) ||
+           this.cache.machines.find(m => m.technology === technology) ||
+           null;
+  },
+
+  // Teknolojiye göre makine listesi
+  getMachinesByTech(technology) {
+    return this.cache.machines.filter(m => m.technology === technology);
   },
 
   // Makine Fiyatları — debounced save
@@ -1221,6 +1533,7 @@ async function onAuthReady(user) {
   renderClients();
   updateClientSelect();
   renderTemplates();
+  renderMachines();
   startCurrencyAutoRefresh();
   RECALC();
 }
@@ -1280,11 +1593,291 @@ function goStep(step) {
     if (b.dataset.step === step) b.classList.add('active');
   });
   window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (step === 'machines') renderMachines();
   RECALC();
 }
 document.querySelectorAll('.step-btn').forEach(b => {
   b.addEventListener('click', () => goStep(b.dataset.step));
 });
+
+// ═══════════ MAKİNE PARKI (v5) ═══════════
+let currentMachineTech = 'rotogravur';
+const TECH_LABELS = { rotogravur: 'Rotogravür', flekso: 'Fleksografi', dijital: 'Dijital' };
+
+function switchMachineTech(btn, tech) {
+  currentMachineTech = tech;
+  document.querySelectorAll('.mch-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  renderMachineList();
+}
+
+// Teknoloji sayaçlarını güncelle
+function updateMachineCounts() {
+  ['rotogravur','flekso','dijital'].forEach(tech => {
+    const count = DB.getMachinesByTech(tech).length;
+    const el = $('mch-count-' + tech);
+    if (el) el.textContent = count;
+  });
+}
+
+// Tüm panel içeriğini render et (sekme + liste + migration kutusu)
+function renderMachines() {
+  updateMachineCounts();
+  renderMachineList();
+  checkMigrationPrompt();
+}
+
+// Aktif teknolojinin makine listesini render et
+function renderMachineList() {
+  const container = $('mch-list-container');
+  if (!container) return;
+  const machines = DB.getMachinesByTech(currentMachineTech);
+
+  if (machines.length === 0) {
+    container.innerHTML = `
+      <div class="mch-empty">
+        <div class="mch-empty-icon">🏭</div>
+        <h3>${TECH_LABELS[currentMachineTech]} makinesi tanımlı değil</h3>
+        <p>Bu teknoloji için ilk makinenizi ekleyerek başlayın. Baskı eni, hız ve saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır.</p>
+      </div>`;
+    return;
+  }
+
+  container.innerHTML = `<div class="mch-list">${machines.map(m => machineCardHtml(m)).join('')}</div>`;
+}
+
+function machineCardHtml(m) {
+  const isDefault = m.is_default;
+  const totalHourly = (+m.hourly_labor || 0) + (+m.hourly_energy || 0) + (+m.hourly_overhead || 0);
+  return `
+    <div class="mch-card ${isDefault ? 'is-default' : ''}">
+      ${isDefault ? '<div class="mch-star" title="Varsayılan makine">⭐</div>' : ''}
+      <div class="mch-name">${escapeHtml(m.name)}</div>
+      <div class="mch-specs">
+        <div><strong>${m.web_width || 0}mm</strong> baskı eni · <strong>${m.rec_speed || 0}</strong> m/dk</div>
+        <div>Setup: <strong>${m.setup_time_min || 0} dk</strong> · Fire: <strong>${m.setup_waste_m || 0} mt</strong></div>
+        <div>Saatlik: <strong>€${num(totalHourly,2)}</strong> · Verim: <strong>%${m.efficiency_pct || 0}</strong></div>
+        ${m.min_economic_qty ? `<div style="color:var(--t3);font-size:.72rem;margin-top:4px">Min sipariş: ${num(m.min_economic_qty,0)} adet</div>` : ''}
+      </div>
+      <div class="mch-actions">
+        ${!isDefault ? `<button class="mch-btn def" onclick="setMachineDefault('${m.id}','${m.technology}')">Varsayılan Yap</button>` : ''}
+        <button class="mch-btn" onclick="editMachine('${m.id}')">Düzenle</button>
+        <button class="mch-btn del" onclick="confirmDeleteMachine('${m.id}','${escapeHtml(m.name).replace(/'/g,"\\'")}')">Sil</button>
+      </div>
+    </div>`;
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+// ═══════════ FORM İŞLEMLERİ ═══════════
+function openMachineForm(tech) {
+  $('mch-edit-id').value = '';
+  $('mch-modal-title').textContent = 'Yeni Makine Ekle';
+  // Formu sıfırla
+  ['mch-name','mch-web-width','mch-rec-speed','mch-total-hourly','mch-hourly-labor','mch-hourly-energy','mch-hourly-overhead',
+   'mch-setup-time','mch-setup-waste','mch-changeover-time','mch-color-prep','mch-min-print-length','mch-max-print-length',
+   'mch-max-speed','mch-efficiency','mch-yield','mch-downtime','mch-operator-count','mch-min-qty','mch-notes'
+  ].forEach(id => { const el = $(id); if (el) el.value = ''; });
+  $('mch-efficiency').value = 85;
+  $('mch-yield').value = 95;
+  $('mch-downtime').value = 5;
+  $('mch-operator-count').value = 1;
+  $('mch-is-default').checked = false;
+  $('mch-tech').value = tech || currentMachineTech;
+  // Gelişmiş ayarları kapat
+  $('mch-adv-content').classList.remove('active');
+  $('mch-adv-toggle').classList.remove('active');
+  $('machineModal').classList.add('active');
+  setTimeout(() => $('mch-name').focus(), 50);
+}
+
+function closeMachineForm() {
+  $('machineModal').classList.remove('active');
+}
+
+function toggleAdvSettings() {
+  $('mch-adv-content').classList.toggle('active');
+  $('mch-adv-toggle').classList.toggle('active');
+}
+
+function editMachine(id) {
+  const m = DB.cache.machines.find(x => x.id === id);
+  if (!m) return;
+  $('mch-edit-id').value = id;
+  $('mch-modal-title').textContent = 'Makineyi Düzenle';
+  $('mch-tech').value = m.technology;
+  $('mch-name').value = m.name || '';
+  $('mch-web-width').value = m.web_width || '';
+  $('mch-rec-speed').value = m.rec_speed || '';
+  const totalHourly = (+m.hourly_labor || 0) + (+m.hourly_energy || 0) + (+m.hourly_overhead || 0);
+  $('mch-total-hourly').value = totalHourly || '';
+  $('mch-hourly-labor').value = m.hourly_labor || '';
+  $('mch-hourly-energy').value = m.hourly_energy || '';
+  $('mch-hourly-overhead').value = m.hourly_overhead || '';
+  $('mch-setup-time').value = m.setup_time_min || '';
+  $('mch-setup-waste').value = m.setup_waste_m || '';
+  $('mch-changeover-time').value = m.changeover_time_min || '';
+  $('mch-color-prep').value = m.color_prep_time_min || '';
+  $('mch-min-print-length').value = m.min_print_length || '';
+  $('mch-max-print-length').value = m.max_print_length || '';
+  $('mch-max-speed').value = m.max_speed || '';
+  $('mch-efficiency').value = m.efficiency_pct || 85;
+  $('mch-yield').value = m.yield_pct || 95;
+  $('mch-downtime').value = m.planned_downtime_pct || 5;
+  $('mch-operator-count').value = m.operator_count || 1;
+  $('mch-min-qty').value = m.min_economic_qty || '';
+  $('mch-notes').value = m.notes || '';
+  $('mch-is-default').checked = !!m.is_default;
+  $('machineModal').classList.add('active');
+}
+
+async function saveMachineForm() {
+  const name = $('mch-name').value.trim();
+  const webWidth = +$('mch-web-width').value || 0;
+  const recSpeed = +$('mch-rec-speed').value || 0;
+  const totalHourlyInput = +$('mch-total-hourly').value || 0;
+
+  // Validation
+  if (!name) { alert('Makine adı gerekli.'); return; }
+  if (!webWidth) { alert('Baskı eni gerekli.'); return; }
+  if (!recSpeed) { alert('Tavsiye üretim hızı gerekli.'); return; }
+
+  // Saatlik gider: gelişmiş alanlar doldurulduysa onların toplamı, yoksa toplam alanı
+  let hourlyLabor = +$('mch-hourly-labor').value || 0;
+  let hourlyEnergy = +$('mch-hourly-energy').value || 0;
+  let hourlyOverhead = +$('mch-hourly-overhead').value || 0;
+  const detailedSum = hourlyLabor + hourlyEnergy + hourlyOverhead;
+  if (detailedSum === 0 && totalHourlyInput > 0) {
+    // Basit kullanıcı sadece toplamı girdi → tümünü labor olarak kaydet
+    hourlyLabor = totalHourlyInput;
+  }
+
+  if ((hourlyLabor + hourlyEnergy + hourlyOverhead) === 0) {
+    if (!confirm('Saatlik gider girilmedi. Hesaplamalar bu makine seçildiğinde eksik kalacak. Yine de kaydedilsin mi?')) return;
+  }
+
+  const data = {
+    name,
+    technology: $('mch-tech').value,
+    is_default: $('mch-is-default').checked,
+    web_width: webWidth,
+    rec_speed: recSpeed,
+    max_speed: +$('mch-max-speed').value || 0,
+    min_print_length: +$('mch-min-print-length').value || 0,
+    max_print_length: +$('mch-max-print-length').value || 0,
+    hourly_labor: hourlyLabor,
+    hourly_energy: hourlyEnergy,
+    hourly_overhead: hourlyOverhead,
+    setup_time_min: +$('mch-setup-time').value || 0,
+    setup_waste_m: +$('mch-setup-waste').value || 0,
+    changeover_time_min: +$('mch-changeover-time').value || 0,
+    color_prep_time_min: +$('mch-color-prep').value || 0,
+    operator_count: +$('mch-operator-count').value || 1,
+    efficiency_pct: +$('mch-efficiency').value || 85,
+    yield_pct: +$('mch-yield').value || 95,
+    planned_downtime_pct: +$('mch-downtime').value || 5,
+    min_economic_qty: +$('mch-min-qty').value || 0,
+    notes: $('mch-notes').value.trim()
+  };
+
+  const editId = $('mch-edit-id').value;
+  if (editId) {
+    // Varsayılan değiştiriliyorsa önce diğerlerini sıfırla
+    if (data.is_default) {
+      await DB.setDefaultMachine(editId, data.technology);
+      delete data.is_default;
+    }
+    await DB.updateMachine(editId, data);
+  } else {
+    const inserted = await DB.addMachine(data);
+    if (inserted && data.is_default) {
+      await DB.setDefaultMachine(inserted.id, data.technology);
+    }
+  }
+
+  closeMachineForm();
+  currentMachineTech = data.technology;
+  document.querySelectorAll('.mch-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tech === data.technology);
+  });
+  renderMachines();
+}
+
+async function setMachineDefault(id, tech) {
+  await DB.setDefaultMachine(id, tech);
+  renderMachines();
+}
+
+async function confirmDeleteMachine(id, name) {
+  if (!confirm(`"${name}" makinesini silmek istediğinize emin misiniz?`)) return;
+  await DB.deleteMachine(id);
+  renderMachines();
+}
+
+// ═══════════ MIGRATION (eski machine_rates → yeni machines) ═══════════
+function checkMigrationPrompt() {
+  const hasOld = DB.cache.rates && Object.keys(DB.cache.rates).length > 0;
+  const hasNew = DB.cache.machines.length > 0;
+  const dismissed = localStorage.getItem('flexi-migrate-dismissed') === '1';
+  $('mch-migrate-box').style.display = (hasOld && !hasNew && !dismissed) ? 'block' : 'none';
+}
+
+async function migrateOldRates() {
+  const r = DB.cache.rates || {};
+  const gravureSpeed = +r['rate-gravure-speed'] || 150;
+  const gravureHourly = +r['rate-gravure-hourly'] || 0;
+  const digitalSpeed = +r['rate-digital-speed'] || 30;
+  const digitalHourly = +r['rate-digital-hourly'] || 0;
+
+  const rotoMachine = {
+    name: 'Ana Rotogravür',
+    technology: 'rotogravur',
+    is_default: true,
+    web_width: 1200,
+    rec_speed: gravureSpeed,
+    max_speed: gravureSpeed,
+    hourly_labor: gravureHourly,
+    hourly_energy: 0,
+    hourly_overhead: 0,
+    efficiency_pct: 85,
+    yield_pct: 95,
+    planned_downtime_pct: 5,
+    operator_count: 1,
+    notes: 'Eski makine fiyatlarından otomatik dönüştürüldü.'
+  };
+  const digitalMachine = {
+    name: 'Ana Dijital',
+    technology: 'dijital',
+    is_default: true,
+    web_width: 760,
+    rec_speed: digitalSpeed,
+    max_speed: digitalSpeed,
+    hourly_labor: digitalHourly,
+    hourly_energy: 0,
+    hourly_overhead: 0,
+    efficiency_pct: 85,
+    yield_pct: 95,
+    planned_downtime_pct: 5,
+    operator_count: 1,
+    notes: 'Eski makine fiyatlarından otomatik dönüştürüldü.'
+  };
+
+  const m1 = await DB.addMachine(rotoMachine);
+  const m2 = await DB.addMachine(digitalMachine);
+  if (m1) await DB.setDefaultMachine(m1.id, 'rotogravur');
+  if (m2) await DB.setDefaultMachine(m2.id, 'dijital');
+
+  localStorage.setItem('flexi-migrate-dismissed', '1');
+  renderMachines();
+  alert('Eski makine fiyatlarınız 2 makine kartına dönüştürüldü. Gerekirse ayrıntıları düzenleyebilirsiniz.');
+}
+
+function dismissMigrate() {
+  localStorage.setItem('flexi-migrate-dismissed', '1');
+  $('mch-migrate-box').style.display = 'none';
+}
 
 // ═══════════ PKG TYPE ═══════════
 function selectPkg(el) {
@@ -1526,14 +2119,11 @@ function RECALC() {
   // ═══ 10. KESİM (SLITTING) MALİYETİ ═══
   const slitCost = metrajFire * (rates.sPerMt || 0);
 
-  // ═══ 11. TOPLAM MALİYET + OVERHEAD + KÂR MARJI ═══
+  // ═══ 11. TOPLAM MALİYET + OVERHEAD ═══
   const baseCost = rawMatCost + totalPrintCost + lamCost + totalConvCost + slitCost;
   const overheadPct = rates.overhead || 0;
-  const profitPct = rates.profitMargin || 0;
   const overheadAmount = baseCost * (overheadPct / 100);
-  const costWithOverhead = baseCost + overheadAmount;
-  const profitAmount = costWithOverhead * (profitPct / 100);
-  const totalCost = costWithOverhead + profitAmount;
+  const totalCost = baseCost + overheadAmount;
   const eurKg = grossKg > 0 ? totalCost / grossKg : 0;
   const eurPc = qty > 0 ? totalCost / qty : 0;
   const eurK = eurPc * 1000;
@@ -1545,7 +2135,7 @@ function RECALC() {
     layers, totalAdhGsm, adhRate, lakGsm, lakRate,
     rawMatCost, inkKg, inkCost, cylCost, printLabor, totalPrintCost,
     lamCost, slitCost, convLabor, convMachine, convZipper, convValve, convSpout, convOther, totalConvCost,
-    baseCost, overheadAmount, profitAmount,
+    baseCost, overheadAmount,
     totalCost, eurKg, eurPc, eurK,
     layerStr: layers.map(l => `${l.micron}μ ${l.film}`).join(' / ')
   };
@@ -1726,8 +2316,7 @@ function RECALC() {
       { label: 'Laminasyon', cost: lamCost, color: '#f59e0b' },
       { label: 'Kesim (Slitting)', cost: slitCost, color: '#14b8a6' },
       { label: 'Konverting', cost: totalConvCost, color: '#22c55e' },
-      { label: 'Genel Gider (%' + overheadPct + ')', cost: overheadAmount, color: '#a855f7' },
-      { label: 'Kâr Marjı (%' + profitPct + ')', cost: profitAmount, color: '#f97316' }
+      { label: 'Genel Gider (%' + overheadPct + ')', cost: overheadAmount, color: '#a855f7' }
     ].filter(c => c.cost > 0);
 
     const barEl = $('s-bar'), legEl = $('s-leg');
@@ -1745,7 +2334,7 @@ function RECALC() {
 
     const utbody = document.querySelector('#s-unitTable tbody');
     utbody.innerHTML = '';
-    [{l:'Hammadde',c:rawMatCost},{l:'Baskı (mürekkep+silindir+işçilik)',c:totalPrintCost},{l:'Laminasyon',c:lamCost},{l:'Kesim',c:slitCost},{l:'Konverting',c:totalConvCost},{l:'Genel Gider + Kâr',c:overheadAmount+profitAmount}].filter(u=>u.c>0).forEach(u => {
+    [{l:'Hammadde',c:rawMatCost},{l:'Baskı (mürekkep+silindir+işçilik)',c:totalPrintCost},{l:'Laminasyon',c:lamCost},{l:'Kesim',c:slitCost},{l:'Konverting',c:totalConvCost},{l:'Genel Gider',c:overheadAmount}].filter(u=>u.c>0).forEach(u => {
       utbody.innerHTML += `<tr><td>${u.l}</td><td class="right">${euro(u.c / grossKg)}</td><td class="right">${euro(u.c / qty, 4)}</td></tr>`;
     });
     utbody.innerHTML += `<tr><td>TOPLAM</td><td class="right">${euro(eurKg)}</td><td class="right">${euro(eurPc, 4)}</td></tr>`;
@@ -1788,8 +2377,7 @@ function RECALC() {
       const bConvExtras = bq * ((pf('conv-zipper')||0) + (pf('conv-valve')||0) + (pf('conv-spout')||0) + (pf('conv-other')||0));
       const bBase = bRaw + bInkCost + bCyl + bPrintLabor + bLam + bSlit + bConvLabor + bConvMachine + bConvExtras;
       const bOverhead = bBase * (overheadPct / 100);
-      const bProfit = (bBase + bOverhead) * (profitPct / 100);
-      const bTotal = bBase + bOverhead + bProfit;
+      const bTotal = bBase + bOverhead;
       const bEurPc = bTotal / bq;
       const bEurKg = bGrossKg > 0 ? bTotal / bGrossKg : 0;
       const isCurrent = bq === qty;
@@ -1886,7 +2474,6 @@ async function exportFullPDF() {
   const brutToplam = araToplam;
   const genelToplam = araToplam + kdvTutar;
 
-  const LOGO_B64 = 'data:image/png;base64,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';
 
   const win = window.open('', '_blank');
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Teklif - ${refNo}</title>
@@ -1899,7 +2486,6 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 
 /* Header */
 .hdr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0}
-.logo{width:165px;height:auto}
 .teklif-title{font-size:36px;font-weight:900;color:#585858;letter-spacing:1px;text-transform:uppercase}
 
 /* Company / Customer columns */
@@ -1966,7 +2552,10 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 
   <!-- HEADER -->
   <div class="hdr-row">
-    <img src="${LOGO_B64}" class="logo" alt="Logo">
+    <svg viewBox="0 0 160 55" style="width:165px;height:auto" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="hs" patternUnits="userSpaceOnUse" width="160" height="8.5"><rect width="160" height="5.5" fill="#333"/></pattern></defs>
+      <text x="0" y="45" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="55" fill="url(#hs)" letter-spacing="2">CVK</text>
+    </svg>
     <div class="teklif-title">TEKLİF</div>
   </div>
 
@@ -2283,7 +2872,6 @@ function calcMachineRates() {
 
   S.rates = { gPerMt, dPerMt, lPerMt, sPerMt, cPer1000,
     overhead: pf('rate-overhead') || 0,
-    profitMargin: pf('rate-profit-margin') || 0,
     lamAdhesive: pf('rate-lam-adhesive') || 0
   };
 
@@ -2300,8 +2888,7 @@ function calcMachineRates() {
     'rate-slit-hourly': pf('rate-slit-hourly'),
     'rate-conv-speed': pf('rate-conv-speed'),
     'rate-conv-hourly': pf('rate-conv-hourly'),
-    'rate-overhead': pf('rate-overhead'),
-    'rate-profit-margin': pf('rate-profit-margin')
+    'rate-overhead': pf('rate-overhead')
   });
 }
 
@@ -2478,7 +3065,6 @@ function exportCSV() {
     ['Kesim', R.slitCost.toFixed(2), (R.slitCost * kur).toFixed(2)],
     ['Konverting', R.totalConvCost.toFixed(2), (R.totalConvCost * kur).toFixed(2)],
     ['Genel Gider', R.overheadAmount.toFixed(2), (R.overheadAmount * kur).toFixed(2)],
-    ['Kâr Marjı', R.profitAmount.toFixed(2), (R.profitAmount * kur).toFixed(2)],
     ['TOPLAM', R.totalCost.toFixed(2), (R.totalCost * kur).toFixed(2)],
     [],
     ['BİRİM FİYATLAR', 'EUR', 'TRY'],
