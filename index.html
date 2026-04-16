@@ -1234,6 +1234,19 @@ body{background:#fff;color:#000;padding-bottom:0}
       </div>
     </div>
 
+    <!-- TEKNOLOJİ KARŞILAŞTIRMA MOTORU (v5 Faz 3) -->
+    <div class="cd" style="margin-top:16px;border-color:var(--accent)">
+      <h2><span class="ic" style="background:var(--accent)">⚖️</span> Teknoloji Karşılaştırması</h2>
+      <p style="color:var(--t2);font-size:.85rem;margin-bottom:14px;line-height:1.6">
+        Bu işi Rotogravür, Fleksografi ve Dijital baskı teknolojilerinde ayrı ayrı hesaplayıp yazılı karşılaştırır. Her teknoloji için varsayılan makineniz kullanılır.
+      </p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn btn-main" onclick="runComparison()" style="flex:1;min-width:200px">⚖️ 3 Teknolojiyi Karşılaştır</button>
+        <button class="btn btn-out btn-sm" onclick="clearComparison()" id="clear-compare-btn" style="display:none">Temizle</button>
+      </div>
+      <div id="compare-result" style="display:none;margin-top:16px"></div>
+    </div>
+
     <!-- SİPARİŞ ADEDİ BAZLI FİYAT KIRILIMI -->
     <div class="cd" style="margin-top:16px">
       <h2><span class="ic" style="background:var(--cyan)">📊</span> Adet Bazlı Fiyat Kırılımı</h2>
@@ -3419,7 +3432,230 @@ function renderTemplates() {
   }).join('');
 }
 
-// ═══════════ CURRENCY ═══════════
+// ═══════════ KARŞILAŞTIRMA MOTORU (v5 Faz 3) ═══════════
+// Mevcut işi 3 teknolojide ayrı ayrı hesaplar, yazılı karşılaştırma üretir.
+
+// Bir teknoloji için tek bir senaryo hesaplar — RECALC mantığının özet bir kopyası
+function calcScenarioForTech(tech, inputs) {
+  // tech: 'roto' | 'flekso' | 'digital'
+  // inputs: { qty, metrajFire, grossKg, printAreaM2, inkCost, colors, cylPrice, platePrice, sleeveAmort, washupMin, otherCosts }
+  const techToMachineKey = { roto: 'rotogravur', flekso: 'flekso', digital: 'dijital' };
+  const machine = DB.getDefaultMachine ? DB.getDefaultMachine(techToMachineKey[tech]) : null;
+
+  let cylCost = 0;
+  let printMachineCost = 0;
+  let printSetupCost = 0;
+  let machineRatePerMt = 0;
+
+  // Teknolojiye özel sabit maliyet
+  if (tech === 'roto') {
+    cylCost = (inputs.colors || 0) * (inputs.cylPrice || 0);
+  } else if (tech === 'flekso') {
+    cylCost = ((inputs.colors || 0) * (inputs.platePrice || 0)) + (inputs.sleeveAmort || 0);
+  } else {
+    // dijital click charge
+    const dcm2 = pf('digi-costM2') || 0;
+    const dckg = pf('digi-costKg') || 0;
+    cylCost = dckg > 0 ? inputs.grossKg * dckg : inputs.printAreaM2 * dcm2;
+  }
+
+  let machineNote = null;
+  if (machine) {
+    const recSpeed = +machine.rec_speed || 0;
+    const efficiency = +machine.efficiency_pct || 85;
+    const effSpeed = recSpeed * (efficiency / 100);
+    const hourly = (+machine.hourly_labor || 0) + (+machine.hourly_energy || 0) + (+machine.hourly_overhead || 0);
+    machineRatePerMt = effSpeed > 0 ? hourly / (effSpeed * 60) : 0;
+    printMachineCost = inputs.metrajFire * machineRatePerMt;
+
+    const setupMin = +machine.setup_time_min || 0;
+    const colorPrepMin = +machine.color_prep_time_min || 0;
+    let colorCount = 0;
+    let extraPerColor = colorPrepMin;
+    if (tech === 'roto') colorCount = inputs.colors || 0;
+    else if (tech === 'flekso') {
+      colorCount = inputs.colors || 0;
+      extraPerColor = colorPrepMin + (inputs.washupMin || 0);
+    }
+    const totalSetupMin = setupMin + (colorCount * extraPerColor);
+    printSetupCost = (totalSetupMin / 60) * hourly;
+  } else {
+    machineNote = `⚠️ ${TECH_LABELS[techToMachineKey[tech]]} için varsayılan makine yok — karşılaştırma yaklaşık değerle yapıldı`;
+  }
+
+  const totalPrintCost = (inputs.inkCost || 0) + cylCost + printMachineCost + printSetupCost;
+  const totalCost = totalPrintCost + (inputs.otherCosts || 0);  // hammadde + lam + slit + conv
+  const perUnit = inputs.qty > 0 ? totalCost / inputs.qty : 0;
+  const perKg = inputs.grossKg > 0 ? totalCost / inputs.grossKg : 0;
+
+  return {
+    tech,
+    label: { roto: 'Rotogravür', flekso: 'Fleksografi', digital: 'Dijital' }[tech],
+    machine,
+    machineNote,
+    cylCost, printMachineCost, printSetupCost, totalPrintCost,
+    totalCost, perUnit, perKg, machineRatePerMt,
+    minEconomicQty: machine ? (+machine.min_economic_qty || 0) : 0,
+    leadtime: printTypeLeadtime(tech),
+    webWidth: machine ? (+machine.web_width || 0) : 0
+  };
+}
+
+function runComparison() {
+  // RECALC sonucunu baz al — eğer boş ya da temel alanlar eksikse uyar
+  if (!R || !R.qty || !R.metrajFire) {
+    alert('Önce ürün tanımını ve baskı parametrelerini girin.');
+    return;
+  }
+
+  // Ortak girdiler
+  const commonInputs = {
+    qty: R.qty,
+    metrajFire: R.metrajFire,
+    grossKg: R.grossKg,
+    printAreaM2: R.metraj * (R.webw / 1000),
+    inkCost: R.inkCost,
+    otherCosts: R.rawMatCost + R.lamCost + R.slitCost + R.totalConvCost + R.overheadAmount,
+    // Teknolojiye özel — mevcut ekrandan
+    colors: pf('roto-colors') || pf('flekso-colors') || 6,
+    cylPrice: pf('roto-cylPrice') || 350,
+    platePrice: pf('flekso-platePrice') || 80,
+    sleeveAmort: pf('flekso-sleeveAmort') || 0,
+    washupMin: pf('flekso-washupMin') || 8
+  };
+
+  // Her teknoloji için kendi renk sayısı olursa onu kullan, yoksa varsayılan
+  const rotoColors = pf('roto-colors') || 8;
+  const fleksoColors = pf('flekso-colors') || 6;
+
+  const rotoResult = calcScenarioForTech('roto', { ...commonInputs, colors: rotoColors });
+  const fleksoResult = calcScenarioForTech('flekso', { ...commonInputs, colors: fleksoColors });
+  const digitalResult = calcScenarioForTech('digital', { ...commonInputs, colors: 0 });
+
+  const scenarios = [rotoResult, fleksoResult, digitalResult];
+  const sorted = [...scenarios].sort((a, b) => a.perUnit - b.perUnit);
+  const winner = sorted[0];
+
+  renderComparisonResult(scenarios, winner, R.qty);
+  $('clear-compare-btn').style.display = 'inline-flex';
+}
+
+function clearComparison() {
+  $('compare-result').style.display = 'none';
+  $('compare-result').innerHTML = '';
+  $('clear-compare-btn').style.display = 'none';
+}
+
+// Yazılı rapor üretici — başlık/alt başlık formatında (tablo kullanmaz)
+function renderComparisonResult(scenarios, winner, qty) {
+  const el = $('compare-result');
+  const kur = getEurTry();
+
+  // Sezgisel gerekçe üretimi
+  const qtyCategory = qty < 10000 ? 'düşük' : qty < 100000 ? 'orta' : 'yüksek';
+  const designCount = 1; // gelecekte çoklu tasarım için
+
+  // Teknoloji bazlı değerlendirmeler
+  const scenarioSections = scenarios.map(s => {
+    const cost = s.totalCost;
+    const diff = cost - winner.totalCost;
+    const diffPct = winner.totalCost > 0 ? (diff / winner.totalCost) * 100 : 0;
+    const relStatus = s === winner
+      ? '<span style="color:var(--accent)"><strong>✓ En düşük maliyet</strong></span>'
+      : `<span style="color:var(--orange)">Kazanan üstüne <strong>€${num(diff,2)}</strong> (<strong>%${num(diffPct,1)}</strong> daha pahalı)</span>`;
+
+    const machineInfo = s.machine
+      ? `Varsayılan makine: <strong>${escapeHtml(s.machine.name)}</strong> · ${s.webWidth}mm baskı eni`
+      : `<span style="color:var(--orange)">${s.machineNote}</span>`;
+
+    const qtyFit = s.minEconomicQty && qty < s.minEconomicQty
+      ? `<div style="color:var(--red);font-size:.85rem;margin-top:4px">⚠️ Sipariş adedi bu makinenin ekonomik eşiğinin altında (min ${num(s.minEconomicQty,0)} adet)</div>`
+      : '';
+
+    return `
+      <div style="border-left:3px solid ${s === winner ? 'var(--accent)' : 'var(--border)'};padding:12px 14px;margin-bottom:12px;background:var(--bg2);border-radius:6px">
+        <h3 style="margin:0 0 6px;font-size:1.05rem;color:${s === winner ? 'var(--accent)' : 'var(--t1)'}">
+          ${s === winner ? '🏆 ' : ''}${s.label}
+        </h3>
+        <div style="font-size:.82rem;color:var(--t2);margin-bottom:8px">${machineInfo}</div>
+        ${qtyFit}
+        <div style="font-size:.88rem;line-height:1.8;margin-top:6px">
+          <strong>Maliyet Kırılımı:</strong><br>
+          • Silindir/Klişe/Click: <strong>€${num(s.cylCost,2)}</strong><br>
+          • Baskı makine zamanı: <strong>€${num(s.printMachineCost,2)}</strong><br>
+          • Setup (sabit kalem): <strong>€${num(s.printSetupCost,2)}</strong><br>
+          • Diğer (hammadde+lam+kesim+conv+overhead): <strong>€${num(s.totalCost - s.totalPrintCost,2)}</strong><br>
+          <strong>Toplam: €${num(s.totalCost,2)} — Birim: €${num(s.perUnit,4)}</strong>
+        </div>
+        <div style="margin-top:8px;font-size:.85rem">
+          ${relStatus}
+          <span style="color:var(--t3);margin-left:10px">Termin: ${s.leadtime}</span>
+        </div>
+      </div>`;
+  }).join('');
+
+  // Öneri ve gerekçe metni
+  const reasoning = generateComparisonReasoning(scenarios, winner, qty, qtyCategory);
+
+  el.innerHTML = `
+    <div style="padding:14px;background:var(--accent-bg);border:1px solid rgba(16,185,129,.3);border-radius:10px;margin-bottom:14px">
+      <h3 style="margin:0 0 8px;color:var(--accent);font-size:1.1rem">📋 Sonuç Özeti</h3>
+      <div style="font-size:.9rem;line-height:1.7;color:var(--t1)">
+        <strong>${num(qty,0)} adetlik siparişte</strong> <strong style="color:var(--accent)">${winner.label}</strong> birim maliyette öne çıkıyor (<strong>€${num(winner.perUnit,4)}/adet</strong>, toplam <strong>€${num(winner.totalCost,2)}</strong> / <strong>₺${num(winner.totalCost * kur,2)}</strong>).
+      </div>
+    </div>
+
+    <h3 style="font-size:1rem;margin:14px 0 10px;color:var(--t1)">Teknoloji Bazlı Analiz</h3>
+    ${scenarioSections}
+
+    <h3 style="font-size:1rem;margin:16px 0 10px;color:var(--t1)">Gerekçeli Öneri</h3>
+    <div style="padding:14px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;font-size:.9rem;line-height:1.8;color:var(--t1)">
+      ${reasoning}
+    </div>
+  `;
+  el.style.display = 'block';
+}
+
+// Yazılı gerekçe üretici — teknik mantıkla yorum yapar
+function generateComparisonReasoning(scenarios, winner, qty, qtyCategory) {
+  const [roto, flekso, digital] = scenarios;
+  const lines = [];
+
+  // Adet kategorisi yorumu
+  if (qtyCategory === 'düşük') {
+    lines.push(`<strong>Sipariş adedi düşük (${num(qty,0)} adet).</strong> Bu senaryoda silindir ve klişe gibi sabit kalıplar birim maliyete büyük oran oluşturur — setup maliyetleri az adete bölünür. Bu nedenle dijital baskı, kalıpsız yapısıyla tipik olarak avantajlı olur.`);
+  } else if (qtyCategory === 'orta') {
+    lines.push(`<strong>Sipariş adedi orta seviyede (${num(qty,0)} adet).</strong> Flekso ve rotogravür başlangıç maliyetlerini (klişe/silindir) bu adet üzerine dağıtmaya başlar. Dijital hala avantajlı olabilir ama fark daralır.`);
+  } else {
+    lines.push(`<strong>Sipariş adedi yüksek (${num(qty,0)} adet).</strong> Yüksek tirajlarda rotogravür ve flekso, setup/silindir maliyetlerini çok adete dağıtarak birim maliyeti dramatik düşürür. Dijital'in per-adet maliyeti bu aralıkta rakipler karşısında avantajını yitirir.`);
+  }
+
+  // Kazananın gerekçesi
+  if (winner.tech === 'digital') {
+    lines.push(`<strong>Dijital kazandı</strong> çünkü klişe ya da silindir gibi sabit kalıp maliyeti yok. Setup süresi kısa, hazırlık firesi minimum. Bu adet aralığında diğer teknolojilerin başlangıç maliyetlerini aşmak birim fiyatta yansımıyor.`);
+  } else if (winner.tech === 'flekso') {
+    lines.push(`<strong>Fleksografi kazandı</strong> — klişe maliyeti rotogravürün silindirinden belirgin daha ucuz (tipik 4–8× fark). Flekso'nun setup süresi rotogravürden kısa ama dijitalden uzun. Orta/yüksek tirajda bu denge lehine döner.`);
+  } else {
+    lines.push(`<strong>Rotogravür kazandı</strong> — yüksek hız ve geniş baskı eni (1200mm) sayesinde üretim metrajını hızla kapatıyor. Silindir maliyeti sabit olduğu için adet arttıkça birim fiyata yansıyan pay küçülüyor. Çok yüksek tirajlı işlerde rotogravürün konforu buradan geliyor.`);
+  }
+
+  // İkincilik yorumu (sadece anlamlıysa)
+  const second = scenarios.filter(s => s !== winner).sort((a,b) => a.perUnit - b.perUnit)[0];
+  const secondDiffPct = winner.perUnit > 0 ? ((second.perUnit - winner.perUnit) / winner.perUnit) * 100 : 0;
+  if (secondDiffPct < 10) {
+    lines.push(`<em>${second.label}</em> sadece <strong>%${num(secondDiffPct,1)}</strong> daha pahalı — teknik nedenlerle (termin, kalite stabilitesi, renk tutarlılığı, müşteri tercihi) bu yakın alternatif de değerlendirilebilir.`);
+  } else {
+    lines.push(`İkinci sırada <em>${second.label}</em> var — kazanandan <strong>%${num(secondDiffPct,1)}</strong> daha pahalı. Bu fark ciddi olduğu için alternatif kullanmak için güçlü bir gerekçe gerekli.`);
+  }
+
+  // Adet eşiği uyarısı
+  const winnerMin = winner.minEconomicQty;
+  if (winnerMin && qty < winnerMin) {
+    lines.push(`<span style="color:var(--red)"><strong>⚠️ Uyarı:</strong> Kazanan teknolojinin makinesi için minimum ekonomik sipariş eşiği ${num(winnerMin,0)} adet. Sen ${num(qty,0)} girdin — makinenin fiili verimine ulaşamayabilir, hesaplanandan daha pahalı gerçekleşebilir.</span>`);
+  }
+
+  return lines.map(l => `<p style="margin:0 0 10px">• ${l}</p>`).join('');
+}
 const EUR_TRY_KEY = 'flexicost-eurtry';
 const CURRENCY_INTERVAL = 10 * 60 * 1000; // 10 dakika
 let _currencyTimer = null;
