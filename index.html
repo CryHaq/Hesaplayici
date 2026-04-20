@@ -58,37 +58,56 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .cur-bar{flex-wrap:wrap;justify-content:center;gap:6px}
 .hero-result .hv{font-size:2rem}
 .hero-result{padding:18px}
-.pills{gap:6px}
-.pill{min-width:80px;padding:10px 8px;font-size:.78rem}
+.pills{grid-template-columns:repeat(2,1fr);gap:6px}
+.pill{padding:10px 8px;font-size:.78rem}
 .pill .pill-icon{font-size:1.1rem}
 .pill-img{height:60px}
-.panel-banner{height:100px;padding:14px 16px}
-.panel-banner-content h2{font-size:1rem}
-.panel-banner-content p{font-size:.72rem}
-.hdr-logos{gap:8px}
-.hdr-logo{height:20px}
-.hdr-logo-cvk{height:14px}
-.donut-wrap{width:160px;height:160px}
-.donut-total{font-size:.95rem}
+.panel-banner{height:90px;padding:12px 14px}
+.panel-banner-content h2{font-size:.95rem}
+.panel-banner-content p{font-size:.7rem;display:none}
+.hdr-logos{gap:6px}
+.hdr-logo{height:18px}
+.hdr-logo-cvk{height:12px}
+.hdr-logo-sep{font-size:.9rem}
+.donut-wrap{width:150px;height:150px}
+.donut-total{font-size:.9rem}
 .step-btn{padding:8px 10px;font-size:.75rem}
 .step-btn .num{width:18px;height:18px;font-size:.65rem}
 .chain-bar{padding:6px 8px;gap:3px}
-.chain-bar .cb-item{min-width:58px;padding:3px 6px}
-.chain-bar .cb-label{font-size:.55rem}
-.chain-bar .cb-val{font-size:.7rem}
-.chain-bar .cb-arrow{font-size:.7rem}
+.chain-bar .cb-item{min-width:54px;padding:3px 5px}
+.chain-bar .cb-label{font-size:.52rem}
+.chain-bar .cb-val{font-size:.68rem}
+.chain-bar .cb-arrow{font-size:.65rem}
 .cd{padding:14px}
 .cd h2{font-size:.9rem}
 .rg{grid-template-columns:repeat(auto-fit,minmax(130px,1fr))}
 .tbl{font-size:.76rem}
 .tbl th,.tbl td{padding:7px 4px}
 .btn{padding:10px 16px;font-size:.82rem}
+/* Tetris mobil */
+#tetris-modal>div{padding:14px;max-width:100%;border-radius:12px}
+#tetris-modal>div>div:last-child{flex-direction:column;align-items:center}
+#tetris-modal>div>div:last-child>div:last-child{flex-direction:row;flex-wrap:wrap;justify-content:center;gap:8px;text-align:center}
+#tetris-canvas{width:180px!important;height:360px!important}
+#tetris-next{width:60px!important;height:60px!important}
+#tetris-modal h2{font-size:1.1rem!important}
+#tetris-modal p{font-size:.7rem!important}
+/* Auth mobil */
+.auth-right{padding:16px}
+.auth-box{padding:24px 20px}
+.auth-left-features{grid-template-columns:1fr}
 }
 @media(max-width:480px){
 .g3,.g4{grid-template-columns:1fr}
 .cur-bar .cur-manual input{width:50px}
 .hero-result .hv{font-size:1.6rem}
 .rg{grid-template-columns:1fr 1fr}
+.panel-banner{height:80px}
+.pills{grid-template-columns:1fr 1fr}
+.pill-img{height:50px}
+#tetris-canvas{width:150px!important;height:300px!important}
+#tetris-next{width:60px!important;height:60px!important}
+#tetris-modal>div>div:last-child{gap:10px}
 }
 
 /* ─── CARD ─── */
@@ -331,6 +350,13 @@ body.light select option{background:#fff;color:#1a1a1a}
 .donut-total{font-size:1.1rem;font-weight:800;color:var(--accent)}
 .donut-label{font-size:.72rem;color:var(--t3);margin-top:2px}
 
+/* ─── TETRIS TOUCH BUTTONS ─── */
+.t-btn{background:var(--card);border:1px solid var(--border);color:var(--t1);width:48px;height:44px;border-radius:10px;font-size:1.1rem;cursor:pointer;font-family:inherit;transition:all .1s;-webkit-tap-highlight-color:transparent}
+.t-btn:active{background:var(--accent);color:#fff;border-color:var(--accent);transform:scale(.93)}
+.t-btn-wide{width:auto;padding:0 16px;font-size:.82rem;font-weight:600}
+@media(max-width:600px){#tetris-touch{display:flex!important}}
+@media(min-width:601px){#tetris-touch{display:none!important}}
+
 /* ─── PANEL BANNER ─── */
 .panel-banner{position:relative;border-radius:12px;overflow:hidden;height:160px;margin-bottom:16px;display:flex;align-items:flex-end;padding:20px 24px}
 .panel-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.35)}
@@ -428,6 +454,7 @@ body{background:#fff;color:#000;padding-bottom:0}
 </div>
 
 <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️ Açık Tema</button>
+<button class="theme-toggle" style="top:48px;font-size:.72rem" onclick="openTetris()" title="Ambalaj Tetris">🎮</button>
 <div class="app" id="mainApp" style="display:none">
 
 <div class="hdr">
@@ -4770,6 +4797,165 @@ function tl(v, d=2) { return '₺' + v.toFixed(d).replace(/\B(?=(\d{3})+(?!\d))/
       showAuthOverlay();
     }
   });
+})();
+</script>
+
+<!-- ═══════════ AMBALAJ TETRİS ═══════════ -->
+<div id="tetris-modal" style="display:none;position:fixed;inset:0;z-index:9000;background:rgba(0,0,0,.88);backdrop-filter:blur(8px);align-items:center;justify-content:center">
+  <div style="background:var(--card);border:1px solid var(--border);border-radius:16px;padding:24px;max-width:480px;width:95%;position:relative">
+    <button onclick="closeTetris()" style="position:absolute;top:10px;right:14px;background:none;border:none;color:var(--t2);font-size:1.2rem;cursor:pointer">✕</button>
+    <div style="text-align:center;margin-bottom:16px">
+      <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:6px">
+        <img src="images/cvk-wordmark-white.svg" alt="CVK" style="height:14px;opacity:.6">
+      </div>
+      <h2 style="font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:4px">📦 Ambalaj Tetris</h2>
+      <p style="font-size:.75rem;color:var(--t3)">Doypack, Flat, Roll, Quadro — üretim hattını doldur!</p>
+    </div>
+    <div style="display:flex;gap:16px;justify-content:center;align-items:flex-start">
+      <div style="display:flex;flex-direction:column;align-items:center;gap:8px">
+        <div style="position:relative">
+          <canvas id="tetris-canvas" width="240" height="480" style="background:#0a0a0a;border-radius:10px;border:2px solid var(--border)"></canvas>
+          <div id="tetris-msg" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:1rem;font-weight:800;color:var(--accent);pointer-events:none;opacity:0;transition:opacity .3s;text-shadow:0 2px 8px rgba(0,0,0,.8);white-space:nowrap"></div>
+        </div>
+        <div id="tetris-touch" style="display:none;gap:6px;justify-content:center;flex-wrap:wrap">
+          <button onclick="tetrisTouch('left')" class="t-btn">◀</button>
+          <button onclick="tetrisTouch('rotate')" class="t-btn">↻</button>
+          <button onclick="tetrisTouch('down')" class="t-btn">▼</button>
+          <button onclick="tetrisTouch('right')" class="t-btn">▶</button>
+          <button onclick="tetrisTouch('drop')" class="t-btn t-btn-wide">⏬ Düşür</button>
+        </div>
+      </div>
+      <div style="min-width:110px">
+        <div style="font-size:.68rem;color:var(--t3);margin-bottom:2px;text-transform:uppercase;letter-spacing:1px">Üretim</div>
+        <div id="tetris-score" style="font-size:1.5rem;font-weight:800;color:var(--accent);margin-bottom:14px">0</div>
+        <div style="font-size:.68rem;color:var(--t3);margin-bottom:2px;text-transform:uppercase;letter-spacing:1px">Seviye</div>
+        <div id="tetris-level" style="font-size:1.1rem;font-weight:700;color:var(--t1);margin-bottom:14px">1</div>
+        <div style="font-size:.68rem;color:var(--t3);margin-bottom:2px;text-transform:uppercase;letter-spacing:1px">Hatlar</div>
+        <div id="tetris-lines" style="font-size:1rem;font-weight:600;color:var(--t2);margin-bottom:14px">0</div>
+        <div style="font-size:.68rem;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:1px">Sıradaki</div>
+        <canvas id="tetris-next" width="96" height="96" style="background:#111;border-radius:8px;border:1px solid var(--border);margin-bottom:4px"></canvas>
+        <div id="tetris-next-name" style="font-size:.7rem;color:var(--t2);text-align:center;margin-bottom:14px">—</div>
+        <button onclick="startTetris()" class="btn btn-main btn-sm" style="width:100%;padding:8px;font-size:.8rem">▶ Üretime Başla</button>
+        <div style="margin-top:12px;font-size:.62rem;color:var(--t3);line-height:1.7">
+          ← → Hareket<br>↑ Döndür<br>↓ Hızlandır<br>Space Düşür
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+(function(){
+  const COLS=10,ROWS=20,SZ=24;
+  const PIECES = [
+    {name:'Doypack',color:'#ef4444',img:'images/pkg-doypack.png',shape:[[1,1],[1,1]]},
+    {name:'Roll Film',color:'#3b82f6',img:'images/pkg-roll.png',shape:[[1,1,1,1]]},
+    {name:'Flat Bottom',color:'#8b5cf6',img:'images/pkg-flat.png',shape:[[1,1,0],[0,1,1]]},
+    {name:'Quadro',color:'#f59e0b',img:'images/pkg-quadro.png',shape:[[0,1,1],[1,1,0]]},
+    {name:'3 Kenar',color:'#22c55e',img:'images/pkg-3kenar.png',shape:[[1,0],[1,0],[1,1]]},
+    {name:'Silindir',color:'#ec4899',img:null,shape:[[0,1],[0,1],[1,1]]},
+    {name:'Bobin',color:'#06b6d4',img:null,shape:[[1,1,1],[0,1,0]]}
+  ];
+  const CLEAR_MSGS = ['Sipariş Hazır! 📦','Teslimat! 🚚','Üretim Tamam! ✅','Hat Temizlendi! 🏭','Paketlendi! 🎁','Sevkiyat! 📋'];
+
+  // Preload images
+  const pieceImgs = {};
+  PIECES.forEach(p => {
+    if (p.img) {
+      const im = new Image();
+      im.src = p.img;
+      pieceImgs[p.name] = im;
+    }
+  });
+  // CVK watermark
+  const wmImg = new Image();
+  wmImg.src = 'images/cvk-wordmark-white.svg';
+
+  let board,boardColors,cur,next,pos,score,level,lines,timer,gameOver;
+  const canvas=()=>document.getElementById('tetris-canvas');
+  const ncanvas=()=>document.getElementById('tetris-next');
+
+  function newBoard(){boardColors=Array.from({length:ROWS},()=>Array(COLS).fill(null));return Array.from({length:ROWS},()=>Array(COLS).fill(0))}
+  function randPiece(){const p=PIECES[Math.floor(Math.random()*PIECES.length)];return{...p,shape:p.shape.map(r=>[...r])}}
+  function rotate(shape){const r=shape[0].length,c=shape.length;const n=Array.from({length:r},()=>Array(c).fill(0));for(let y=0;y<c;y++)for(let x=0;x<r;x++)n[x][c-1-y]=shape[y][x];return n}
+  function valid(shape,px,py){for(let y=0;y<shape.length;y++)for(let x=0;x<shape[y].length;x++){if(!shape[y][x])continue;const nx=px+x,ny=py+y;if(nx<0||nx>=COLS||ny>=ROWS)return false;if(ny>=0&&board[ny][nx])return false}return true}
+  function place(){for(let y=0;y<cur.shape.length;y++)for(let x=0;x<cur.shape[y].length;x++){if(!cur.shape[y][x])continue;const ny=pos.y+y;if(ny<0){gameOver=true;return}board[ny][pos.x+x]={color:cur.color,name:cur.name};boardColors[ny][pos.x+x]=cur.color}}
+
+  function showMsg(text){const el=document.getElementById('tetris-msg');if(!el)return;el.textContent=text;el.style.opacity='1';setTimeout(()=>el.style.opacity='0',1200)}
+
+  function clearLines(){let cleared=0;for(let y=ROWS-1;y>=0;y--){if(board[y].every(c=>c)){board.splice(y,1);board.unshift(Array(COLS).fill(0));boardColors.splice(y,1);boardColors.unshift(Array(COLS).fill(null));cleared++;y++}}
+    if(cleared){lines+=cleared;score+=cleared===1?100:cleared===2?300:cleared===3?500:800;level=Math.floor(lines/10)+1;
+    document.getElementById('tetris-score').textContent=score;document.getElementById('tetris-level').textContent=level;document.getElementById('tetris-lines').textContent=lines;
+    showMsg(CLEAR_MSGS[Math.floor(Math.random()*CLEAR_MSGS.length)]);
+    clearInterval(timer);timer=setInterval(tick,Math.max(100,800-level*60))}}
+
+  function drawBlock(ctx,x,y,color,isGhost){
+    const bx=x*SZ,by=y*SZ;
+    if(isGhost){ctx.globalAlpha=.12;ctx.fillStyle=color;ctx.fillRect(bx+1,by+1,SZ-2,SZ-2);ctx.globalAlpha=1;return}
+    ctx.fillStyle=color;ctx.fillRect(bx+1,by+1,SZ-2,SZ-2);
+    // 3D highlight
+    ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(bx+1,by+1,SZ-2,4);
+    ctx.fillStyle='rgba(255,255,255,.08)';ctx.fillRect(bx+1,by+1,3,SZ-2);
+    // Shadow
+    ctx.fillStyle='rgba(0,0,0,.2)';ctx.fillRect(bx+1,by+SZ-3,SZ-2,2);
+  }
+
+  function draw(){const ctx=canvas()?.getContext('2d');if(!ctx)return;const W=240,H=480;ctx.clearRect(0,0,W,H);
+    // CVK watermark
+    if(wmImg.complete&&wmImg.naturalWidth){ctx.globalAlpha=.04;const ww=120;const wh=ww*(wmImg.naturalHeight/wmImg.naturalWidth);ctx.drawImage(wmImg,(W-ww)/2,(H-wh)/2,ww,wh);ctx.globalAlpha=1}
+    // Grid
+    ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=.5;for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){ctx.strokeRect(x*SZ,y*SZ,SZ,SZ)}
+    // Board
+    for(let y=0;y<ROWS;y++)for(let x=0;x<COLS;x++){const cell=board[y][x];if(cell){
+      drawBlock(ctx,x,y,cell.color,false);
+      // Draw product image tiny icon
+      const im=pieceImgs[cell.name];
+      if(im&&im.complete&&im.naturalWidth){ctx.globalAlpha=.35;ctx.drawImage(im,x*SZ+3,y*SZ+3,SZ-6,SZ-6);ctx.globalAlpha=1}
+    }}
+    // Ghost + Current
+    if(cur&&!gameOver){
+      let gy=pos.y;while(valid(cur.shape,pos.x,gy+1))gy++;
+      for(let y=0;y<cur.shape.length;y++)for(let x=0;x<cur.shape[y].length;x++){if(!cur.shape[y][x])continue;
+        if(gy!==pos.y)drawBlock(ctx,pos.x+x,gy+y,cur.color,true);
+        if(pos.y+y>=0){drawBlock(ctx,pos.x+x,pos.y+y,cur.color,false);
+          const im=pieceImgs[cur.name];
+          if(im&&im.complete&&im.naturalWidth){ctx.globalAlpha=.4;ctx.drawImage(im,(pos.x+x)*SZ+3,(pos.y+y)*SZ+3,SZ-6,SZ-6);ctx.globalAlpha=1}
+        }
+      }
+    }
+    // Game over
+    if(gameOver){ctx.fillStyle='rgba(0,0,0,.75)';ctx.fillRect(0,H/2-50,W,100);
+      ctx.fillStyle='#fff';ctx.font='bold 22px DM Sans';ctx.textAlign='center';ctx.fillText('ÜRETİM DURDU!',W/2,H/2-10);
+      ctx.font='13px DM Sans';ctx.fillStyle='var(--accent)';ctx.fillText('Toplam Üretim: '+score,W/2,H/2+18);
+      ctx.font='11px DM Sans';ctx.fillStyle='#888';ctx.fillText(lines+' hat tamamlandı',W/2,H/2+38)}
+  }
+
+  function drawNext(){const ctx=ncanvas()?.getContext('2d');if(!ctx||!next)return;ctx.clearRect(0,0,96,96);
+    const s=next.shape;const nsz=SZ;const ox=Math.floor((4-s[0].length)/2)*nsz,oy=Math.floor((4-s.length)/2)*nsz;
+    for(let y=0;y<s.length;y++)for(let x=0;x<s[y].length;x++){if(s[y][x]){
+      const bx=ox+x*nsz,by=oy+y*nsz;
+      ctx.fillStyle=next.color;ctx.fillRect(bx+1,by+1,nsz-2,nsz-2);
+      ctx.fillStyle='rgba(255,255,255,.2)';ctx.fillRect(bx+1,by+1,nsz-2,3);
+      const im=pieceImgs[next.name];
+      if(im&&im.complete&&im.naturalWidth){ctx.globalAlpha=.4;ctx.drawImage(im,bx+3,by+3,nsz-6,nsz-6);ctx.globalAlpha=1}
+    }}
+    const nameEl=document.getElementById('tetris-next-name');
+    if(nameEl)nameEl.textContent=next.name;
+  }
+
+  function spawn(){cur=next||randPiece();next=randPiece();pos={x:Math.floor((COLS-cur.shape[0].length)/2),y:-cur.shape.length};drawNext()}
+  function tick(){if(gameOver)return clearInterval(timer);if(valid(cur.shape,pos.x,pos.y+1)){pos.y++}else{place();clearLines();if(gameOver){draw();return}spawn()}draw()}
+  function move(dx){if(valid(cur.shape,pos.x+dx,pos.y)){pos.x+=dx;draw()}}
+  function rotatePiece(){const r=rotate(cur.shape);if(valid(r,pos.x,pos.y)){cur.shape=r;draw()}else if(valid(r,pos.x-1,pos.y)){pos.x--;cur.shape=r;draw()}else if(valid(r,pos.x+1,pos.y)){pos.x++;cur.shape=r;draw()}}
+  function hardDrop(){while(valid(cur.shape,pos.x,pos.y+1)){pos.y++;score+=2}place();clearLines();document.getElementById('tetris-score').textContent=score;if(!gameOver)spawn();draw()}
+
+  function handleKey(e){if(gameOver||!cur)return;if(e.key==='ArrowLeft'){e.preventDefault();move(-1)}else if(e.key==='ArrowRight'){e.preventDefault();move(1)}else if(e.key==='ArrowUp'){e.preventDefault();rotatePiece()}else if(e.key==='ArrowDown'){e.preventDefault();if(valid(cur.shape,pos.x,pos.y+1)){pos.y++;score++;document.getElementById('tetris-score').textContent=score;draw()}}else if(e.key===' '){e.preventDefault();hardDrop()}}
+
+  window.tetrisTouch=function(action){if(gameOver||!cur)return;if(action==='left')move(-1);else if(action==='right')move(1);else if(action==='rotate')rotatePiece();else if(action==='down'){if(valid(cur.shape,pos.x,pos.y+1)){pos.y++;score++;document.getElementById('tetris-score').textContent=score;draw()}}else if(action==='drop')hardDrop()};
+  window.openTetris=function(){document.getElementById('tetris-modal').style.display='flex';document.addEventListener('keydown',handleKey)};
+  window.closeTetris=function(){document.getElementById('tetris-modal').style.display='none';clearInterval(timer);document.removeEventListener('keydown',handleKey)};
+  window.startTetris=function(){board=newBoard();score=0;level=1;lines=0;gameOver=false;
+    document.getElementById('tetris-score').textContent='0';document.getElementById('tetris-level').textContent='1';document.getElementById('tetris-lines').textContent='0';
+    next=randPiece();spawn();clearInterval(timer);timer=setInterval(tick,Math.max(100,800-level*60));draw()};
 })();
 </script>
 </body>
