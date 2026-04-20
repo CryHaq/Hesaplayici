@@ -103,8 +103,8 @@ select option{background:var(--card);color:var(--t1)}
 
 /* ─── PKG TYPE PILLS ─── */
 .pills{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
-.pill{flex:1;min-width:120px;padding:14px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--t2);cursor:pointer;text-align:center;transition:all .2s;font-size:.85rem;font-weight:500}
-.pill:hover{border-color:var(--accent);color:var(--t1)}
+.pill{flex:1;min-width:120px;padding:14px 12px;border-radius:10px;border:1px solid var(--border);background:var(--card2);color:var(--t2);cursor:pointer;text-align:center;transition:all .25s;font-size:.85rem;font-weight:600}
+.pill:hover{border-color:var(--accent);color:var(--t1);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.3)}
 .pill.active{background:var(--accent-bg);border-color:var(--accent);color:var(--accent)}
 .pill .pill-icon{font-size:1.4rem;display:block;margin-bottom:4px}
 
@@ -272,8 +272,20 @@ body.light select option{background:#fff;color:#1a1a1a}
 .cur-manual input:focus{outline:none;border-color:var(--accent)}
 
 /* ─── AUTH OVERLAY ─── */
-.auth-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;align-items:center;justify-content:center;transition:opacity .3s}
+.auth-overlay{position:fixed;inset:0;z-index:9999;background:var(--bg);display:flex;transition:opacity .3s}
 .auth-overlay.hidden{opacity:0;pointer-events:none}
+.auth-left{flex:1;position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:40px}
+.auth-left img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.45)}
+.auth-left-content{position:relative;z-index:2;max-width:480px}
+.auth-logos{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.auth-logo-cevikbas{height:32px;opacity:.95}
+.auth-logo-cvk{height:22px;opacity:.85}
+.auth-left-content h2{font-size:2rem;font-weight:800;color:#fff;line-height:1.2;margin-bottom:10px}
+.auth-left-content p{color:rgba(255,255,255,.7);font-size:.92rem;line-height:1.6}
+.auth-left-features{display:flex;gap:16px;margin-top:24px;flex-wrap:wrap}
+.auth-left-features .alf{display:flex;align-items:center;gap:8px;background:rgba(255,255,255,.1);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:10px 14px;font-size:.82rem;color:rgba(255,255,255,.85);font-weight:500}
+.auth-left-features .alf-icon{width:32px;height:32px;border-radius:8px;background:rgba(16,185,129,.25);display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.auth-right{width:440px;display:flex;align-items:center;justify-content:center;padding:32px;flex-shrink:0}
 .auth-box{width:100%;max-width:400px;padding:32px;background:var(--card);border:1px solid var(--border);border-radius:16px}
 .auth-box h1{font-size:1.6rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center;margin-bottom:4px}
 .auth-box .auth-sub{text-align:center;color:var(--t2);font-size:.82rem;margin-bottom:24px}
@@ -288,6 +300,31 @@ body.light select option{background:#fff;color:#1a1a1a}
 .auth-error{background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.3);border-radius:8px;padding:10px;font-size:.82rem;color:var(--red);margin-top:12px;display:none}
 .auth-msg{background:var(--accent-bg);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:10px;font-size:.82rem;color:var(--accent);margin-top:12px;display:none}
 .auth-loading{text-align:center;padding:40px;color:var(--t2);font-size:.9rem}
+@media(max-width:900px){
+.auth-left{display:none}
+.auth-right{width:100%;padding:20px}
+.auth-overlay{align-items:center;justify-content:center}
+}
+
+/* ─── PKG PILLS WITH IMAGES ─── */
+.pill-img{width:100%;height:80px;object-fit:contain;margin-bottom:6px;filter:drop-shadow(0 4px 12px rgba(0,0,0,.4));transition:transform .3s}
+.pill:hover .pill-img{transform:scale(1.08)}
+.pill.active .pill-img{transform:scale(1.05)}
+
+/* ─── PANEL BANNER ─── */
+.panel-banner{position:relative;border-radius:12px;overflow:hidden;height:160px;margin-bottom:16px;display:flex;align-items:flex-end;padding:20px 24px}
+.panel-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.35)}
+.panel-banner-content{position:relative;z-index:2}
+.panel-banner-content h2{font-size:1.3rem;font-weight:700;color:#fff;margin-bottom:2px}
+.panel-banner-content p{color:rgba(255,255,255,.7);font-size:.82rem}
+
+/* ─── HEADER LOGO ─── */
+.hdr-logos{display:flex;align-items:center;justify-content:center;gap:12px;margin-bottom:10px}
+.hdr-logo{height:28px;opacity:.9}
+.hdr-logo-cvk{height:20px}
+.hdr-logo-sep{color:var(--border);font-size:1.2rem;font-weight:300;opacity:.5}
+body.light .hdr-logo{filter:brightness(0)}
+body.light .hdr-logo-sep{color:#ccc}
 
 /* ─── USER BAR ─── */
 .user-bar{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:4px 0;font-size:.78rem}
@@ -314,27 +351,51 @@ body{background:#fff;color:#000;padding-bottom:0}
 <body>
 <!-- AUTH OVERLAY -->
 <div id="authOverlay" class="auth-overlay">
-  <div class="auth-box">
-    <h1>FlexiCost</h1>
-    <div class="auth-sub">Esnek Ambalaj Üretim Maliyet Sistemi</div>
-    <div class="auth-tabs">
-      <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Giriş Yap</button>
-      <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
+  <div class="auth-left">
+    <img src="images/factory1.webp" alt="Fabrika">
+    <div class="auth-left-content">
+      <div class="auth-logos">
+        <img src="images/cevikbas-footer.svg" alt="Çevikbaş" class="auth-logo-cevikbas">
+        <img src="images/cvk-wordmark-white.svg" alt="CVK" class="auth-logo-cvk">
+      </div>
+      <h2>Esnek Ambalaj Maliyet Yönetim Platformu</h2>
+      <p>Rotogravür, fleksografi ve dijital baskı teknolojileri ile endüstriyel maliyetlendirme ve üretim planlama.</p>
+      <div class="auth-left-features">
+        <div class="alf"><span class="alf-icon">🏭</span>Makine Parkı Yönetimi</div>
+        <div class="alf"><span class="alf-icon">📊</span>Anlık Maliyet Analizi</div>
+        <div class="alf"><span class="alf-icon">🧪</span>Malzeme Katman Yapısı</div>
+        <div class="alf"><span class="alf-icon">📋</span>PDF Teklif Oluşturma</div>
+      </div>
     </div>
-    <div id="authLoginForm">
-      <input type="email" class="auth-input" id="auth-email" placeholder="E-posta adresi" autocomplete="email">
-      <input type="password" class="auth-input" id="auth-pass" placeholder="Şifre" autocomplete="current-password">
-      <button class="auth-btn" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
+  </div>
+  <div class="auth-right">
+    <div class="auth-box">
+      <div style="text-align:center;margin-bottom:16px;display:flex;align-items:center;justify-content:center;gap:10px">
+        <img src="images/cevikbas-logo.svg" alt="Çevikbaş" style="height:28px">
+        <span style="color:var(--border);font-size:1.2rem">|</span>
+        <img src="images/cvk-mark-square.svg" alt="CVK" style="height:36px;border-radius:6px">
+      </div>
+      <h1>FlexiCost</h1>
+      <div class="auth-sub">Esnek Ambalaj Üretim Maliyet Sistemi</div>
+      <div class="auth-tabs">
+        <button class="auth-tab active" id="tabLogin" onclick="switchAuthTab('login')">Giriş Yap</button>
+        <button class="auth-tab" id="tabRegister" onclick="switchAuthTab('register')">Kayıt Ol</button>
+      </div>
+      <div id="authLoginForm">
+        <input type="email" class="auth-input" id="auth-email" placeholder="E-posta adresi" autocomplete="email">
+        <input type="password" class="auth-input" id="auth-pass" placeholder="Şifre" autocomplete="current-password">
+        <button class="auth-btn" id="loginBtn" onclick="doLogin()">Giriş Yap</button>
+      </div>
+      <div id="authRegisterForm" style="display:none">
+        <input type="email" class="auth-input" id="reg-email" placeholder="E-posta adresi" autocomplete="email">
+        <input type="text" class="auth-input" id="reg-company" placeholder="Firma Adı">
+        <input type="password" class="auth-input" id="reg-pass" placeholder="Şifre (min 6 karakter)" autocomplete="new-password">
+        <input type="password" class="auth-input" id="reg-pass2" placeholder="Şifre Tekrar" autocomplete="new-password">
+        <button class="auth-btn" id="registerBtn" onclick="doRegister()">Kayıt Ol</button>
+      </div>
+      <div class="auth-error" id="authError"></div>
+      <div class="auth-msg" id="authMsg"></div>
     </div>
-    <div id="authRegisterForm" style="display:none">
-      <input type="email" class="auth-input" id="reg-email" placeholder="E-posta adresi" autocomplete="email">
-      <input type="text" class="auth-input" id="reg-company" placeholder="Firma Adı">
-      <input type="password" class="auth-input" id="reg-pass" placeholder="Şifre (min 6 karakter)" autocomplete="new-password">
-      <input type="password" class="auth-input" id="reg-pass2" placeholder="Şifre Tekrar" autocomplete="new-password">
-      <button class="auth-btn" id="registerBtn" onclick="doRegister()">Kayıt Ol</button>
-    </div>
-    <div class="auth-error" id="authError"></div>
-    <div class="auth-msg" id="authMsg"></div>
   </div>
 </div>
 
@@ -352,6 +413,11 @@ body{background:#fff;color:#000;padding-bottom:0}
     <span class="user-company" id="userCompany"></span>
     <span class="user-email" id="userEmail"></span>
     <button class="user-logout" onclick="doLogout()">Çıkış Yap</button>
+  </div>
+  <div class="hdr-logos">
+    <img src="images/cevikbas-footer.svg" alt="Çevikbaş" class="hdr-logo">
+    <span class="hdr-logo-sep">|</span>
+    <img src="images/cvk-wordmark-white.svg" alt="CVK" class="hdr-logo hdr-logo-cvk">
   </div>
   <h1>Esnek Ambalaj Üretim Maliyet Sistemi</h1>
   <p>Doypack / Flat Bottom / 3 Kenar Kaynak / Bobin — Endüstriyel maliyetlendirme ve üretim planlama (€)</p>
@@ -378,8 +444,15 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL: MAKİNE PARKI (v5 — Makine Kartları) ═══════════════ -->
 <div class="panel" id="p-machines">
+  <div class="panel-banner">
+    <img src="images/gallery1.jpg" alt="Fabrika">
+    <div class="panel-banner-content">
+      <h2>Makine Parkı</h2>
+      <p>Fabrikanızdaki makineleri tanımlayın, hesaplamalarda otomatik kullanılsın.</p>
+    </div>
+  </div>
   <div class="cd">
-    <h2><span class="ic" style="background:var(--cyan)">🏭</span> Makine Parkı</h2>
+    <h2><span class="ic" style="background:var(--cyan)">🏭</span> Makine Yönetimi</h2>
     <p style="color:var(--t2);font-size:.85rem;margin-bottom:18px;line-height:1.6">
       Fabrikanızdaki her makineyi ayrı kart olarak tanımlayın. Hız, setup süresi, saatlik gider gibi parametreler hesaplamalarda otomatik kullanılır. Her teknoloji için bir makineyi <strong style="color:var(--accent)">varsayılan</strong> olarak işaretleyin.
     </p>
@@ -614,6 +687,13 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL: MÜŞTERİ YÖNETİMİ ═══════════════ -->
 <div class="panel" id="p-clients">
+  <div class="panel-banner">
+    <img src="images/factory2.webp" alt="Üretim">
+    <div class="panel-banner-content">
+      <h2>Müşteri Yönetimi</h2>
+      <p>Müşterilerinizi kaydedin, segment ve termin bilgilerini takip edin.</p>
+    </div>
+  </div>
   <div class="g2">
     <div>
       <div class="cd">
@@ -696,16 +776,16 @@ body{background:#fff;color:#000;padding-bottom:0}
         <h2><span class="ic" style="background:var(--accent)">📦</span> Paket Tipi</h2>
         <div class="pills" id="pkgType">
           <div class="pill active" data-type="doypack" onclick="selectPkg(this)">
-            <span class="pill-icon">🧃</span>Doypack
+            <img src="images/pkg-doypack.png" alt="Doypack" class="pill-img">Doypack
           </div>
           <div class="pill" data-type="flatbottom" onclick="selectPkg(this)">
-            <span class="pill-icon">📦</span>Flat Bottom
+            <img src="images/pkg-flat.png" alt="Flat Bottom" class="pill-img">Flat Bottom
           </div>
           <div class="pill" data-type="3sideseal" onclick="selectPkg(this)">
-            <span class="pill-icon">🛍️</span>3 Kenar Kaynak
+            <img src="images/pkg-3kenar.jpg" alt="3 Kenar Kaynak" class="pill-img">3 Kenar Kaynak
           </div>
           <div class="pill" data-type="rollstock" onclick="selectPkg(this)">
-            <span class="pill-icon">🧻</span>Bobin (Rollstock)
+            <img src="images/pkg-roll.png" alt="Bobin" class="pill-img">Bobin (Rollstock)
           </div>
         </div>
       </div>
@@ -949,6 +1029,13 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL 2: MALZEME YAPISI ═══════════════ -->
 <div class="panel" id="p-material">
+  <div class="panel-banner">
+    <img src="images/about_header.png" alt="Malzeme">
+    <div class="panel-banner-content">
+      <h2>Malzeme Yapısı</h2>
+      <p>Katman yapısı, film özellikleri ve malzeme maliyetlerini belirleyin.</p>
+    </div>
+  </div>
   <div class="g2">
     <div>
       <div class="cd">
@@ -1029,6 +1116,13 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL 3: BASKI ═══════════════ -->
 <div class="panel" id="p-print">
+  <div class="panel-banner">
+    <img src="images/slider.webp" alt="Baskı Makinesi">
+    <div class="panel-banner-content">
+      <h2>Baskı Parametreleri</h2>
+      <p>Mürekkep, silindir ve baskı makinesi maliyetlerini yapılandırın.</p>
+    </div>
+  </div>
   <div class="g2">
     <div>
       <div class="cd">
@@ -1083,6 +1177,13 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL 4: KONVERTİNG ═══════════════ -->
 <div class="panel" id="p-converting">
+  <div class="panel-banner">
+    <img src="images/gallery3.jpg" alt="Konverting">
+    <div class="panel-banner-content">
+      <h2>Konverting</h2>
+      <p>Poşet kesim, dikiş ve ek malzeme maliyetlerini hesaplayın.</p>
+    </div>
+  </div>
   <div class="g2">
     <div>
       <div class="cd">
@@ -1146,6 +1247,13 @@ body{background:#fff;color:#000;padding-bottom:0}
 
 <!-- ═══════════════ PANEL 5: HESAPLA & ÖZET ═══════════════ -->
 <div class="panel" id="p-summary">
+  <div class="panel-banner">
+    <img src="images/factory3.webp" alt="Üretim">
+    <div class="panel-banner-content">
+      <h2>Hesapla & Ozet</h2>
+      <p>Tum maliyet kalemlerinin nihai hesaplaması ve teklif olusturma.</p>
+    </div>
+  </div>
   <div id="summary-err" class="err" style="display:none"></div>
   <div id="summary-content" style="display:none">
 
