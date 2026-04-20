@@ -6,6 +6,7 @@
 <title>Esnek Ambalaj Üretim Maliyet Sistemi</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -60,6 +61,15 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .pills{gap:6px}
 .pill{min-width:80px;padding:10px 8px;font-size:.78rem}
 .pill .pill-icon{font-size:1.1rem}
+.pill-img{height:60px}
+.panel-banner{height:100px;padding:14px 16px}
+.panel-banner-content h2{font-size:1rem}
+.panel-banner-content p{font-size:.72rem}
+.hdr-logos{gap:8px}
+.hdr-logo{height:20px}
+.hdr-logo-cvk{height:14px}
+.donut-wrap{width:160px;height:160px}
+.donut-total{font-size:.95rem}
 .step-btn{padding:8px 10px;font-size:.75rem}
 .step-btn .num{width:18px;height:18px;font-size:.65rem}
 .chain-bar{padding:6px 8px;gap:3px}
@@ -313,6 +323,14 @@ body.light select option{background:#fff;color:#1a1a1a}
 .pill:hover .pill-img{transform:scale(1.12) translateY(-4px)}
 .pill.active .pill-img{transform:scale(1.06);filter:drop-shadow(0 6px 20px rgba(16,185,129,.3))}
 
+/* ─── DONUT CHART ─── */
+.donut-wrap{position:relative;width:200px;height:200px;margin:0 auto 16px}
+.donut-svg{width:100%;height:100%;transform:rotate(-90deg)}
+.donut-svg circle{fill:none;stroke-width:28;transition:stroke-dasharray .6s ease,stroke-dashoffset .6s ease}
+.donut-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center}
+.donut-total{font-size:1.1rem;font-weight:800;color:var(--accent)}
+.donut-label{font-size:.72rem;color:var(--t3);margin-top:2px}
+
 /* ─── PANEL BANNER ─── */
 .panel-banner{position:relative;border-radius:12px;overflow:hidden;height:160px;margin-bottom:16px;display:flex;align-items:flex-end;padding:20px 24px}
 .panel-banner img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;filter:brightness(.35)}
@@ -428,7 +446,7 @@ body{background:#fff;color:#000;padding-bottom:0}
   <div class="cur-bar">
     <span>EUR/TRY:</span>
     <div class="cur-manual">
-      <input type="number" id="eur-try-rate" step="0.01" value="36.50" oninput="onCurrencyChange()">
+      <input type="number" id="eur-try-rate" step="0.01" value="52.75" oninput="onCurrencyChange()">
     </div>
     <button class="cur-tl" onclick="fetchEurTry(false)" title="Şimdi güncelle">↻ Şimdi Güncelle</button>
     <span class="cur-src" id="cur-src">Yükleniyor...</span>
@@ -1326,7 +1344,13 @@ body{background:#fff;color:#000;padding-bottom:0}
       <div>
         <div class="cd">
           <h2><span class="ic" style="background:var(--green)">💰</span> Maliyet Dağılımı</h2>
-          <div class="bar" id="s-bar"></div>
+          <div class="donut-wrap">
+            <svg id="s-donut" viewBox="0 0 200 200" class="donut-svg"></svg>
+            <div class="donut-center" id="s-donut-center">
+              <div class="donut-total" id="s-donut-total">—</div>
+              <div class="donut-label">Toplam</div>
+            </div>
+          </div>
           <div class="leg" id="s-leg"></div>
           <table class="tbl" id="s-costTable">
             <thead><tr><th>Kalem</th><th class="right">Tutar (€)</th><th class="right">%</th></tr></thead>
@@ -1430,7 +1454,7 @@ body{background:#fff;color:#000;padding-bottom:0}
     <!-- AKSIYON BUTONLARI -->
     <div style="display:flex;gap:10px;justify-content:center;margin:20px 0;flex-wrap:wrap">
       <button class="btn btn-out" onclick="exportFullPDF()">📄 PDF Teklif İndir</button>
-      <button class="btn btn-out" onclick="exportCSV()">📊 Excel (CSV)</button>
+      <button class="btn btn-out" onclick="exportCSV()">📊 Excel İndir (.xlsx)</button>
       <button class="btn btn-out" onclick="saveToHistory()">💾 Geçmişe Kaydet</button>
       <button class="btn btn-out btn-sm" onclick="goStep('product')">🔄 Yeni Hesaplama</button>
     </div>
@@ -1449,6 +1473,17 @@ body{background:#fff;color:#000;padding-bottom:0}
   </div>
   <div style="display:flex;gap:12px;overflow-x:auto;padding-bottom:6px" id="hist-scroll">
     <div id="hist-empty" style="text-align:center;padding:20px;width:100%;color:var(--t3);font-size:.85rem">Henüz kayıt yok</div>
+  </div>
+</div>
+
+<!-- ═══════════════ TEKLİF GEÇMİŞİ ═══════════════ -->
+<div class="cd" style="margin-top:12px">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+    <h2 style="margin:0"><span class="ic" style="background:var(--orange)">📄</span> Teklif Geçmişi</h2>
+    <span style="font-size:.75rem;color:var(--t3)" id="quotation-count"></span>
+  </div>
+  <div id="quotation-list">
+    <div style="text-align:center;padding:20px;color:var(--t3);font-size:.85rem">Henüz teklif oluşturulmadı</div>
   </div>
 </div>
 
@@ -1782,6 +1817,7 @@ async function onAuthReady(user) {
   initLayers();
   bindInputs();
   renderHist();
+  renderQuotationList();
   renderClients();
   updateClientSelect();
   renderTemplates();
@@ -2886,13 +2922,19 @@ function _RECALC_BODY() {
       { label: 'Genel Gider (%' + overheadPct + ')', cost: overheadAmount, color: '#a855f7' }
     ].filter(c => c.cost > 0);
 
-    const barEl = $('s-bar'), legEl = $('s-leg');
-    barEl.innerHTML = ''; legEl.innerHTML = '';
+    // Donut chart
+    const donutEl = $('s-donut'), legEl = $('s-leg');
+    const R_DONUT = 86, C_DONUT = 2 * Math.PI * R_DONUT;
+    donutEl.innerHTML = ''; legEl.innerHTML = '';
+    let offset = 0;
     costItems.forEach(c => {
-      const pct = c.cost / totalCost * 100;
-      barEl.innerHTML += `<div class="bar-seg" style="width:${pct}%;background:${c.color}">${pct > 6 ? pct.toFixed(0) + '%' : ''}</div>`;
-      legEl.innerHTML += `<div class="leg-i"><div class="leg-d" style="background:${c.color}"></div>${c.label}</div>`;
+      const pct = c.cost / totalCost;
+      const dash = pct * C_DONUT;
+      donutEl.innerHTML += `<circle cx="100" cy="100" r="${R_DONUT}" stroke="${c.color}" stroke-dasharray="${dash} ${C_DONUT - dash}" stroke-dashoffset="${-offset}" stroke-linecap="round" style="opacity:.9"/>`;
+      offset += dash;
+      legEl.innerHTML += `<div class="leg-i"><div class="leg-d" style="background:${c.color}"></div>${c.label} (${(pct*100).toFixed(0)}%)</div>`;
     });
+    tx('s-donut-total', euro(totalCost));
 
     const ctbody = document.querySelector('#s-costTable tbody');
     ctbody.innerHTML = '';
@@ -3080,6 +3122,11 @@ async function exportFullPDF() {
     alert('PDF penceresi açılamadı. Tarayıcınızın pop-up engelleyicisini bu site için kapatın, sonra tekrar deneyin.');
     return;
   }
+  // Çevikbaş logo SVG paths (inline — PDF yeni pencerede açıldığı için dosya referansı kullanılamaz)
+  const cevikbasLogoSVG = `<svg width="160" height="27" viewBox="0 0 209 35" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M58.8666 4.80238L62.1384 1.48779L65.4101 4.80238L62.1384 8.11697L58.8666 4.80238Z" fill="#E30613"/><path fill-rule="evenodd" clip-rule="evenodd" d="M146.877 2.06099C142.297 4.92699 140.006 7.86775 140.006 10.9082C140.006 12.3287 140.661 13.9487 141.995 15.7929C143.832 18.3349 144.763 20.4283 144.763 22.0233C144.763 24.3659 143.807 26.6587 141.869 28.8269H134.52C137.615 26.3846 139.151 24.1666 139.151 22.1977C139.151 21.4252 139 20.7274 138.673 20.1292C138.421 19.6059 137.766 18.609 136.684 17.0888C135.149 14.9704 134.394 12.9019 134.394 10.9082C134.394 7.61854 135.904 4.67777 138.924 2.06099H146.877ZM134.394 31.1696H141.441V34.1103H134.394V31.1696ZM125.007 17.4128V7.04534C125.007 5.79925 124.302 5.15129 122.893 5.15129C121.534 5.15129 120.854 5.77433 120.854 7.04534V17.4128H125.007ZM130.619 28.8518H125.007V21.1012H120.854V28.8518H115.242V21.0763H114.084L110.661 17.4128H115.242V7.04534C115.242 5.32574 115.946 3.97996 117.356 2.93325C118.765 1.91146 120.653 1.38811 123.018 1.38811C125.434 1.38811 127.347 1.96131 128.807 3.08278C130.015 4.02981 130.619 5.35066 130.619 7.04534V28.8518ZM104.394 23.4937V22.447C104.394 21.4002 103.941 20.8769 103.01 20.8769H99.9902V25.0388H103.01C103.941 25.0388 104.394 24.5155 104.394 23.4937ZM110.057 24.0918C110.057 25.313 109.403 26.9827 108.069 27.7304C106.735 28.478 104.923 28.8518 102.658 28.8518H94.3778V20.7772H92.9685L89.5457 17.1137H94.3778V0.86475C95.5356 1.08905 96.6681 1.33826 97.7503 1.63732C100.418 2.4099 102.633 3.35692 104.445 4.4784C108.17 6.82104 109.906 9.7618 109.906 12.553C109.906 15.12 108.723 15.1947 106.081 17.3629C108.723 18.4346 110.057 21.2258 110.057 22.9205V24.0918ZM104.394 12.3537C104.394 10.0609 102.935 8.24158 99.9902 6.89581V17.5623C100.141 17.5125 100.343 17.4128 100.594 17.2882C103.136 15.9175 104.394 14.2976 104.394 12.3537ZM87.7588 28.8518H82.222V22.0233C82.222 21.4999 81.7941 21.2507 80.9636 21.2507H77.4653V28.8269H71.9285V21.2507H70.2675L66.8699 17.6869H71.9033V2.08591H77.4402V17.3131C80.6113 15.5686 82.1968 12.6029 82.1968 9.58735V2.08591H87.7337V9.58735C87.7337 12.9269 86.4753 15.9424 83.9837 17.7617C85.4434 18.1853 86.5508 18.8084 87.1296 19.581C87.5575 20.1292 87.7337 21.0015 87.7337 22.123V28.8518H87.7588ZM59.521 9.7618H65.1836V28.8518H59.5461V9.7618H59.521ZM47.0883 29.425L56.3247 2.08591H50.6117L47.0883 14.1231L43.5396 2.08591H37.8266L47.0883 29.425ZM34.4794 28.8518H25.998C22.3738 28.8518 20.6876 27.2818 20.6876 24.0918V21.475H19.5551L16.1072 17.7866H20.6876V2.08591H34.4794V5.89894H26.2748V17.7866H34.4794V21.4501H26.2748V24.5902C26.2748 24.9142 26.6271 25.0637 27.3067 25.0637H34.4794V28.8518ZM17.3655 28.8518H9.91597L9.56362 29.6493C9.56362 29.6493 11.124 30.3222 10.822 31.8425C10.52 33.3627 8.17941 33.9608 7.12238 33.9608C6.06535 33.9608 4.27846 33.5122 4.27846 33.5122L5.91435 31.6182C5.91435 31.6182 7.47473 31.992 7.85224 31.3191C8.22975 30.6462 7.77673 29.7989 7.02171 29.7989C6.26669 29.7989 5.96468 29.7241 5.96468 29.7241L7.52506 28.179C2.51674 24.341 0 20.0046 0 15.3941C0 10.6341 2.84392 6.17308 8.50659 2.08591H17.1894C13.0871 4.37871 10.1425 6.5469 8.38075 8.64033C6.61903 10.7338 5.73817 13.0016 5.73817 15.444C5.73817 17.986 6.59387 20.2788 8.33042 22.2974C10.1173 24.4158 13.1374 26.584 17.3655 28.8518Z" fill="#193767"/><path d="M131.223 32.5901H13.2632V34.1103H131.223V32.5901Z" fill="#E30613"/><path d="M183.96 28.8653H181.08V22.4969H170V18.8437L182.203 4.97149L182.105 9.46392L173.173 19.5842H183.96V28.8653Z" fill="#193767"/><path d="M197.09 4.92213C190.549 4.92213 185.278 10.2538 185.229 16.869L188.206 16.8197C188.255 11.9323 192.209 7.9829 197.09 7.9829C201.971 7.9829 205.925 11.9817 205.925 16.9184C205.925 21.8551 201.971 25.8045 197.09 25.8045V28.9147C203.923 28.9147 208.951 23.5336 208.951 16.9184C208.951 10.3032 203.631 4.92213 197.09 4.92213Z" fill="#193767"/><path d="M185.961 28.0754V28.8653H185.18V28.0754H185.961Z" fill="#193767"/><path d="M186.888 30.3957C186.888 30.3957 186.986 30.3957 187.035 30.3957C187.181 30.3957 187.181 30.3957 187.279 30.3957C187.425 30.3957 187.523 30.3957 187.621 30.3463C187.718 30.2969 187.816 30.1982 187.914 30.0501C188.011 29.902 188.109 29.7045 188.206 29.4083L188.304 29.1615L186.498 24.6691H187.133L188.597 28.4704H188.646L190.012 24.6691H190.647L188.89 29.2109C188.694 29.7045 188.499 30.0501 188.353 30.2969C188.206 30.5438 188.011 30.6919 187.865 30.7906C187.718 30.8894 187.523 30.8894 187.328 30.8894C187.181 30.8894 187.035 30.8894 186.84 30.8894" fill="#193767"/><path d="M191.965 24.6691V29.2109H191.379V24.6691H191.965Z" fill="#193767"/><path d="M193.722 22.9412V29.1615H193.136V22.9412H193.722Z" fill="#193767"/><path d="M195.479 28.9147V25.8045H197.432C197.432 25.8045 198.505 27.0881 198.505 27.1374C198.505 27.1868 197.188 28.964 197.188 28.964L195.479 28.9147Z" fill="#193767"/><path d="M185.424 16.5728L185.229 16.9184V22.2994H188.206V16.326L185.424 16.5728Z" fill="#193767"/><path d="M194.454 16.9678L196.992 14.3513L199.53 16.9678L196.992 19.6336L194.454 16.9678Z" fill="#E30613"/></svg>`;
+
+  const cvkLogoSVG = `<svg width="36" height="17" viewBox="0 0 45.9 21.4" xmlns="http://www.w3.org/2000/svg"><path d="M11.4,15.8c-2.7,0-4.9-2.3-4.9-5s2.1-5,4.9-5,1.5.3,2.3.5l-2.3-4C6.9,2.1,3.2,6.1,3.2,10.7s3.7,8.6,8.3,8.6,5.7-1.6,7.2-4.3l-2.3-4c0,2.7-2.3,4.8-4.8,4.8" fill="#193767"/><polygon points="28.6 2.1 26.7 5.4 22.6 12.7 18.6 5.4 16.7 2.1 13.1 2.1 22.6 19.3 32.2 2.1 28.6 2.1" fill="#193767"/><polygon points="37.4 2.1 33.1 9.7 33.1 3.8 30.1 9.2 30.1 19.3 33.1 19.3 33.1 11.7 37.3 19.3 41.1 19.3 35.8 10.6 41.1 2.1 37.4 2.1" fill="#193767"/></svg>`;
+
   win.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Teklif - ${refNo}</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
@@ -3092,7 +3139,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 .hdr-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:0}
 .teklif-title{font-size:36px;font-weight:900;color:#585858;letter-spacing:1px;text-transform:uppercase}
 
-/* Company / Customer columns */
+/* Company / Customer */
 .info-row{display:flex;justify-content:space-between;margin-top:16px}
 .info-col{width:48%}
 .info-col.right{text-align:left}
@@ -3104,28 +3151,25 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 .divider{height:2.5px;background:#5e5e5e;margin:6px 0 10px}
 .divider-thin{height:0.75px;background:#aaa;margin:8px 0}
 
-/* Teklif tarihi */
+/* Date rows */
 .date-row{display:flex;justify-content:space-between;margin-top:10px;padding-top:8px;border-top:.75px solid #aaa}
 .date-row .lbl{font-size:9pt;font-weight:700;color:#444}
 .date-row .val{font-size:9pt;font-weight:700;color:#726869}
 
-/* Notlar bölümü */
+/* Notes */
 .notes-section{margin-top:10px;padding-top:8px;border-top:.75px solid #aaa}
 .note-title{font-size:9pt;font-weight:700;color:#444;margin-bottom:4px}
 .note-line{font-size:8pt;color:#555;line-height:1.8}
 
 /* Table */
 .tbl{width:100%;border-collapse:collapse;margin-top:16px}
-.tbl th{font-size:9pt;font-weight:700;padding:10px 6px;border-bottom:.75px solid #aaa;text-align:left}
+.tbl th{font-size:9pt;font-weight:700;padding:10px 6px;border-bottom:.75px solid #aaa;text-align:left;color:#726869}
 .tbl th.right{text-align:right}
-.tbl th:first-child{width:40%}
+.tbl th:first-child{width:40%;color:#444}
 .tbl td{font-size:8.5pt;padding:8px 6px;border-bottom:.5px solid #ddd;vertical-align:top}
 .tbl td.right{text-align:right}
 .tbl td.desc-cell{line-height:1.6}
 .tbl td.mono{font-family:'DM Sans',monospace;font-weight:500}
-.tbl .hdr-miktar{color:#726869}
-.tbl .hdr-fiyat{color:#726869}
-.tbl .hdr-kdv{color:#726869}
 
 /* Totals */
 .totals{margin-top:8px;display:flex;justify-content:flex-end}
@@ -3137,7 +3181,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 .total-row.grand .t-label{color:#444;font-weight:800}
 .total-row.grand .t-val{font-weight:800;color:#444;font-size:10pt}
 
-/* Tech specs box */
+/* Specs */
 .specs-box{margin-top:20px;padding:14px;border:1px solid #ddd;border-radius:8px;background:#fafafa}
 .specs-title{font-size:9pt;font-weight:700;color:#10b981;margin-bottom:8px}
 .specs-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px}
@@ -3145,21 +3189,19 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 .spec-item strong{color:#333}
 
 /* Footer */
-.footer{position:absolute;bottom:12px;left:28px;right:28px;display:flex;justify-content:space-between;font-size:7.5pt;color:#565656}
+.footer{position:absolute;bottom:12px;left:28px;right:28px;display:flex;justify-content:space-between;align-items:center;font-size:7.5pt;color:#565656}
 
-@media print{
-  body{width:auto;margin:0}
-  .page{padding:28px}
-}
+@media print{body{width:auto;margin:0}.page{padding:28px}}
 </style></head><body>
 <div class="page">
 
   <!-- HEADER -->
   <div class="hdr-row">
-    <svg viewBox="0 0 160 55" style="width:165px;height:auto" xmlns="http://www.w3.org/2000/svg">
-      <defs><pattern id="hs" patternUnits="userSpaceOnUse" width="160" height="8.5"><rect width="160" height="5.5" fill="#333"/></pattern></defs>
-      <text x="0" y="45" font-family="Arial Black,Impact,sans-serif" font-weight="900" font-size="55" fill="url(#hs)" letter-spacing="2">CVK</text>
-    </svg>
+    <div style="display:flex;align-items:center;gap:12px">
+      ${cevikbasLogoSVG.replace(/width="160"/,'width="140"').replace(/height="27"/,'height="24"')}
+      <span style="color:#ccc;font-size:18px;font-weight:200">|</span>
+      ${cvkLogoSVG.replace(/width="36"/,'width="32"').replace(/height="17"/,'height="15"')}
+    </div>
     <div class="teklif-title">TEKLİF</div>
   </div>
 
@@ -3200,9 +3242,9 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
     <thead>
       <tr>
         <th>Hizmet / Ürün</th>
-        <th class="right hdr-miktar">Miktar</th>
-        <th class="right hdr-fiyat">Br. Fiyat</th>
-        <th class="right hdr-kdv">KDV</th>
+        <th class="right">Miktar</th>
+        <th class="right">Br. Fiyat</th>
+        <th class="right">KDV</th>
         <th class="right">Toplam</th>
       </tr>
     </thead>
@@ -3262,7 +3304,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
       <div class="spec-item"><strong>Yapı:</strong> ${layerStr}</div>
       <div class="spec-item"><strong>Toplam GSM:</strong> ${num(gsm, 2)} g/m²</div>
       <div class="spec-item"><strong>Baskı:</strong> ${printTypeLabel()}</div>
-      <div class="spec-item"><strong>Tasarım Sayısı:</strong> ${designCount}${designCount > 1 ? (sameCylinder ? ' (aynı silindir)' : ' (ayrı silindir)') : ''}</div>
+      <div class="spec-item"><strong>Tasarım:</strong> ${designCount}${designCount > 1 ? (sameCylinder ? ' (aynı silindir)' : ' (ayrı silindir)') : ''}</div>
       <div class="spec-item"><strong>Repeat:</strong> ${repeat} mm</div>
       <div class="spec-item"><strong>Web Width:</strong> ${webw} mm</div>
       <div class="spec-item"><strong>Up Sayısı:</strong> ${up}</div>
@@ -3272,7 +3314,6 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
       <div class="spec-item"><strong>Paket Gramajı:</strong> ${num(pktGram, 2)} gr</div>
       <div class="spec-item"><strong>Adet/KG:</strong> ${num(pcsPerKg, 0)}</div>
       <div class="spec-item"><strong>€/KG:</strong> ${num(eurKg, 2)} €</div>
-      <div class="spec-item"><strong>€/1000 Adet:</strong> ${num(eurPc * 1000, 2)} €</div>
     </div>
   </div>
 
@@ -3301,6 +3342,7 @@ body{font-family:'DM Sans',Arial,Helvetica,sans-serif;color:#444;width:210mm;min
 
   // Teklif geçmişine kaydet
   saveTeklifToHistory(refNo, custName, totalCost, genelToplam, items);
+  renderQuotationList();
 
  } catch (err) {
   console.error('PDF Export hatası:', err);
@@ -3474,6 +3516,37 @@ async function clearHist() {
   }
 }
 
+function renderQuotationList() {
+  const el = $('quotation-list');
+  const countEl = $('quotation-count');
+  if (!el) return;
+  const quotes = DB.cache.quotations || [];
+  if (countEl) countEl.textContent = quotes.length > 0 ? quotes.length + ' teklif' : '';
+  if (quotes.length === 0) {
+    el.innerHTML = '<div style="text-align:center;padding:20px;color:var(--t3);font-size:.85rem">Henüz teklif oluşturulmadı</div>';
+    return;
+  }
+  const kur = getEurTry();
+  el.innerHTML = quotes.slice(0, 20).map(q => {
+    const d = new Date(q.created_at);
+    const dateStr = d.toLocaleDateString('tr-TR') + ' ' + d.toLocaleTimeString('tr-TR',{hour:'2-digit',minute:'2-digit'});
+    const total = q.total_eur || q.genel_toplam || 0;
+    return `<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;margin-bottom:6px;gap:12px">
+      <div style="flex:1;min-width:0">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:2px">
+          <span style="font-weight:700;font-size:.88rem;color:var(--orange)">${q.ref_no || '—'}</span>
+          <span style="font-size:.72rem;color:var(--t3)">${dateStr}</span>
+        </div>
+        <div style="font-size:.8rem;color:var(--t2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${q.customer || 'Müşteri belirtilmedi'}</div>
+      </div>
+      <div style="text-align:right;flex-shrink:0">
+        <div style="font-weight:700;font-size:.95rem;color:var(--accent)">€${typeof total === 'number' ? total.toFixed(2) : total}</div>
+        <div style="font-size:.72rem;color:var(--t3)">₺${(total * kur).toFixed(2)}</div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
 // ╔══════════════════════════════════════════════════════════════╗
 // ║  LEGACY RATES — eski Makine Fiyatları panelinin kalıntısı    ║
 // ║  v5 Faz 5'ten itibaren makine kartları kullanılıyor.         ║
@@ -3628,53 +3701,76 @@ function exportCSV() {
   RECALC();
   if (!R.qty || !R.totalCost) { alert('Önce hesaplama yapın.'); return; }
   const kur = getEurTry();
-  const sep = ';'; // Excel TR uyumlu
-  const rows = [
-    ['ESNEK AMBALAJ MALİYET RAPORU'],
-    ['Tarih', new Date().toLocaleDateString('tr-TR')],
+
+  if (typeof XLSX === 'undefined') {
+    alert('Excel kütüphanesi yüklenemedi. İnternet bağlantınızı kontrol edin.');
+    return;
+  }
+
+  const wb = XLSX.utils.book_new();
+
+  // Sayfa 1: Özet
+  const summaryData = [
+    ['CVK PLASTİK AMBALAJ — MALİYET RAPORU'],
+    ['Tarih', new Date().toLocaleDateString('tr-TR'), '', 'Kur', `1 EUR = ${kur.toFixed(2)} TRY`],
     [],
     ['ÜRÜN BİLGİLERİ'],
     ['Paket Tipi', PKG_NAMES[S.pkgType]],
     ['Ölçü (mm)', `${R.w}×${R.h}${R.g > 0 ? '+' + R.g : ''}`],
     ['Yapı', R.layerStr],
-    ['Toplam GSM', R.totalGSM.toFixed(2)],
+    ['Toplam GSM', R.totalGSM],
     ['Baskı Tipi', printTypeLabel()],
     [],
     ['ÜRETİM VERİLERİ'],
     ['Sipariş Adedi', R.qty],
     ['Fire Oranı (%)', R.waste],
-    ['Toplam Metraj (mt)', R.metraj.toFixed(0)],
-    ['Net KG', R.netKg.toFixed(1)],
-    ['Fire Dahil KG', R.grossKg.toFixed(1)],
-    ['Paket Gramajı (gr)', R.pktGram.toFixed(2)],
-    ['Adet/KG', R.pcsPerKg.toFixed(0)],
+    ['Toplam Metraj (mt)', Math.round(R.metraj)],
+    ['Net KG', +R.netKg.toFixed(1)],
+    ['Fire Dahil KG', +R.grossKg.toFixed(1)],
+    ['Paket Gramajı (gr)', +R.pktGram.toFixed(2)],
+    ['Adet/KG', Math.round(R.pcsPerKg)],
     [],
-    ['MALİYET DAĞILIMI', 'EUR', 'TRY'],
-    ['Hammadde', R.rawMatCost.toFixed(2), (R.rawMatCost * kur).toFixed(2)],
-    ['Mürekkep', R.inkCost.toFixed(2), (R.inkCost * kur).toFixed(2)],
-    ['Silindir/Dijital Baskı', R.cylCost.toFixed(2), (R.cylCost * kur).toFixed(2)],
-    ['Baskı İşçilik+Makine', R.printLabor.toFixed(2), (R.printLabor * kur).toFixed(2)],
-    ['Laminasyon', R.lamCost.toFixed(2), (R.lamCost * kur).toFixed(2)],
-    ['Kesim', R.slitCost.toFixed(2), (R.slitCost * kur).toFixed(2)],
-    ['Konverting', R.totalConvCost.toFixed(2), (R.totalConvCost * kur).toFixed(2)],
-    ['Genel Gider', R.overheadAmount.toFixed(2), (R.overheadAmount * kur).toFixed(2)],
-    ['TOPLAM', R.totalCost.toFixed(2), (R.totalCost * kur).toFixed(2)],
+    ['MALİYET DAĞILIMI', 'EUR (€)', 'TRY (₺)', '%'],
+    ['Hammadde', +R.rawMatCost.toFixed(2), +(R.rawMatCost*kur).toFixed(2), +(R.rawMatCost/R.totalCost*100).toFixed(1)],
+    ['Mürekkep', +R.inkCost.toFixed(2), +(R.inkCost*kur).toFixed(2), +(R.inkCost/R.totalCost*100).toFixed(1)],
+    ['Silindir/Klişe', +R.cylCost.toFixed(2), +(R.cylCost*kur).toFixed(2), +(R.cylCost/R.totalCost*100).toFixed(1)],
+    ['Baskı İşçilik+Makine', +R.printLabor.toFixed(2), +(R.printLabor*kur).toFixed(2), +(R.printLabor/R.totalCost*100).toFixed(1)],
+    ['Laminasyon', +R.lamCost.toFixed(2), +(R.lamCost*kur).toFixed(2), +(R.lamCost/R.totalCost*100).toFixed(1)],
+    ['Kesim', +R.slitCost.toFixed(2), +(R.slitCost*kur).toFixed(2), +(R.slitCost/R.totalCost*100).toFixed(1)],
+    ['Konverting', +R.totalConvCost.toFixed(2), +(R.totalConvCost*kur).toFixed(2), +(R.totalConvCost/R.totalCost*100).toFixed(1)],
+    ['Genel Gider', +R.overheadAmount.toFixed(2), +(R.overheadAmount*kur).toFixed(2), +(R.overheadAmount/R.totalCost*100).toFixed(1)],
+    ['TOPLAM', +R.totalCost.toFixed(2), +(R.totalCost*kur).toFixed(2), 100],
     [],
-    ['BİRİM FİYATLAR', 'EUR', 'TRY'],
-    ['€/KG', R.eurKg.toFixed(2), (R.eurKg * kur).toFixed(2)],
-    ['€/Adet', R.eurPc.toFixed(4), (R.eurPc * kur).toFixed(4)],
-    ['€/1000 Adet', R.eurK.toFixed(2), (R.eurK * kur).toFixed(2)],
-    [],
-    ['KUR', `1 EUR = ${kur.toFixed(2)} TRY`]
+    ['BİRİM FİYATLAR', 'EUR (€)', 'TRY (₺)'],
+    ['€/KG', +R.eurKg.toFixed(2), +(R.eurKg*kur).toFixed(2)],
+    ['€/Adet', +R.eurPc.toFixed(4), +(R.eurPc*kur).toFixed(4)],
+    ['€/1000 Adet', +R.eurK.toFixed(2), +(R.eurK*kur).toFixed(2)]
   ];
-  const bom = '\uFEFF';
-  const csv = bom + rows.map(r => r.join(sep)).join('\n');
-  const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-  const link = document.createElement('a');
-  link.href = URL.createObjectURL(blob);
-  link.download = `maliyet_${PKG_NAMES[S.pkgType]}_${R.w}x${R.h}_${new Date().toISOString().slice(0,10)}.csv`;
-  link.click();
-  URL.revokeObjectURL(link.href);
+
+  const ws = XLSX.utils.aoa_to_sheet(summaryData);
+  // Kolon genişlikleri
+  ws['!cols'] = [{wch:22},{wch:16},{wch:16},{wch:10},{wch:20}];
+  // Başlık satırını kalın yap
+  if (ws['A1']) ws['A1'].s = {font:{bold:true,sz:14}};
+  XLSX.utils.book_append_sheet(wb, ws, 'Maliyet Özeti');
+
+  // Sayfa 2: Katman detayı
+  if (R.layers && R.layers.length > 0) {
+    const layerData = [
+      ['KATMAN DETAYI'],
+      ['#', 'Malzeme', 'Mikron (μ)', 'GSM (g/m²)', 'Fiyat (€/kg)']
+    ];
+    R.layers.forEach((l, i) => {
+      layerData.push([i+1, l.film || '—', l.micron, +l.gsm.toFixed(2), l.rate || 0]);
+    });
+    layerData.push([], ['Toplam GSM', '', '', +R.totalGSM.toFixed(2)]);
+    const ws2 = XLSX.utils.aoa_to_sheet(layerData);
+    ws2['!cols'] = [{wch:5},{wch:18},{wch:12},{wch:14},{wch:14}];
+    XLSX.utils.book_append_sheet(wb, ws2, 'Katman Yapısı');
+  }
+
+  const fileName = `FlexiCost_${PKG_NAMES[S.pkgType]}_${R.w}x${R.h}_${new Date().toISOString().slice(0,10)}.xlsx`;
+  XLSX.writeFile(wb, fileName);
 }
 
 // ═══════════ THEME ═══════════
@@ -4556,7 +4652,7 @@ const CURRENCY_INTERVAL = 10 * 60 * 1000; // 10 dakika
 let _currencyTimer = null;
 
 function getEurTry() {
-  return parseFloat($('eur-try-rate')?.value) || 36.50;
+  return parseFloat($('eur-try-rate')?.value) || 52.75;
 }
 
 function onCurrencyChange() {
@@ -4566,34 +4662,30 @@ function onCurrencyChange() {
   RECALC();
 }
 
-// Çoklu kur API'leri — en CORS-dostu olan ilk sırada
+// Çoklu kur API'leri — en güvenilir ve CORS-dostu olanlar
 const CURRENCY_APIS = [
+  { id: 'fawaz-cdn', url: 'https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@latest/v1/currencies/eur.json', parse: d => d?.eur?.try },
+  { id: 'fawaz-cf', url: 'https://latest.currency-api.pages.dev/v1/currencies/eur.json', parse: d => d?.eur?.try },
   { id: 'erapi', url: 'https://open.er-api.com/v6/latest/EUR', parse: d => d?.rates?.TRY },
-  { id: 'exhost', url: 'https://api.exchangerate.host/latest?base=EUR&symbols=TRY', parse: d => d?.rates?.TRY },
   { id: 'frankfurter', url: 'https://api.frankfurter.app/latest?from=EUR&to=TRY', parse: d => d?.rates?.TRY }
 ];
-// Bir session'da kaç kez fail oldu — 2'den fazla ise artık deneme
-const _apiFailCount = {};
 
 async function tryFetchRate() {
   for (const api of CURRENCY_APIS) {
-    if ((_apiFailCount[api.id] || 0) >= 2) continue;  // kalıcı fail olan API'yi atla
     try {
-      const res = await fetch(api.url, { mode: 'cors' });
-      if (!res.ok) { _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1; continue; }
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 6000);
+      const res = await fetch(api.url, { signal: controller.signal });
+      clearTimeout(timeoutId);
+      if (!res.ok) continue;
       const data = await res.json();
       const rate = api.parse(data);
-      if (rate && rate > 0) {
-        _apiFailCount[api.id] = 0;  // başarılı → sayaç sıfırlansın
+      if (rate && rate > 10 && rate < 200) {
+        console.log('Kur alındı (' + api.id + '):', rate);
         return rate;
       }
-      _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1;
     } catch (e) {
-      _apiFailCount[api.id] = (_apiFailCount[api.id] || 0) + 1;
-      // Sadece ilk fail'de log at — sonraki denemelerde gürültüyü azalt
-      if (_apiFailCount[api.id] === 1) {
-        console.warn('Kur API fail (' + api.id + '):', e.message);
-      }
+      console.warn('Kur API fail (' + api.id + '):', e.message);
     }
   }
   return null;
@@ -4601,7 +4693,8 @@ async function tryFetchRate() {
 
 async function fetchEurTry(silent) {
   const btn = document.querySelector('.cur-tl');
-  if (!silent && btn) { btn.textContent = '⏳ Çekiliyor...'; btn.disabled = true; }
+  if (btn) { btn.textContent = '⏳ Çekiliyor...'; btn.disabled = true; }
+  tx('cur-src', 'Güncelleniyor...');
   try {
     const rate = await tryFetchRate();
     if (rate) {
@@ -4613,14 +4706,14 @@ async function fetchEurTry(silent) {
       localStorage.setItem(EUR_TRY_KEY, JSON.stringify({ rate: S.eurTry, date: new Date().toISOString(), source: 'live' }));
       if (typeof RECALC === 'function') RECALC();
     } else {
-      if (!silent) tx('cur-src', 'Bağlantı hatası — manuel giriş kullanın');
+      tx('cur-src', 'API erişilemedi — manuel giriş kullanın');
     }
   } catch (e) {
     console.warn('fetchEurTry hata:', e);
-    if (!silent) tx('cur-src', 'Bağlantı hatası');
+    tx('cur-src', 'Bağlantı hatası — manuel giriş kullanın');
   } finally {
     if (btn) {
-      btn.textContent = '↻ Canlı Kur';
+      btn.textContent = '↻ Şimdi Güncelle';
       btn.disabled = false;
     }
   }
