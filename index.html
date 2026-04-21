@@ -49,8 +49,6 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .g2{grid-template-columns:1fr}
 .g3{grid-template-columns:1fr 1fr}
 .g4{grid-template-columns:1fr 1fr}
-.top-actions{position:fixed;top:auto;bottom:68px;right:8px;left:auto;width:auto;flex-direction:row}
-.theme-toggle{font-size:.72rem;padding:4px 8px;width:auto;min-width:0}
 }
 @media(max-width:600px){
 .app{padding:10px}
@@ -287,9 +285,8 @@ body.light .chain-bar{background:#fff;border-top:1px solid #e0e0e0}
 body.light select option{background:#fff;color:#1a1a1a}
 
 /* ─── THEME TOGGLE ─── */
-.top-actions{position:fixed;top:10px;right:12px;left:auto;width:auto;z-index:200;display:flex;gap:6px}
-.theme-toggle{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 10px;cursor:pointer;font-size:.82rem;color:var(--t2);transition:all .2s}
-.theme-toggle:hover{border-color:var(--accent);color:var(--accent)}
+.hdr-icon-btn{background:none;border:1px solid var(--border);border-radius:6px;padding:3px 7px;cursor:pointer;font-size:.78rem;color:var(--t2);transition:all .15s;line-height:1}
+.hdr-icon-btn:hover{border-color:var(--accent);color:var(--accent)}
 
 /* ─── CURRENCY BAR ─── */
 .cur-bar{display:flex;align-items:center;gap:8px;justify-content:flex-end;padding:6px 0;font-size:.78rem;color:var(--t2)}
@@ -469,10 +466,6 @@ body{background:#fff;color:#000;padding-bottom:0}
   <span>Veriler yükleniyor...</span>
 </div>
 
-<div class="top-actions" id="topActions">
-  <button class="theme-toggle" id="themeBtn" onclick="toggleTheme()">☀️</button>
-  <button class="theme-toggle" onclick="openTetris()" title="Ambalaj Tetris">🎮</button>
-</div>
 <div class="app" id="mainApp" style="display:none">
 
 <div class="hdr">
@@ -480,6 +473,8 @@ body{background:#fff;color:#000;padding-bottom:0}
     <span class="user-company" id="userCompany"></span>
     <span class="user-email" id="userEmail"></span>
     <button class="user-logout" onclick="doLogout()">Çıkış Yap</button>
+    <button class="hdr-icon-btn" id="themeBtn" onclick="toggleTheme()">☀️</button>
+    <button class="hdr-icon-btn" onclick="openTetris()" title="Ambalaj Tetris">🎮</button>
   </div>
   <div class="hdr-logos">
     <img src="images/cevikbas-footer.svg" alt="Çevikbaş" class="hdr-logo">
