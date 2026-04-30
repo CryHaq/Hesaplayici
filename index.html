@@ -1553,6 +1553,43 @@ function wizBuild(wiz){
 }
 Object.keys(WIZ_DEFS).forEach(function(wiz){wizBuild(wiz)});
 
+/* ═══ FORM PERSISTENCE (localStorage) ═══ */
+var FORM_KEY='fh-form-state';
+var PERSIST_IDS=['pp-pet','pp-7525','pp-cpp','pp-tutkal','pp-murekkep','pp-solvent','pp-coldseal','pp-matlak','fh-tutkal-val','fh-fire-pct','fh-x1','fh-x2','fh-matlak-total','fh-order-qty','fh-order-kg','fh-kg-multiplier','fh-min-matlak','dp-fotosel','dp-bobin','dp-kg-price','dp-zip-price','fb-g-fotosel','fb-g-bobin','fb-k-fotosel','fb-k-bobin','fb-kg-price','fb-cut-price','fb-ayrist','fb-govde-kgprice','fb-koruk-kgprice','sl-p1','sl-p2','sl-p3','sl-p-tutkal','sl-p-murekkep','sl-p-solvent','sl-t1','sl-t2','sl-t3','sl-d1','sl-d2','sl-d3','sl-tutkal-gsm','sl-murekkep-gsm','sl-fire-pct','sl-x1','sl-order-kg','sl-multiplier','sl-klise-price','sl-color-count','sl-fire-cost','sl-min-kg','sl-min-multiplier','fr-urun-kg','fr-brut-bant','fr-net-bant','fr-brut-foto','fr-net-foto','eur-try-rate'];
+var PERSIST_CHECKS=['fh-murekkep-on','fh-matlak-on','fh-coldseal-on'];
+
+function saveFormState(){
+  var state={inputs:{},checks:{},layers:FH_LAYER_DATA,dpFire:$('dp-fire-type').value};
+  PERSIST_IDS.forEach(function(id){var e=$(id);if(e)state.inputs[id]=e.value});
+  PERSIST_CHECKS.forEach(function(id){var e=$(id);if(e)state.checks[id]=e.checked});
+  // Doypack material values
+  var dpVals=[];document.querySelectorAll('.dp-val').forEach(function(inp){dpVals.push(parseFloat(inp.value)||0)});
+  state.dpMat=dpVals;
+  // FB material values
+  var fbG=[],fbK=[];
+  document.querySelectorAll('.fb-govde-val').forEach(function(inp){fbG.push(parseFloat(inp.value)||0)});
+  document.querySelectorAll('.fb-koruk-val').forEach(function(inp){fbK.push(parseFloat(inp.value)||0)});
+  state.fbG=fbG;state.fbK=fbK;
+  localStorage.setItem(FORM_KEY,JSON.stringify(state));
+}
+
+function loadFormState(){
+  var raw=localStorage.getItem(FORM_KEY);if(!raw)return;
+  try{var state=JSON.parse(raw)}catch(e){return}
+  if(state.inputs){PERSIST_IDS.forEach(function(id){var e=$(id);if(e&&state.inputs[id]!=null)e.value=state.inputs[id]})}
+  if(state.checks){PERSIST_CHECKS.forEach(function(id){var e=$(id);if(e&&state.checks[id]!=null)e.checked=state.checks[id]})}
+  if(state.layers&&state.layers.length>0){FH_LAYER_DATA=state.layers;renderFHLayers()}
+  if(state.dpFire)$('dp-fire-type').value=state.dpFire;
+  if(state.dpMat){state.dpMat.forEach(function(v,i){var inp=document.querySelector('.dp-val[data-idx="'+i+'"]');if(inp)inp.value=v})}
+  if(state.fbG){state.fbG.forEach(function(v,i){var inp=document.querySelector('.fb-govde-val[data-idx="'+i+'"]');if(inp)inp.value=v})}
+  if(state.fbK){state.fbK.forEach(function(v,i){var inp=document.querySelector('.fb-koruk-val[data-idx="'+i+'"]');if(inp)inp.value=v})}
+}
+
+// Auto-save on every change (debounced)
+var saveTimer;
+document.addEventListener('input',function(){clearTimeout(saveTimer);saveTimer=setTimeout(saveFormState,500)});
+document.addEventListener('change',function(){clearTimeout(saveTimer);saveTimer=setTimeout(saveFormState,500)});
+
 /* ═══ INIT ═══ */
 renderStaticTable('dp-cut-body',[[{t:'\u2264 5 g'},{t:'2,75',r:1}],[{t:'\u2264 7 g'},{t:'2,50',r:1}],[{t:'\u2264 9 g'},{t:'1,84',r:1}],[{t:'\u2264 12 g'},{t:'1,65',r:1}],[{t:'\u2264 15 g'},{t:'1,45',r:1}],[{t:'\u2264 17 g'},{t:'1,35',r:1}],[{t:'\u2264 21 g'},{t:'1,20',r:1}]]);
 renderStaticTable('dp-fire-body',[[{t:'500 KG'},{t:'%12',r:1}],[{t:'750 KG'},{t:'%9',r:1}],[{t:'1500 KG'},{t:'%7',r:1}],[{t:'2500 KG'},{t:'%5',r:1}],[{t:'5000-10000 KG'},{t:'%3-3,5',r:1}]]);
@@ -1561,6 +1598,7 @@ renderFHLayers();
 renderMatTable('dp-materials',POUCH_MATERIALS,null,'dp');
 renderMatTable('fb-govde-materials',POUCH_MATERIALS,FB_G_DEF,'fb-govde');
 renderMatTable('fb-koruk-materials',POUCH_MATERIALS,FB_K_DEF,'fb-koruk');
+loadFormState();
 renderHistory();
 recalcAll();
 </script>
