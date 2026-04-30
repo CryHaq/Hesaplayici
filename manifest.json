@@ -1,0 +1,13 @@
+{
+  "name": "Ambalaj Fiyat Hesaplayıcı",
+  "short_name": "Fiyat Hesap",
+  "description": "Esnek ambalaj maliyet hesaplama sistemi — Çevikbaş",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#0a0a0a",
+  "theme_color": "#0a0a0a",
+  "orientation": "portrait-primary",
+  "icons": [
+    {"src": "https://cevikbas.com/frontend/img/paket.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any"}
+  ]
+}

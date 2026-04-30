@@ -6,6 +6,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#0a0a0a">
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="https://cevikbas.com/frontend/img/paket.svg">
 <title>Ambalaj Fiyat Hesaplayıcı</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
@@ -1706,6 +1708,9 @@ renderMatTable('fb-koruk-materials',POUCH_MATERIALS,FB_K_DEF,'fb-koruk');
 loadFormState();
 renderHistory();
 recalcAll();
+
+// PWA Service Worker
+if('serviceWorker' in navigator){navigator.serviceWorker.register('sw.js').catch(function(){})}
 </script>
 </body>
 </html>
