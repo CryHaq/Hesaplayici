@@ -129,6 +129,36 @@ select option{background:var(--card);color:var(--t1)}
 .tag-green{background:rgba(16,185,129,.1);color:var(--accent)}
 .tag-orange{background:rgba(245,158,11,.1);color:var(--orange)}
 
+/* ─── WIZARD STEPS ─── */
+.wiz-bar{display:flex;gap:4px;margin-bottom:16px;overflow-x:auto;padding:2px 0;-webkit-overflow-scrolling:touch}
+.wiz-bar::-webkit-scrollbar{display:none}
+.wiz-step-btn{display:flex;align-items:center;gap:5px;padding:8px 14px;border-radius:8px;border:1px solid var(--border);background:var(--card);color:var(--t3);cursor:pointer;font-family:inherit;font-size:.72rem;font-weight:600;white-space:nowrap;transition:all .2s;flex-shrink:0}
+.wiz-step-btn:active{transform:scale(.96)}
+.wiz-step-btn .wiz-num{width:20px;height:20px;border-radius:6px;background:var(--border2);display:flex;align-items:center;justify-content:center;font-size:.65rem;font-weight:700;flex-shrink:0;transition:all .2s}
+.wiz-step-btn.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+.wiz-step-btn.active .wiz-num{background:rgba(255,255,255,.25)}
+.wiz-step-btn.done{border-color:var(--accent);color:var(--accent)}
+.wiz-step-btn.done .wiz-num{background:var(--accent-bg);color:var(--accent)}
+.wiz-content{display:none;animation:fadeUp .25s ease}
+.wiz-content.active{display:block}
+.wiz-nav{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.wiz-nav button{padding:10px 24px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:6px}
+.wiz-nav button:active{transform:scale(.96)}
+.wiz-prev{background:var(--card);color:var(--t2);border:1px solid var(--border)!important}
+.wiz-prev:hover{border-color:var(--accent)!important;color:var(--accent)}
+.wiz-next{background:var(--accent);color:#fff}
+.wiz-next:hover{background:var(--accent2)}
+.wiz-counter{font-size:.72rem;color:var(--t3);font-weight:500}
+@media(max-width:600px){
+  .wiz-step-btn{padding:6px 10px;font-size:.65rem}
+  .wiz-step-btn .wiz-num{width:18px;height:18px;font-size:.6rem}
+  .wiz-nav button{padding:10px 18px;font-size:.78rem}
+}
+@media(max-width:380px){
+  .wiz-step-btn{padding:5px 8px;font-size:.6rem}
+  .wiz-nav{flex-wrap:wrap;gap:8px;justify-content:center}
+}
+
 /* ─── VALIDATION ─── */
 .input-error{border-color:var(--red)!important;box-shadow:0 0 0 2px rgba(239,68,68,.15)!important}
 .input-error:focus{box-shadow:0 0 0 3px rgba(239,68,68,.25)!important}
@@ -300,13 +330,47 @@ select option{background:var(--card);color:var(--t1)}
 
 <!-- ═══ TAB 1: FİYAT HESAPLAMA ═══ -->
 <div class="tab active" id="tab-fiyat">
-  <!-- Fiyatlar (collapsible) -->
-  <div class="cd">
-    <button class="collapse-btn open" data-target="fiyat-prices">
-      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#8364;</span> Ürün Fiyatları</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content open" id="fiyat-prices">
+  <div class="wiz-bar" data-wiz="fh"></div>
+
+  <!-- Adım 1: Yapı -->
+  <div class="wiz-content active" data-wiz="fh" data-step="0">
+    <div class="cd cd-accent">
+      <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9881;</span> Film Katmanları</h2>
+      <div id="fh-layers"></div>
+      <button type="button" id="fh-add-layer" style="width:100%;padding:10px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:500;transition:all .2s">+ Katman Ekle</button>
+    </div>
+  </div>
+
+  <!-- Adım 2: Ek Malzemeler -->
+  <div class="wiz-content" data-wiz="fh" data-step="1">
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9878;</span> Ek Malzemeler</h2>
+      <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px">
+        <div class="tgl-row">
+          <span class="tgl-label">Tutkal <span style="color:var(--t3);font-size:.72rem">(2.5 g/m²)</span></span>
+          <div class="fg" style="margin:0;width:54px"><div class="iw"><input type="number" id="fh-tutkal-val" value="1" step="0.5" min="0" style="padding:6px;font-size:.8rem;text-align:center"></div></div>
+        </div>
+        <div class="tgl-row">
+          <span class="tgl-label">Mürekkep <span style="color:var(--t3);font-size:.72rem">(x3.2)</span></span>
+          <label class="switch"><input type="checkbox" id="fh-murekkep-on" checked><span class="slider"></span></label>
+        </div>
+        <div class="tgl-row">
+          <span class="tgl-label">Mat Lak <span style="color:var(--t3);font-size:.72rem">(x4)</span></span>
+          <label class="switch"><input type="checkbox" id="fh-matlak-on"><span class="slider"></span></label>
+        </div>
+        <div class="tgl-row">
+          <span class="tgl-label">Cold Seal <span style="color:var(--t3);font-size:.72rem">(x2)</span></span>
+          <label class="switch"><input type="checkbox" id="fh-coldseal-on" checked><span class="slider"></span></label>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adım 3: Fiyatlar & Parametreler -->
+  <div class="wiz-content" data-wiz="fh" data-step="2">
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#8364;</span> Fiyatlar &amp; Parametreler</h2>
+      <h3>Ürün Fiyatları (EUR/kg)</h3>
       <div class="row r4">
         <div class="fg"><label>PET</label><div class="iw hu"><input type="number" step="0.01" id="pp-pet" value="2.85"><span class="unit">EUR</span></div></div>
         <div class="fg"><label>7525</label><div class="iw hu"><input type="number" step="0.01" id="pp-7525" value="2.85"><span class="unit">EUR</span></div></div>
@@ -317,366 +381,333 @@ select option{background:var(--card);color:var(--t1)}
         <div class="fg"><label>Cold Seal</label><div class="iw hu"><input type="number" step="0.01" id="pp-coldseal" value="2.00"><span class="unit">EUR</span></div></div>
         <div class="fg"><label>Mat Lak</label><div class="iw hu"><input type="number" step="0.01" id="pp-matlak" value="4.00"><span class="unit">EUR</span></div></div>
       </div>
+      <h3>Fire &amp; Ek Maliyetler</h3>
+      <div class="row r3">
+        <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="fh-fire-pct" value="7" step="1" min="0"><span class="unit">%</span></div></div>
+        <div class="fg"><label>Ek Maliyet 1</label><div class="iw hu"><input type="number" id="fh-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Ek Maliyet 2</label><div class="iw hu"><input type="number" id="fh-x2" value="750" step="50"><span class="unit">EUR</span></div></div>
+      </div>
+      <h3>Sipariş Bilgileri</h3>
+      <div class="row r3">
+        <div class="fg"><label>Matlak Tahsisatı</label><div class="iw hu"><input type="number" id="fh-matlak-total" value="350" step="10"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Sipariş Adedi</label><div class="iw hu"><input type="number" id="fh-order-qty" value="30000" step="1000"><span class="unit">ad</span></div></div>
+        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fh-order-kg" value="500" step="50"><span class="unit">kg</span></div></div>
+      </div>
+      <div class="row r2" style="margin-top:6px">
+        <div class="fg"><label>KG Çarpan (Fire/Ek)</label><div class="iw"><input type="number" id="fh-kg-multiplier" value="2.4" step="0.1"></div></div>
+        <div class="fg"><label>Min. Sip. Matlak</label><div class="iw hu"><input type="number" id="fh-min-matlak" value="350" step="10"><span class="unit">EUR</span></div></div>
+      </div>
     </div>
   </div>
 
-  <!-- Yapı -->
-  <div class="cd cd-accent">
-    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9881;</span> Yapı &amp; Hesaplama</h2>
-    <h3>Film Katmanları</h3>
-    <div id="fh-layers"></div>
-    <button type="button" id="fh-add-layer" style="width:100%;padding:10px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:500;transition:all .2s;margin-bottom:14px">+ Katman Ekle</button>
-
-    <h3>Ek Malzemeler</h3>
-    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px">
-      <div class="tgl-row">
-        <span class="tgl-label">Tutkal <span style="color:var(--t3);font-size:.72rem">(2.5 g/m²)</span></span>
-        <div class="fg" style="margin:0;width:54px"><div class="iw"><input type="number" id="fh-tutkal-val" value="1" step="0.5" min="0" style="padding:6px;font-size:.8rem;text-align:center"></div></div>
-      </div>
-      <div class="tgl-row">
-        <span class="tgl-label">Mürekkep <span style="color:var(--t3);font-size:.72rem">(x3.2)</span></span>
-        <label class="switch"><input type="checkbox" id="fh-murekkep-on" checked><span class="slider"></span></label>
-      </div>
-      <div class="tgl-row">
-        <span class="tgl-label">Mat Lak <span style="color:var(--t3);font-size:.72rem">(x4)</span></span>
-        <label class="switch"><input type="checkbox" id="fh-matlak-on"><span class="slider"></span></label>
-      </div>
-      <div class="tgl-row">
-        <span class="tgl-label">Cold Seal <span style="color:var(--t3);font-size:.72rem">(x2)</span></span>
-        <label class="switch"><input type="checkbox" id="fh-coldseal-on" checked><span class="slider"></span></label>
-      </div>
+  <!-- Adım 4: Sonuçlar -->
+  <div class="wiz-content" data-wiz="fh" data-step="3">
+    <div class="warn-box" id="fh-warnings"><div class="warn-title">Dikkat</div><ul id="fh-warn-list"></ul></div>
+    <div class="hero" id="fh-hero">
+      <div class="val" id="fh-result-kg">0,00 EUR/kg</div>
+      <div class="lbl">KG Fiyatı (Sipariş Bazlı)</div>
     </div>
-
-    <h3>Ek Maliyetler &amp; Fire</h3>
-    <div class="row r3">
-      <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="fh-fire-pct" value="7" step="1" min="0"><span class="unit">%</span></div></div>
-      <div class="fg"><label>Ek Maliyet 1</label><div class="iw hu"><input type="number" id="fh-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Ek Maliyet 2</label><div class="iw hu"><input type="number" id="fh-x2" value="750" step="50"><span class="unit">EUR</span></div></div>
+    <div class="rg">
+      <div class="ri"><div class="rl">Ton Başı Maliyet</div><div class="rv accent" id="fh-r-ton">-</div></div>
+      <div class="ri"><div class="rl">Ton + Matlak</div><div class="rv accent" id="fh-r-ton-mat">-</div></div>
+      <div class="ri"><div class="rl">KG (Matlak Hariç)</div><div class="rv" id="fh-r-kg-nomatlak">-</div></div>
+      <div class="ri"><div class="rl">KG (Matlak Dahil)</div><div class="rv green" id="fh-r-kg-full">-</div></div>
+      <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="fh-r-gsm">-</div></div>
+      <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="fh-r-fire">-</div></div>
+      <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="fh-r-minsip">-</div></div>
+      <div class="ri"><div class="rl">Matlak / 1000 Ad</div><div class="rv purple" id="fh-r-matlak1000">-</div></div>
     </div>
-    <div class="row r3">
-      <div class="fg"><label>Matlak Tahsisatı</label><div class="iw hu"><input type="number" id="fh-matlak-total" value="350" step="10"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Sipariş Adedi</label><div class="iw hu"><input type="number" id="fh-order-qty" value="30000" step="1000"><span class="unit">ad</span></div></div>
-      <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fh-order-kg" value="500" step="50"><span class="unit">kg</span></div></div>
-    </div>
-    <div class="row r2" style="margin-top:6px">
-      <div class="fg"><label>KG Çarpan (Fire/Ek)</label><div class="iw"><input type="number" id="fh-kg-multiplier" value="2.4" step="0.1"></div></div>
-      <div class="fg"><label>Min. Sip. Matlak</label><div class="iw hu"><input type="number" id="fh-min-matlak" value="350" step="10"><span class="unit">EUR</span></div></div>
-    </div>
-  </div>
-
-  <!-- Uyarılar + Sonuçlar -->
-  <div class="warn-box" id="fh-warnings"><div class="warn-title">Dikkat</div><ul id="fh-warn-list"></ul></div>
-  <div class="hero" id="fh-hero">
-    <div class="val" id="fh-result-kg">0,00 EUR/kg</div>
-    <div class="lbl">KG Fiyatı (Sipariş Bazlı)</div>
-  </div>
-  <div class="rg">
-    <div class="ri"><div class="rl">Ton Başı Maliyet</div><div class="rv accent" id="fh-r-ton">-</div></div>
-    <div class="ri"><div class="rl">Ton + Matlak</div><div class="rv accent" id="fh-r-ton-mat">-</div></div>
-    <div class="ri"><div class="rl">KG (Matlak Hariç)</div><div class="rv" id="fh-r-kg-nomatlak">-</div></div>
-    <div class="ri"><div class="rl">KG (Matlak Dahil)</div><div class="rv green" id="fh-r-kg-full">-</div></div>
-    <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="fh-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="fh-r-fire">-</div></div>
-    <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="fh-r-minsip">-</div></div>
-    <div class="ri"><div class="rl">Matlak / 1000 Ad</div><div class="rv purple" id="fh-r-matlak1000">-</div></div>
-  </div>
-
-  <!-- Detay -->
-  <div class="cd">
-    <button class="collapse-btn open" data-target="fiyat-detail">
+    <div class="cd">
       <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9776;</span> Maliyet Kırılımı</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content open" id="fiyat-detail">
-      <table class="tbl">
-        <thead><tr><th>Kalem</th><th>g/m²</th><th class="r">Kullanım (kg)</th><th class="r">Tutar (EUR)</th></tr></thead>
-        <tbody id="fh-detail-body"></tbody>
-      </table>
+      <div class="tbl-wrap">
+        <table class="tbl">
+          <thead><tr><th>Kalem</th><th>g/m²</th><th class="r">Kullanım (kg)</th><th class="r">Tutar (EUR)</th></tr></thead>
+          <tbody id="fh-detail-body"></tbody>
+        </table>
+      </div>
     </div>
+    <div class="save-bar"><input type="text" id="fh-save-label" placeholder="Teklif adı (ör: ABC Firma PET yapı)" class="iw"><button type="button" onclick="saveQuotation('fiyat')">Teklif Kaydet</button></div>
+    <div class="save-ok" id="fh-save-ok">Teklif kaydedildi</div>
   </div>
-  <div class="save-bar"><input type="text" id="fh-save-label" placeholder="Teklif adı (ör: ABC Firma PET yapı)" class="iw"><button type="button" onclick="saveQuotation('fiyat')">Teklif Kaydet</button></div>
-  <div class="save-ok" id="fh-save-ok">Teklif kaydedildi</div>
+
+  <div class="wiz-nav" data-wiz="fh"></div>
 </div>
 
 <!-- ═══ TAB 2: DOYPACK ═══ -->
 <div class="tab" id="tab-doypack">
-  <div class="cd">
-    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9638;</span> Malzeme Yapısı</h2>
-    <div class="tbl-wrap">
-    <table class="tbl">
-      <thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead>
-      <tbody id="dp-materials"></tbody>
-    </table>
+  <div class="wiz-bar" data-wiz="dp"></div>
+
+  <!-- Adım 1: Malzeme -->
+  <div class="wiz-content active" data-wiz="dp" data-step="0">
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9638;</span> Malzeme Yapısı</h2>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="dp-materials"></tbody></table></div>
     </div>
   </div>
 
-  <div class="cd cd-accent">
-    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Poşet Boyutları</h2>
-    <div class="row r2">
-      <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="dp-fotosel" value="152" step="1"><span class="unit">mm</span></div></div>
-      <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="dp-bobin" value="542.5" step="0.5"><span class="unit">mm</span></div></div>
-    </div>
-    <div class="row r3">
-      <div class="fg"><label>Fire Tipi</label><div class="iw"><select id="dp-fire-type">
-        <option value="5" selected>Doypack %5</option>
-        <option value="10">Flat Bottom %10</option>
-        <option value="5b">Quadro %5</option>
-      </select></div></div>
-      <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="dp-kg-price" value="4.13" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Zip Fiyatı</label><div class="iw hu"><input type="number" id="dp-zip-price" value="14.8" step="0.1"><span class="unit">EUR</span></div></div>
-    </div>
-  </div>
-
-  <div class="warn-box" id="dp-warnings"><div class="warn-title">Dikkat</div><ul id="dp-warn-list"></ul></div>
-  <div class="hero" id="dp-hero">
-    <div class="val" id="dp-hero-cost">0,00 EUR</div>
-    <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
-  </div>
-  <div class="rg">
-    <div class="ri"><div class="rl">m² Ağırlığı</div><div class="rv accent" id="dp-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">1 Poşet Ağırlığı</div><div class="rv" id="dp-r-pouch-gr">-</div></div>
-    <div class="ri"><div class="rl">Fireli Poşet Ağ.</div><div class="rv orange" id="dp-r-pouch-fire">-</div></div>
-    <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="dp-r-1000kg">-</div></div>
-    <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="dp-r-mat-cost">-</div></div>
-    <div class="ri"><div class="rl">Kesim Bedeli</div><div class="rv" id="dp-r-cut-cost">-</div></div>
-    <div class="ri"><div class="rl">Zip Maliyeti</div><div class="rv" id="dp-r-zip-cost">-</div></div>
-    <div class="ri"><div class="rl">+ Ayrıştırma (2.2)</div><div class="rv green" id="dp-r-total-ayrist">-</div></div>
-  </div>
-
-  <!-- Referanslar (collapsible) -->
-  <div class="cd">
-    <button class="collapse-btn" data-target="dp-ref">
-      <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9986;</span> Kesim &amp; Fire Referans</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="dp-ref">
-      <h3>Kesim Bedeli Tablosu</h3>
-      <table class="tbl"><thead><tr><th>Poşet Gramajı</th><th class="r">Fiyat (EUR/kg)</th></tr></thead><tbody id="dp-cut-body"></tbody></table>
-      <div class="divider"></div>
-      <h3>Doypack Kesim Fire %</h3>
-      <table class="tbl"><thead><tr><th>Sipariş Miktarı</th><th class="r">Fire %</th></tr></thead><tbody id="dp-fire-body"></tbody></table>
-    </div>
-  </div>
-
-  <!-- Dönüştürücüler -->
-  <div class="cd">
-    <button class="collapse-btn" data-target="dp-conv">
-      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG / Uzunluk Hesabı</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="dp-conv">
-      <h3>KG &#8594; Adet</h3>
+  <!-- Adım 2: Boyutlar -->
+  <div class="wiz-content" data-wiz="dp" data-step="1">
+    <div class="cd cd-accent">
+      <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Poşet Boyutları &amp; Fiyatlar</h2>
       <div class="row r2">
-        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="dp-conv-kg" value="2850" step="50"><span class="unit">kg</span></div></div>
-        <div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="dp-conv-adet" readonly></div></div>
+        <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="dp-fotosel" value="152" step="1"><span class="unit">mm</span></div></div>
+        <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="dp-bobin" value="542.5" step="0.5"><span class="unit">mm</span></div></div>
       </div>
-      <h3>Adet &#8594; Uzunluk (Metre)</h3>
       <div class="row r3">
-        <div class="fg"><label>Adet</label><div class="iw"><input type="number" id="dp-conv-adet2" value="480000" step="1000"></div></div>
-        <div class="fg"><label>Bant Sayısı</label><div class="iw"><input type="number" id="dp-conv-bant" value="1" step="1" min="1"></div></div>
-        <div class="fg"><label>Sonuç (m)</label><div class="iw"><input type="text" id="dp-conv-metre" readonly></div></div>
-      </div>
-      <h3>Uzunluk &#8594; KG</h3>
-      <div class="row r3">
-        <div class="fg"><label>Bant Eni</label><div class="iw hu"><input type="number" id="dp-conv-bant-eni" value="625" step="0.5"><span class="unit">mm</span></div></div>
-        <div class="fg"><label>Metre</label><div class="iw"><input type="number" id="dp-conv-metre2" value="96960" step="100"></div></div>
-        <div class="fg"><label>Sonuç (KG)</label><div class="iw"><input type="text" id="dp-conv-kg-result" readonly></div></div>
+        <div class="fg"><label>Fire Tipi</label><div class="iw"><select id="dp-fire-type"><option value="5" selected>Doypack %5</option><option value="10">Flat Bottom %10</option><option value="5b">Quadro %5</option></select></div></div>
+        <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="dp-kg-price" value="4.13" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Zip Fiyatı</label><div class="iw hu"><input type="number" id="dp-zip-price" value="14.8" step="0.1"><span class="unit">EUR</span></div></div>
       </div>
     </div>
   </div>
-  <div class="save-bar"><input type="text" id="dp-save-label" placeholder="Teklif adı (ör: XYZ Doypack 152mm)" class="iw"><button type="button" onclick="saveQuotation('doypack')">Teklif Kaydet</button></div>
-  <div class="save-ok" id="dp-save-ok">Teklif kaydedildi</div>
+
+  <!-- Adım 3: Sonuçlar -->
+  <div class="wiz-content" data-wiz="dp" data-step="2">
+    <div class="warn-box" id="dp-warnings"><div class="warn-title">Dikkat</div><ul id="dp-warn-list"></ul></div>
+    <div class="hero" id="dp-hero">
+      <div class="val" id="dp-hero-cost">0,00 EUR</div>
+      <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
+    </div>
+    <div class="rg">
+      <div class="ri"><div class="rl">m² Ağırlığı</div><div class="rv accent" id="dp-r-gsm">-</div></div>
+      <div class="ri"><div class="rl">1 Poşet Ağırlığı</div><div class="rv" id="dp-r-pouch-gr">-</div></div>
+      <div class="ri"><div class="rl">Fireli Poşet Ağ.</div><div class="rv orange" id="dp-r-pouch-fire">-</div></div>
+      <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="dp-r-1000kg">-</div></div>
+      <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="dp-r-mat-cost">-</div></div>
+      <div class="ri"><div class="rl">Kesim Bedeli</div><div class="rv" id="dp-r-cut-cost">-</div></div>
+      <div class="ri"><div class="rl">Zip Maliyeti</div><div class="rv" id="dp-r-zip-cost">-</div></div>
+      <div class="ri"><div class="rl">+ Ayrıştırma (2.2)</div><div class="rv green" id="dp-r-total-ayrist">-</div></div>
+    </div>
+    <div class="cd"><button class="collapse-btn" data-target="dp-ref"><h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9986;</span> Kesim &amp; Fire Referans</h2><span class="chevron">&#9660;</span></button><div class="collapse-content" id="dp-ref"><h3>Kesim Bedeli Tablosu</h3><table class="tbl"><thead><tr><th>Poşet Gramajı</th><th class="r">Fiyat (EUR/kg)</th></tr></thead><tbody id="dp-cut-body"></tbody></table><div class="divider"></div><h3>Doypack Kesim Fire %</h3><table class="tbl"><thead><tr><th>Sipariş Miktarı</th><th class="r">Fire %</th></tr></thead><tbody id="dp-fire-body"></tbody></table></div></div>
+    <div class="cd"><button class="collapse-btn" data-target="dp-conv"><h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG / Uzunluk Hesabı</h2><span class="chevron">&#9660;</span></button><div class="collapse-content" id="dp-conv"><h3>KG &#8594; Adet</h3><div class="row r2"><div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="dp-conv-kg" value="2850" step="50"><span class="unit">kg</span></div></div><div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="dp-conv-adet" readonly></div></div></div><h3>Adet &#8594; Uzunluk (Metre)</h3><div class="row r3"><div class="fg"><label>Adet</label><div class="iw"><input type="number" id="dp-conv-adet2" value="480000" step="1000"></div></div><div class="fg"><label>Bant Sayısı</label><div class="iw"><input type="number" id="dp-conv-bant" value="1" step="1" min="1"></div></div><div class="fg"><label>Sonuç (m)</label><div class="iw"><input type="text" id="dp-conv-metre" readonly></div></div></div><h3>Uzunluk &#8594; KG</h3><div class="row r3"><div class="fg"><label>Bant Eni</label><div class="iw hu"><input type="number" id="dp-conv-bant-eni" value="625" step="0.5"><span class="unit">mm</span></div></div><div class="fg"><label>Metre</label><div class="iw"><input type="number" id="dp-conv-metre2" value="96960" step="100"></div></div><div class="fg"><label>Sonuç (KG)</label><div class="iw"><input type="text" id="dp-conv-kg-result" readonly></div></div></div></div></div>
+    <div class="save-bar"><input type="text" id="dp-save-label" placeholder="Teklif adı (ör: XYZ Doypack 152mm)" class="iw"><button type="button" onclick="saveQuotation('doypack')">Teklif Kaydet</button></div>
+    <div class="save-ok" id="dp-save-ok">Teklif kaydedildi</div>
+  </div>
+
+  <div class="wiz-nav" data-wiz="dp"></div>
 </div>
 
 <!-- ═══ TAB 3: FLAT BOTTOM ═══ -->
 <div class="tab" id="tab-flat">
-  <div class="cd">
-    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9632;</span> Gövde Malzeme Yapısı</h2>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-govde-materials"></tbody></table></div>
-  </div>
-  <div class="cd">
-    <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9644;</span> Körük Malzeme Yapısı</h2>
-    <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-koruk-materials"></tbody></table></div>
-  </div>
-  <div class="cd cd-accent">
-    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Boyutlar</h2>
-    <div class="row r2 fb-dims">
-      <div><h3 style="margin-top:0">Gövde</h3><div class="row r2">
-        <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-g-fotosel" value="221" step="1"><span class="unit">mm</span></div></div>
-        <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-g-bobin" value="732" step="0.5"><span class="unit">mm</span></div></div>
-      </div></div>
-      <div><h3 style="margin-top:0">Körük</h3><div class="row r2">
-        <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-k-fotosel" value="300" step="1"><span class="unit">mm</span></div></div>
-        <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-k-bobin" value="193" step="0.5"><span class="unit">mm</span></div></div>
-      </div></div>
+  <div class="wiz-bar" data-wiz="fb"></div>
+
+  <!-- Adım 1: Malzeme -->
+  <div class="wiz-content active" data-wiz="fb" data-step="0">
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9632;</span> Gövde Malzeme Yapısı</h2>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-govde-materials"></tbody></table></div>
     </div>
-    <div class="row r3">
-      <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="fb-kg-price" value="3.86" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Kesim Fiyatı</label><div class="iw hu"><input type="number" id="fb-cut-price" value="1.40" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Ayrıştırma</label><div class="iw hu"><input type="number" id="fb-ayrist" value="0.40" step="0.01"><span class="unit">EUR</span></div></div>
-    </div>
-    <div class="row r2">
-      <div class="fg"><label>Gövde KG Fiyat</label><div class="iw hu"><input type="number" id="fb-govde-kgprice" value="4.10" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Körük KG Fiyat</label><div class="iw hu"><input type="number" id="fb-koruk-kgprice" value="3.20" step="0.01"><span class="unit">EUR</span></div></div>
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9644;</span> Körük Malzeme Yapısı</h2>
+      <div class="tbl-wrap"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-koruk-materials"></tbody></table></div>
     </div>
   </div>
-  <div class="warn-box" id="fb-warnings"><div class="warn-title">Dikkat</div><ul id="fb-warn-list"></ul></div>
-  <div class="hero" id="fb-hero">
-    <div class="val" id="fb-hero-cost">0,00 EUR</div>
-    <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
-  </div>
-  <div class="rg">
-    <div class="ri"><div class="rl">Gövde m²/Ağ.</div><div class="rv" id="fb-r-g-gsm">-</div></div>
-    <div class="ri"><div class="rl">Körük m²/Ağ.</div><div class="rv" id="fb-r-k-gsm">-</div></div>
-    <div class="ri"><div class="rl">Gövde 1 Poşet</div><div class="rv" id="fb-r-g-pouch">-</div></div>
-    <div class="ri"><div class="rl">Körük 1 Poşet</div><div class="rv" id="fb-r-k-pouch">-</div></div>
-    <div class="ri"><div class="rl">Toplam Paket Ağ.</div><div class="rv accent" id="fb-r-total-pouch">-</div></div>
-    <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="fb-r-1000kg">-</div></div>
-    <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="fb-r-mat-cost">-</div></div>
-    <div class="ri"><div class="rl">Kesim Maliyeti</div><div class="rv" id="fb-r-cut-cost">-</div></div>
-  </div>
-  <div class="cd">
-    <button class="collapse-btn" data-target="fb-conv">
-      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG Hesabı</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="fb-conv">
+
+  <!-- Adım 2: Boyutlar -->
+  <div class="wiz-content" data-wiz="fb" data-step="1">
+    <div class="cd cd-accent">
+      <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Boyutlar</h2>
+      <div class="row r2 fb-dims">
+        <div><h3 style="margin-top:0">Gövde</h3><div class="row r2">
+          <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-g-fotosel" value="221" step="1"><span class="unit">mm</span></div></div>
+          <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-g-bobin" value="732" step="0.5"><span class="unit">mm</span></div></div>
+        </div></div>
+        <div><h3 style="margin-top:0">Körük</h3><div class="row r2">
+          <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-k-fotosel" value="300" step="1"><span class="unit">mm</span></div></div>
+          <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-k-bobin" value="193" step="0.5"><span class="unit">mm</span></div></div>
+        </div></div>
+      </div>
+      <div class="row r3">
+        <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="fb-kg-price" value="3.86" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Kesim Fiyatı</label><div class="iw hu"><input type="number" id="fb-cut-price" value="1.40" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Ayrıştırma</label><div class="iw hu"><input type="number" id="fb-ayrist" value="0.40" step="0.01"><span class="unit">EUR</span></div></div>
+      </div>
       <div class="row r2">
-        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fb-conv-kg" value="2400" step="50"><span class="unit">kg</span></div></div>
-        <div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="fb-conv-adet" readonly></div></div>
-      </div>
-      <div class="rg" style="margin-top:12px">
-        <div class="ri"><div class="rl">Gövde KG</div><div class="rv" id="fb-r-govde-kg">-</div></div>
-        <div class="ri"><div class="rl">Körük KG</div><div class="rv" id="fb-r-koruk-kg">-</div></div>
-        <div class="ri"><div class="rl">Gövde %</div><div class="rv" id="fb-r-govde-pct">-</div></div>
-        <div class="ri"><div class="rl">Ort. Fiyat</div><div class="rv green" id="fb-r-avg-price">-</div></div>
+        <div class="fg"><label>Gövde KG Fiyat</label><div class="iw hu"><input type="number" id="fb-govde-kgprice" value="4.10" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Körük KG Fiyat</label><div class="iw hu"><input type="number" id="fb-koruk-kgprice" value="3.20" step="0.01"><span class="unit">EUR</span></div></div>
       </div>
     </div>
   </div>
-  <div class="save-bar"><input type="text" id="fb-save-label" placeholder="Teklif adı (ör: Flat Bottom 221mm)" class="iw"><button type="button" onclick="saveQuotation('flat')">Teklif Kaydet</button></div>
-  <div class="save-ok" id="fb-save-ok">Teklif kaydedildi</div>
+
+  <!-- Adım 3: Sonuçlar -->
+  <div class="wiz-content" data-wiz="fb" data-step="2">
+    <div class="warn-box" id="fb-warnings"><div class="warn-title">Dikkat</div><ul id="fb-warn-list"></ul></div>
+    <div class="hero" id="fb-hero">
+      <div class="val" id="fb-hero-cost">0,00 EUR</div>
+      <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
+    </div>
+    <div class="rg">
+      <div class="ri"><div class="rl">Gövde m²/Ağ.</div><div class="rv" id="fb-r-g-gsm">-</div></div>
+      <div class="ri"><div class="rl">Körük m²/Ağ.</div><div class="rv" id="fb-r-k-gsm">-</div></div>
+      <div class="ri"><div class="rl">Gövde 1 Poşet</div><div class="rv" id="fb-r-g-pouch">-</div></div>
+      <div class="ri"><div class="rl">Körük 1 Poşet</div><div class="rv" id="fb-r-k-pouch">-</div></div>
+      <div class="ri"><div class="rl">Toplam Paket Ağ.</div><div class="rv accent" id="fb-r-total-pouch">-</div></div>
+      <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="fb-r-1000kg">-</div></div>
+      <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="fb-r-mat-cost">-</div></div>
+      <div class="ri"><div class="rl">Kesim Maliyeti</div><div class="rv" id="fb-r-cut-cost">-</div></div>
+    </div>
+    <div class="cd">
+      <button class="collapse-btn" data-target="fb-conv">
+        <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG Hesabı</h2>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="collapse-content" id="fb-conv">
+        <div class="row r2">
+          <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fb-conv-kg" value="2400" step="50"><span class="unit">kg</span></div></div>
+          <div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="fb-conv-adet" readonly></div></div>
+        </div>
+        <div class="rg" style="margin-top:12px">
+          <div class="ri"><div class="rl">Gövde KG</div><div class="rv" id="fb-r-govde-kg">-</div></div>
+          <div class="ri"><div class="rl">Körük KG</div><div class="rv" id="fb-r-koruk-kg">-</div></div>
+          <div class="ri"><div class="rl">Gövde %</div><div class="rv" id="fb-r-govde-pct">-</div></div>
+          <div class="ri"><div class="rl">Ort. Fiyat</div><div class="rv green" id="fb-r-avg-price">-</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="save-bar"><input type="text" id="fb-save-label" placeholder="Teklif adı (ör: Flat Bottom 221mm)" class="iw"><button type="button" onclick="saveQuotation('flat')">Teklif Kaydet</button></div>
+    <div class="save-ok" id="fb-save-ok">Teklif kaydedildi</div>
+  </div>
+
+  <div class="wiz-nav" data-wiz="fb"></div>
 </div>
 
 <!-- ═══ TAB 4: SİLİNDİR ═══ -->
 <div class="tab" id="tab-silindir">
-  <div class="cd cd-accent">
-    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9881;</span> Silindir Fiyat Hesaplama</h2>
-    <h3>Ürün Fiyatları (EUR/kg)</h3>
-    <div class="row r3">
-      <div class="fg"><label>PET (1. katman)</label><div class="iw hu"><input type="number" id="sl-p1" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>PET (2. katman)</label><div class="iw hu"><input type="number" id="sl-p2" value="2.10" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>CPP</label><div class="iw hu"><input type="number" id="sl-p3" value="1.55" step="0.01"><span class="unit">EUR</span></div></div>
-    </div>
-    <div class="row r3">
-      <div class="fg"><label>Tutkal</label><div class="iw hu"><input type="number" id="sl-p-tutkal" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Mürekkep</label><div class="iw hu"><input type="number" id="sl-p-murekkep" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Solvent</label><div class="iw hu"><input type="number" id="sl-p-solvent" value="1.35" step="0.01"><span class="unit">EUR</span></div></div>
-    </div>
-    <h3>Yapı</h3>
-    <div class="row r3">
-      <div class="fg"><label>1. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t1" value="24" step="1"></div></div>
-      <div class="fg"><label>2. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t2" value="80" step="1"></div></div>
-      <div class="fg"><label>3. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t3" value="0" step="1"></div></div>
-    </div>
-    <div class="row r3">
-      <div class="fg"><label>Yoğunluk 1</label><div class="iw"><input type="number" id="sl-d1" value="1.41" step="0.01"></div></div>
-      <div class="fg"><label>Yoğunluk 2</label><div class="iw"><input type="number" id="sl-d2" value="0.92" step="0.01"></div></div>
-      <div class="fg"><label>Yoğunluk 3</label><div class="iw"><input type="number" id="sl-d3" value="0.91" step="0.01"></div></div>
-    </div>
-    <h3>Parametreler</h3>
-    <div class="row r3">
-      <div class="fg"><label>Tutkal (g/m²)</label><div class="iw"><input type="number" id="sl-tutkal-gsm" value="7.5" step="0.5"></div></div>
-      <div class="fg"><label>Mürekkep (g/m²)</label><div class="iw"><input type="number" id="sl-murekkep-gsm" value="3" step="0.5"></div></div>
-      <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="sl-fire-pct" value="0" step="1"><span class="unit">%</span></div></div>
-    </div>
-    <div class="row r3">
-      <div class="fg"><label>Ek Maliyet (X)</label><div class="iw hu"><input type="number" id="sl-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="sl-order-kg" value="2400" step="100"><span class="unit">kg</span></div></div>
-      <div class="fg"><label>Sip. KG Çarpan</label><div class="iw"><input type="number" id="sl-multiplier" value="0.84" step="0.01"></div></div>
-    </div>
-    <h3>Klişe / Silindir</h3>
-    <div class="row r3">
-      <div class="fg"><label>Klişe Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-klise-price" value="200" step="10"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Renk Sayısı</label><div class="iw"><input type="number" id="sl-color-count" value="8" step="1" min="1"></div></div>
-      <div class="fg"><label>Fire Maliyeti</label><div class="iw hu"><input type="number" id="sl-fire-cost" value="150" step="10"><span class="unit">EUR</span></div></div>
-    </div>
-  </div>
-  <div class="warn-box" id="sl-warnings"><div class="warn-title">Dikkat</div><ul id="sl-warn-list"></ul></div>
-  <div class="hero" id="sl-hero-card">
-    <div class="val" id="sl-hero">0,00 EUR</div>
-    <div class="lbl">Ton Başı Son Toplam</div>
-  </div>
-  <div class="rg">
-    <div class="ri"><div class="rl">Malzeme Toplamı</div><div class="rv accent" id="sl-r-mat">-</div></div>
-    <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="sl-r-fire">-</div></div>
-    <div class="ri"><div class="rl">Klişe / Ton</div><div class="rv" id="sl-r-klise">-</div></div>
-    <div class="ri"><div class="rl">Fire 150 EUR/Ton</div><div class="rv" id="sl-r-fire150">-</div></div>
-    <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="sl-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="sl-r-minsip">-</div></div>
-  </div>
-  <div class="cd">
-    <button class="collapse-btn" data-target="sl-detail">
-      <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9776;</span> Maliyet Kırılımı</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="sl-detail">
-      <table class="tbl"><thead><tr><th>Kalem</th><th class="r">g/m²</th><th class="r">Kullanım</th><th class="r">Tutar (EUR)</th></tr></thead><tbody id="sl-detail-body"></tbody></table>
-    </div>
-  </div>
-  <div class="cd">
-    <button class="collapse-btn" data-target="sl-kg">
-      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#9878;</span> KG Bazlı Fiyat</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="sl-kg">
-      <div class="row r2">
-        <div class="fg"><label>Min. Sip. KG</label><div class="iw hu"><input type="number" id="sl-min-kg" value="840" step="10"><span class="unit">kg</span></div></div>
-        <div class="fg"><label>Min. Çarpan</label><div class="iw"><input type="number" id="sl-min-multiplier" value="2.4" step="0.1"></div></div>
+  <div class="wiz-bar" data-wiz="sl"></div>
+
+  <!-- Adım 1: Fiyatlar & Yapı -->
+  <div class="wiz-content active" data-wiz="sl" data-step="0">
+    <div class="cd cd-accent">
+      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9881;</span> Silindir Fiyat Hesaplama</h2>
+      <h3>Ürün Fiyatları (EUR/kg)</h3>
+      <div class="row r3">
+        <div class="fg"><label>PET (1. katman)</label><div class="iw hu"><input type="number" id="sl-p1" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>PET (2. katman)</label><div class="iw hu"><input type="number" id="sl-p2" value="2.10" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>CPP</label><div class="iw hu"><input type="number" id="sl-p3" value="1.55" step="0.01"><span class="unit">EUR</span></div></div>
       </div>
-      <div class="rg" style="margin-top:12px">
-        <div class="ri"><div class="rl">KG Fiyatı</div><div class="rv accent" id="sl-r-kg-price">-</div></div>
-        <div class="ri"><div class="rl">Klişe / KG</div><div class="rv" id="sl-r-klise-kg">-</div></div>
-        <div class="ri"><div class="rl">Klişe+Ürün KG</div><div class="rv green" id="sl-r-total-kg">-</div></div>
-        <div class="ri"><div class="rl">DM Dahil KG</div><div class="rv orange" id="sl-r-dm-kg">-</div></div>
+      <div class="row r3">
+        <div class="fg"><label>Tutkal</label><div class="iw hu"><input type="number" id="sl-p-tutkal" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Mürekkep</label><div class="iw hu"><input type="number" id="sl-p-murekkep" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Solvent</label><div class="iw hu"><input type="number" id="sl-p-solvent" value="1.35" step="0.01"><span class="unit">EUR</span></div></div>
+      </div>
+      <h3>Yapı</h3>
+      <div class="row r3">
+        <div class="fg"><label>1. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t1" value="24" step="1"></div></div>
+        <div class="fg"><label>2. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t2" value="80" step="1"></div></div>
+        <div class="fg"><label>3. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t3" value="0" step="1"></div></div>
+      </div>
+      <div class="row r3">
+        <div class="fg"><label>Yoğunluk 1</label><div class="iw"><input type="number" id="sl-d1" value="1.41" step="0.01"></div></div>
+        <div class="fg"><label>Yoğunluk 2</label><div class="iw"><input type="number" id="sl-d2" value="0.92" step="0.01"></div></div>
+        <div class="fg"><label>Yoğunluk 3</label><div class="iw"><input type="number" id="sl-d3" value="0.91" step="0.01"></div></div>
       </div>
     </div>
   </div>
-  <div class="cd">
-    <button class="collapse-btn" data-target="sl-cmp-sec">
-      <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9733;</span> Rotogravür vs Dijital</h2>
-      <span class="chevron">&#9660;</span>
-    </button>
-    <div class="collapse-content" id="sl-cmp-sec">
-      <div class="row r2 sl-compare">
-        <div><h3 style="margin-top:0">Rotogravür</h3>
-          <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-roto-gr" value="118" step="1"></div></div>
-          <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-roto-petgr" value="290" step="1"></div></div>
-          <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-roto-petmult" value="1.317" step="0.001"></div></div>
-          <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-unit" value="8.11" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-petprice" value="1.10" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>Lam. Maliyeti</label><div class="iw hu"><input type="number" id="sl-roto-lam" value="0.10" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>Ek Maliyet</label><div class="iw hu"><input type="number" id="sl-roto-extra" value="1.00" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>Kesim Mal.</label><div class="iw hu"><input type="number" id="sl-roto-cut" value="0.57" step="0.01"><span class="unit">EUR</span></div></div>
+
+  <!-- Adım 2: Parametreler & Klişe -->
+  <div class="wiz-content" data-wiz="sl" data-step="1">
+    <div class="cd cd-accent">
+      <h3>Parametreler</h3>
+      <div class="row r3">
+        <div class="fg"><label>Tutkal (g/m²)</label><div class="iw"><input type="number" id="sl-tutkal-gsm" value="7.5" step="0.5"></div></div>
+        <div class="fg"><label>Mürekkep (g/m²)</label><div class="iw"><input type="number" id="sl-murekkep-gsm" value="3" step="0.5"></div></div>
+        <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="sl-fire-pct" value="0" step="1"><span class="unit">%</span></div></div>
+      </div>
+      <div class="row r3">
+        <div class="fg"><label>Ek Maliyet (X)</label><div class="iw hu"><input type="number" id="sl-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="sl-order-kg" value="2400" step="100"><span class="unit">kg</span></div></div>
+        <div class="fg"><label>Sip. KG Çarpan</label><div class="iw"><input type="number" id="sl-multiplier" value="0.84" step="0.01"></div></div>
+      </div>
+      <h3>Klişe / Silindir</h3>
+      <div class="row r3">
+        <div class="fg"><label>Klişe Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-klise-price" value="200" step="10"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Renk Sayısı</label><div class="iw"><input type="number" id="sl-color-count" value="8" step="1" min="1"></div></div>
+        <div class="fg"><label>Fire Maliyeti</label><div class="iw hu"><input type="number" id="sl-fire-cost" value="150" step="10"><span class="unit">EUR</span></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Adım 3: Sonuçlar -->
+  <div class="wiz-content" data-wiz="sl" data-step="2">
+    <div class="warn-box" id="sl-warnings"><div class="warn-title">Dikkat</div><ul id="sl-warn-list"></ul></div>
+    <div class="hero" id="sl-hero-card">
+      <div class="val" id="sl-hero">0,00 EUR</div>
+      <div class="lbl">Ton Başı Son Toplam</div>
+    </div>
+    <div class="rg">
+      <div class="ri"><div class="rl">Malzeme Toplamı</div><div class="rv accent" id="sl-r-mat">-</div></div>
+      <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="sl-r-fire">-</div></div>
+      <div class="ri"><div class="rl">Klişe / Ton</div><div class="rv" id="sl-r-klise">-</div></div>
+      <div class="ri"><div class="rl">Fire 150 EUR/Ton</div><div class="rv" id="sl-r-fire150">-</div></div>
+      <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="sl-r-gsm">-</div></div>
+      <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="sl-r-minsip">-</div></div>
+    </div>
+    <div class="cd">
+      <button class="collapse-btn" data-target="sl-detail">
+        <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9776;</span> Maliyet Kırılımı</h2>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="collapse-content" id="sl-detail">
+        <table class="tbl"><thead><tr><th>Kalem</th><th class="r">g/m²</th><th class="r">Kullanım</th><th class="r">Tutar (EUR)</th></tr></thead><tbody id="sl-detail-body"></tbody></table>
+      </div>
+    </div>
+    <div class="cd">
+      <button class="collapse-btn" data-target="sl-kg">
+        <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#9878;</span> KG Bazlı Fiyat</h2>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="collapse-content" id="sl-kg">
+        <div class="row r2">
+          <div class="fg"><label>Min. Sip. KG</label><div class="iw hu"><input type="number" id="sl-min-kg" value="840" step="10"><span class="unit">kg</span></div></div>
+          <div class="fg"><label>Min. Çarpan</label><div class="iw"><input type="number" id="sl-min-multiplier" value="2.4" step="0.1"></div></div>
         </div>
-        <div><h3 style="margin-top:0">Dijital</h3>
-          <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-dij-gr" value="119.64" step="1"></div></div>
-          <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-dij-petgr" value="280" step="1"></div></div>
-          <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-dij-petmult" value="1.41" step="0.001"></div></div>
-          <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-unit" value="22.38" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-petprice" value="1.50" step="0.01"><span class="unit">EUR</span></div></div>
-          <div class="fg"><label>Kesim Fire %</label><div class="iw hu"><input type="number" id="sl-dij-cutfire" value="10" step="1"><span class="unit">%</span></div></div>
-          <div class="fg"><label>Lam. Fire %</label><div class="iw hu"><input type="number" id="sl-dij-lamfire" value="8" step="1"><span class="unit">%</span></div></div>
-          <div class="fg"><label>Kesim + Ek</label><div class="iw hu"><input type="number" id="sl-dij-extra" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+        <div class="rg" style="margin-top:12px">
+          <div class="ri"><div class="rl">KG Fiyatı</div><div class="rv accent" id="sl-r-kg-price">-</div></div>
+          <div class="ri"><div class="rl">Klişe / KG</div><div class="rv" id="sl-r-klise-kg">-</div></div>
+          <div class="ri"><div class="rl">Klişe+Ürün KG</div><div class="rv green" id="sl-r-total-kg">-</div></div>
+          <div class="ri"><div class="rl">DM Dahil KG</div><div class="rv orange" id="sl-r-dm-kg">-</div></div>
         </div>
       </div>
-      <div class="cmp" id="sl-cmp">
-        <div class="cmp-card" id="sl-cmp-roto-card"><h4>Rotogravür</h4><div class="price" id="sl-cmp-roto">-</div></div>
-        <div class="cmp-card" id="sl-cmp-dij-card"><h4>Dijital</h4><div class="price" id="sl-cmp-dij">-</div></div>
+    </div>
+    <div class="cd">
+      <button class="collapse-btn" data-target="sl-cmp-sec">
+        <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9733;</span> Rotogravür vs Dijital</h2>
+        <span class="chevron">&#9660;</span>
+      </button>
+      <div class="collapse-content" id="sl-cmp-sec">
+        <div class="row r2 sl-compare">
+          <div><h3 style="margin-top:0">Rotogravür</h3>
+            <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-roto-gr" value="118" step="1"></div></div>
+            <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-roto-petgr" value="290" step="1"></div></div>
+            <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-roto-petmult" value="1.317" step="0.001"></div></div>
+            <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-unit" value="8.11" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-petprice" value="1.10" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>Lam. Maliyeti</label><div class="iw hu"><input type="number" id="sl-roto-lam" value="0.10" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>Ek Maliyet</label><div class="iw hu"><input type="number" id="sl-roto-extra" value="1.00" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>Kesim Mal.</label><div class="iw hu"><input type="number" id="sl-roto-cut" value="0.57" step="0.01"><span class="unit">EUR</span></div></div>
+          </div>
+          <div><h3 style="margin-top:0">Dijital</h3>
+            <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-dij-gr" value="119.64" step="1"></div></div>
+            <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-dij-petgr" value="280" step="1"></div></div>
+            <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-dij-petmult" value="1.41" step="0.001"></div></div>
+            <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-unit" value="22.38" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-petprice" value="1.50" step="0.01"><span class="unit">EUR</span></div></div>
+            <div class="fg"><label>Kesim Fire %</label><div class="iw hu"><input type="number" id="sl-dij-cutfire" value="10" step="1"><span class="unit">%</span></div></div>
+            <div class="fg"><label>Lam. Fire %</label><div class="iw hu"><input type="number" id="sl-dij-lamfire" value="8" step="1"><span class="unit">%</span></div></div>
+            <div class="fg"><label>Kesim + Ek</label><div class="iw hu"><input type="number" id="sl-dij-extra" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+          </div>
+        </div>
+        <div class="cmp" id="sl-cmp">
+          <div class="cmp-card" id="sl-cmp-roto-card"><h4>Rotogravür</h4><div class="price" id="sl-cmp-roto">-</div></div>
+          <div class="cmp-card" id="sl-cmp-dij-card"><h4>Dijital</h4><div class="price" id="sl-cmp-dij">-</div></div>
+        </div>
       </div>
     </div>
+    <div class="save-bar"><input type="text" id="sl-save-label" placeholder="Teklif adı (ör: Silindir 24/80)" class="iw"><button type="button" onclick="saveQuotation('silindir')">Teklif Kaydet</button></div>
+    <div class="save-ok" id="sl-save-ok">Teklif kaydedildi</div>
   </div>
-  <div class="save-bar"><input type="text" id="sl-save-label" placeholder="Teklif adı (ör: Silindir 24/80)" class="iw"><button type="button" onclick="saveQuotation('silindir')">Teklif Kaydet</button></div>
-  <div class="save-ok" id="sl-save-ok">Teklif kaydedildi</div>
+
+  <div class="wiz-nav" data-wiz="sl"></div>
 </div>
 
 <!-- ═══ TAB 5: FİRE ═══ -->
@@ -1385,6 +1416,72 @@ $('hist-clear-all').addEventListener('click',function(){
 
 // Close modal on overlay click
 $('detail-modal').addEventListener('click',function(e){if(e.target===$('detail-modal'))closeDetailModal()});
+
+/* ═══ WIZARD ENGINE ═══ */
+var WIZ_DEFS={
+  fh:{steps:['Yapı','Ek Malzeme','Fiyatlar','Sonuçlar']},
+  dp:{steps:['Malzeme','Boyutlar','Sonuçlar']},
+  fb:{steps:['Malzeme','Boyutlar','Sonuçlar']},
+  sl:{steps:['Fiyatlar & Yapı','Parametreler','Sonuçlar']}
+};
+var wizState={};
+function wizGo(wiz,step){
+  var def=WIZ_DEFS[wiz];if(!def)return;
+  var max=def.steps.length-1;
+  if(step<0)step=0;if(step>max)step=max;
+  wizState[wiz]=step;
+  // Update content panels
+  document.querySelectorAll('.wiz-content[data-wiz="'+wiz+'"]').forEach(function(el){
+    var s=parseInt(el.getAttribute('data-step'));
+    if(s===step)el.classList.add('active');else el.classList.remove('active');
+  });
+  // Update bar buttons
+  document.querySelectorAll('.wiz-bar[data-wiz="'+wiz+'"] .wiz-step-btn').forEach(function(btn,i){
+    btn.classList.remove('active','done');
+    if(i===step)btn.classList.add('active');
+    else if(i<step)btn.classList.add('done');
+  });
+  // Update nav
+  var nav=document.querySelector('.wiz-nav[data-wiz="'+wiz+'"]');
+  if(!nav)return;
+  var prevBtn=nav.querySelector('.wiz-prev');
+  var nextBtn=nav.querySelector('.wiz-next');
+  var counter=nav.querySelector('.wiz-counter');
+  if(prevBtn)prevBtn.style.visibility=step===0?'hidden':'visible';
+  if(nextBtn)nextBtn.textContent=step===max?'\u2714 Tamam':'Devam \u2192';
+  if(counter)counter.textContent=(step+1)+' / '+(max+1);
+  // Scroll to top of tab
+  window.scrollTo({top:0,behavior:'smooth'});
+  recalcAll();
+}
+function wizBuild(wiz){
+  var def=WIZ_DEFS[wiz];if(!def)return;
+  wizState[wiz]=0;
+  // Build bar
+  var bar=document.querySelector('.wiz-bar[data-wiz="'+wiz+'"]');
+  if(bar){
+    bar.textContent='';
+    def.steps.forEach(function(label,i){
+      var btn=document.createElement('button');btn.type='button';
+      btn.className='wiz-step-btn'+(i===0?' active':'');
+      btn.innerHTML='<span class="wiz-num">'+(i+1)+'</span>'+label;
+      btn.addEventListener('click',function(){wizGo(wiz,i)});
+      bar.appendChild(btn);
+    });
+  }
+  // Build nav
+  var nav=document.querySelector('.wiz-nav[data-wiz="'+wiz+'"]');
+  if(nav){
+    nav.textContent='';
+    var prev=document.createElement('button');prev.type='button';prev.className='wiz-prev';prev.textContent='\u2190 Geri';prev.style.visibility='hidden';
+    prev.addEventListener('click',function(){wizGo(wiz,(wizState[wiz]||0)-1)});
+    var counter=document.createElement('span');counter.className='wiz-counter';counter.textContent='1 / '+def.steps.length;
+    var next=document.createElement('button');next.type='button';next.className='wiz-next';next.textContent='Devam \u2192';
+    next.addEventListener('click',function(){var cur=wizState[wiz]||0;if(cur<def.steps.length-1)wizGo(wiz,cur+1)});
+    nav.appendChild(prev);nav.appendChild(counter);nav.appendChild(next);
+  }
+}
+Object.keys(WIZ_DEFS).forEach(function(wiz){wizBuild(wiz)});
 
 /* ═══ INIT ═══ */
 renderStaticTable('dp-cut-body',[[{t:'\u2264 5 g'},{t:'2,75',r:1}],[{t:'\u2264 7 g'},{t:'2,50',r:1}],[{t:'\u2264 9 g'},{t:'1,84',r:1}],[{t:'\u2264 12 g'},{t:'1,65',r:1}],[{t:'\u2264 15 g'},{t:'1,45',r:1}],[{t:'\u2264 17 g'},{t:'1,35',r:1}],[{t:'\u2264 21 g'},{t:'1,20',r:1}]]);
