@@ -130,6 +130,53 @@ select option{background:var(--card);color:var(--t1)}
 #fh-add-layer:hover{border-color:var(--accent);color:var(--accent)}
 #fh-add-layer:active{transform:scale(.98)}
 
+/* ─── SAVE QUOTE BTN ─── */
+.save-bar{display:flex;gap:8px;margin:16px 0 8px;align-items:stretch}
+.save-bar input{flex:1}
+.save-bar button{white-space:nowrap;padding:10px 18px;border-radius:var(--radius-sm);border:none;background:var(--accent);color:#fff;font-family:inherit;font-size:.82rem;font-weight:700;cursor:pointer;transition:all .2s}
+.save-bar button:hover{background:var(--accent2)}
+.save-bar button:active{transform:scale(.96)}
+.save-ok{text-align:center;padding:10px;color:var(--accent);font-size:.8rem;font-weight:600;display:none}
+
+/* ─── HISTORY CARDS ─── */
+.hist-card{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:10px;cursor:pointer;transition:all .2s}
+.hist-card:hover{border-color:var(--accent)}
+.hist-card:active{transform:scale(.98)}
+.hist-card .hc-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.hist-card .hc-label{font-weight:700;font-size:.88rem;line-height:1.2}
+.hist-card .hc-date{font-size:.68rem;color:var(--t3);white-space:nowrap;margin-left:8px}
+.hist-card .hc-tab{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.62rem;font-weight:600;text-transform:uppercase;letter-spacing:.4px;margin-bottom:6px}
+.hist-card .hc-tab-fiyat{background:rgba(16,185,129,.1);color:var(--accent)}
+.hist-card .hc-tab-doypack{background:rgba(6,182,212,.1);color:var(--cyan)}
+.hist-card .hc-tab-flat{background:rgba(139,92,246,.1);color:var(--purple)}
+.hist-card .hc-tab-silindir{background:rgba(59,130,246,.1);color:var(--blue)}
+.hist-card .hc-tab-fire{background:rgba(239,68,68,.1);color:var(--red)}
+.hist-card .hc-result{font-size:1.1rem;font-weight:800;color:var(--accent);margin:4px 0}
+.hist-card .hc-params{font-size:.72rem;color:var(--t2);line-height:1.6}
+.hist-empty{text-align:center;padding:40px 20px;color:var(--t3);font-size:.85rem}
+
+/* ─── DETAIL MODAL ─── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;overflow-y:auto;padding:20px 10px env(safe-area-inset-bottom,20px)}
+.modal-overlay.open{display:block}
+.modal{background:var(--card);border-radius:var(--radius);max-width:800px;margin:0 auto;padding:20px;position:relative}
+.modal-close{position:absolute;top:12px;right:12px;background:none;border:1px solid var(--border);color:var(--t2);width:30px;height:30px;border-radius:8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.85rem;transition:all .15s}
+.modal-close:hover{border-color:var(--red);color:var(--red)}
+.modal h2{font-size:1rem;font-weight:700;margin-bottom:4px;padding-right:40px}
+.modal .modal-date{font-size:.72rem;color:var(--t3);margin-bottom:16px}
+.modal .detail-section{margin-bottom:16px}
+.modal .detail-section h3{font-size:.72rem;font-weight:600;color:var(--accent);text-transform:uppercase;letter-spacing:.6px;margin-bottom:8px;padding-bottom:4px;border-bottom:1px solid var(--border)}
+.modal .detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.modal .detail-item{display:flex;justify-content:space-between;padding:4px 0;font-size:.78rem;border-bottom:1px solid var(--border)}
+.modal .detail-item:last-child{border-bottom:none}
+.modal .di-label{color:var(--t2)}
+.modal .di-value{font-weight:600;text-align:right}
+.modal-actions{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--border)}
+.modal-actions button{flex:1;padding:10px;border-radius:var(--radius-sm);border:none;font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s}
+.btn-restore{background:var(--accent);color:#fff}
+.btn-restore:hover{background:var(--accent2)}
+.btn-delete{background:transparent;border:1px solid rgba(239,68,68,.3)!important;color:var(--red)}
+.btn-delete:hover{background:var(--red);color:#fff}
+
 /* ─── SCROLLBAR ─── */
 ::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
@@ -260,6 +307,8 @@ select option{background:var(--card);color:var(--t1)}
       </table>
     </div>
   </div>
+  <div class="save-bar"><input type="text" id="fh-save-label" placeholder="Teklif adı (ör: ABC Firma PET yapı)" class="iw"><button type="button" onclick="saveQuotation('fiyat')">Teklif Kaydet</button></div>
+  <div class="save-ok" id="fh-save-ok">Teklif kaydedildi</div>
 </div>
 
 <!-- ═══ TAB 2: DOYPACK ═══ -->
@@ -347,6 +396,8 @@ select option{background:var(--card);color:var(--t1)}
       </div>
     </div>
   </div>
+  <div class="save-bar"><input type="text" id="dp-save-label" placeholder="Teklif adı (ör: XYZ Doypack 152mm)" class="iw"><button type="button" onclick="saveQuotation('doypack')">Teklif Kaydet</button></div>
+  <div class="save-ok" id="dp-save-ok">Teklif kaydedildi</div>
 </div>
 
 <!-- ═══ TAB 3: FLAT BOTTOM ═══ -->
@@ -413,6 +464,8 @@ select option{background:var(--card);color:var(--t1)}
       </div>
     </div>
   </div>
+  <div class="save-bar"><input type="text" id="fb-save-label" placeholder="Teklif adı (ör: Flat Bottom 221mm)" class="iw"><button type="button" onclick="saveQuotation('flat')">Teklif Kaydet</button></div>
+  <div class="save-ok" id="fb-save-ok">Teklif kaydedildi</div>
 </div>
 
 <!-- ═══ TAB 4: SİLİNDİR ═══ -->
@@ -532,6 +585,8 @@ select option{background:var(--card);color:var(--t1)}
       </div>
     </div>
   </div>
+  <div class="save-bar"><input type="text" id="sl-save-label" placeholder="Teklif adı (ör: Silindir 24/80)" class="iw"><button type="button" onclick="saveQuotation('silindir')">Teklif Kaydet</button></div>
+  <div class="save-ok" id="sl-save-ok">Teklif kaydedildi</div>
 </div>
 
 <!-- ═══ TAB 5: FİRE ═══ -->
@@ -562,6 +617,23 @@ select option{background:var(--card);color:var(--t1)}
   </div>
 </div>
 
+<!-- ═══ TAB 6: GEÇMİŞ ═══ -->
+<div class="tab" id="tab-gecmis">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+    <h2 style="font-size:.95rem;font-weight:700;display:flex;align-items:center;gap:8px"><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#128203;</span> Teklif Geçmişi</h2>
+    <button type="button" id="hist-clear-all" style="background:none;border:1px solid rgba(239,68,68,.2);color:var(--red);padding:6px 12px;border-radius:6px;font-family:inherit;font-size:.7rem;font-weight:600;cursor:pointer">Tümünü Sil</button>
+  </div>
+  <div id="hist-list"></div>
+</div>
+
+</div>
+
+<!-- ═══ DETAIL MODAL ═══ -->
+<div class="modal-overlay" id="detail-modal">
+  <div class="modal">
+    <button type="button" class="modal-close" onclick="closeDetailModal()">&#10005;</button>
+    <div id="detail-modal-content"></div>
+  </div>
 </div>
 
 <!-- ═══ BOTTOM NAV ═══ -->
@@ -585,6 +657,10 @@ select option{background:var(--card);color:var(--t1)}
   <button data-tab="fire">
     <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>
     Fire
+  </button>
+  <button data-tab="gecmis">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Geçmiş
   </button>
 </nav>
 
@@ -871,6 +947,252 @@ var recalcTimer;
 function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire()},100)}
 document.addEventListener('input',recalcAll);document.addEventListener('change',recalcAll);
 
+/* ═══ QUOTATION HISTORY ═══ */
+var HIST_KEY='teklif-gecmis';
+var TAB_NAMES={fiyat:'Fiyat Hesaplama',doypack:'Doypack',flat:'Flat Bottom',silindir:'Silindir',fire:'Fire'};
+
+function getHistory(){try{return JSON.parse(localStorage.getItem(HIST_KEY)||'[]')}catch(e){return[]}}
+function setHistory(h){localStorage.setItem(HIST_KEY,JSON.stringify(h))}
+
+function snapshotFiyat(){
+  var pp={pet:$v('pp-pet'),'7525':$v('pp-7525'),cpp:$v('pp-cpp'),tutkal:$v('pp-tutkal'),murekkep:$v('pp-murekkep'),solvent:$v('pp-solvent'),coldseal:$v('pp-coldseal'),matlak:$v('pp-matlak')};
+  var layers=FH_LAYER_DATA.map(function(l){return{mat:l.mat,matName:(MAT_OPTIONS.find(function(o){return o.v===l.mat})||{}).n||l.mat,thick:l.thick,priceRef:l.priceRef,density:DENSITIES[l.mat]||0.91,gsm:(DENSITIES[l.mat]||0.91)*l.thick}});
+  return{
+    inputs:{productPrices:pp,layers:layers,tutkalVal:$v('fh-tutkal-val'),murekkepOn:$('fh-murekkep-on').checked,matlakOn:$('fh-matlak-on').checked,coldsealOn:$('fh-coldseal-on').checked,firePct:$v('fh-fire-pct'),x1:$v('fh-x1'),x2:$v('fh-x2'),matlakTotal:$v('fh-matlak-total'),orderQty:$v('fh-order-qty'),orderKg:$v('fh-order-kg'),kgMultiplier:$v('fh-kg-multiplier'),minMatlak:$v('fh-min-matlak')},
+    results:{kgFull:$('fh-r-kg-full').textContent,kgNoMatlak:$('fh-r-kg-nomatlak').textContent,tonTotal:$('fh-r-ton').textContent,tonMatlak:$('fh-r-ton-mat').textContent,gsm:$('fh-r-gsm').textContent,fire:$('fh-r-fire').textContent,minSip:$('fh-r-minsip').textContent,matlak1000:$('fh-r-matlak1000').textContent},
+    hero:$('fh-result-kg').textContent
+  };
+}
+
+function snapshotDoypack(){
+  var matVals=[];document.querySelectorAll('.dp-val').forEach(function(inp){matVals.push({name:POUCH_MATERIALS[parseInt(inp.getAttribute('data-idx'))].name,val:parseFloat(inp.value)||0})});
+  return{
+    inputs:{materials:matVals,fotosel:$v('dp-fotosel'),bobinEni:$v('dp-bobin'),fireType:$('dp-fire-type').value,kgPrice:$v('dp-kg-price'),zipPrice:$v('dp-zip-price')},
+    results:{gsm:$('dp-r-gsm').textContent,pouchGr:$('dp-r-pouch-gr').textContent,pouchFire:$('dp-r-pouch-fire').textContent,kg1000:$('dp-r-1000kg').textContent,matCost:$('dp-r-mat-cost').textContent,cutCost:$('dp-r-cut-cost').textContent,zipCost:$('dp-r-zip-cost').textContent,totalAyrist:$('dp-r-total-ayrist').textContent},
+    hero:$('dp-hero-cost').textContent
+  };
+}
+
+function snapshotFlat(){
+  var gVals=[],kVals=[];
+  document.querySelectorAll('.fb-govde-val').forEach(function(inp){gVals.push({name:POUCH_MATERIALS[parseInt(inp.getAttribute('data-idx'))].name,val:parseFloat(inp.value)||0})});
+  document.querySelectorAll('.fb-koruk-val').forEach(function(inp){kVals.push({name:POUCH_MATERIALS[parseInt(inp.getAttribute('data-idx'))].name,val:parseFloat(inp.value)||0})});
+  return{
+    inputs:{govdeMat:gVals,korukMat:kVals,gFotosel:$v('fb-g-fotosel'),gBobin:$v('fb-g-bobin'),kFotosel:$v('fb-k-fotosel'),kBobin:$v('fb-k-bobin'),kgPrice:$v('fb-kg-price'),cutPrice:$v('fb-cut-price'),ayrist:$v('fb-ayrist'),govdeKgPrice:$v('fb-govde-kgprice'),korukKgPrice:$v('fb-koruk-kgprice')},
+    results:{gGsm:$('fb-r-g-gsm').textContent,kGsm:$('fb-r-k-gsm').textContent,gPouch:$('fb-r-g-pouch').textContent,kPouch:$('fb-r-k-pouch').textContent,totalPouch:$('fb-r-total-pouch').textContent,kg1000:$('fb-r-1000kg').textContent,matCost:$('fb-r-mat-cost').textContent,cutCost:$('fb-r-cut-cost').textContent},
+    hero:$('fb-hero-cost').textContent
+  };
+}
+
+function snapshotSilindir(){
+  return{
+    inputs:{p1:$v('sl-p1'),p2:$v('sl-p2'),p3:$v('sl-p3'),pTutkal:$v('sl-p-tutkal'),pMurekkep:$v('sl-p-murekkep'),pSolvent:$v('sl-p-solvent'),t1:$v('sl-t1'),t2:$v('sl-t2'),t3:$v('sl-t3'),d1:$v('sl-d1'),d2:$v('sl-d2'),d3:$v('sl-d3'),tutkalGsm:$v('sl-tutkal-gsm'),murekkepGsm:$v('sl-murekkep-gsm'),firePct:$v('sl-fire-pct'),x1:$v('sl-x1'),orderKg:$v('sl-order-kg'),multiplier:$v('sl-multiplier'),klisePrice:$v('sl-klise-price'),colorCount:$v('sl-color-count'),fireCost:$v('sl-fire-cost')},
+    results:{mat:$('sl-r-mat').textContent,fire:$('sl-r-fire').textContent,klise:$('sl-r-klise').textContent,fire150:$('sl-r-fire150').textContent,gsm:$('sl-r-gsm').textContent,minSip:$('sl-r-minsip').textContent,kgPrice:$('sl-r-kg-price').textContent,kliseKg:$('sl-r-klise-kg').textContent,totalKg:$('sl-r-total-kg').textContent,dmKg:$('sl-r-dm-kg').textContent},
+    hero:$('sl-hero').textContent
+  };
+}
+
+function saveQuotation(tab){
+  var snap;
+  if(tab==='fiyat')snap=snapshotFiyat();
+  else if(tab==='doypack')snap=snapshotDoypack();
+  else if(tab==='flat')snap=snapshotFlat();
+  else if(tab==='silindir')snap=snapshotSilindir();
+  else return;
+  var prefixMap={fiyat:'fh',doypack:'dp',flat:'fb',silindir:'sl'};
+  var pfx=prefixMap[tab]||tab;
+  var labelEl=$(pfx+'-save-label');
+  var label=labelEl?labelEl.value.trim():'';
+  if(!label)label=TAB_NAMES[tab]+' - '+new Date().toLocaleDateString('tr-TR');
+  var entry={id:'t_'+Date.now(),date:new Date().toISOString(),tab:tab,label:label,snapshot:snap};
+  var h=getHistory();h.unshift(entry);if(h.length>50)h.pop();setHistory(h);
+  if(labelEl)labelEl.value='';
+  var okEl=$(pfx+'-save-ok');
+  if(okEl){okEl.style.display='block';setTimeout(function(){okEl.style.display='none'},2000)}
+  renderHistory();
+}
+
+function renderHistory(){
+  var cont=$('hist-list');cont.textContent='';
+  var h=getHistory();
+  if(h.length===0){var emp=el('div',{cls:'hist-empty'});emp.textContent='Henüz kayıtlı teklif yok';cont.appendChild(emp);return}
+  h.forEach(function(entry){
+    var card=el('div',{cls:'hist-card','data-id':entry.id});
+    var top=el('div',{cls:'hc-top'});
+    var lbl=el('div',{cls:'hc-label'});lbl.textContent=entry.label;
+    var dt=el('div',{cls:'hc-date'});dt.textContent=new Date(entry.date).toLocaleDateString('tr-TR',{day:'2-digit',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+    top.appendChild(lbl);top.appendChild(dt);card.appendChild(top);
+    var tabTag=el('span',{cls:'hc-tab hc-tab-'+entry.tab});tabTag.textContent=TAB_NAMES[entry.tab]||entry.tab;
+    card.appendChild(tabTag);
+    var res=el('div',{cls:'hc-result'});res.textContent=entry.snapshot.hero||'-';card.appendChild(res);
+    // Summary params
+    var params=el('div',{cls:'hc-params'});
+    var s=entry.snapshot;
+    if(entry.tab==='fiyat'&&s.inputs){
+      var layerStr=s.inputs.layers.map(function(l){return l.matName+' '+l.thick+'\u03BC'}).join(' / ');
+      params.textContent=layerStr+' | Fire: '+s.inputs.firePct+'% | Sip: '+s.inputs.orderKg+' kg';
+    }else if(entry.tab==='doypack'&&s.inputs){
+      params.textContent='Fotosel: '+s.inputs.fotosel+'mm | Bobin: '+s.inputs.bobinEni+'mm | KG: '+s.inputs.kgPrice+' EUR';
+    }else if(entry.tab==='flat'&&s.inputs){
+      params.textContent='G.Fotosel: '+s.inputs.gFotosel+'mm | K.Fotosel: '+s.inputs.kFotosel+'mm';
+    }else if(entry.tab==='silindir'&&s.inputs){
+      params.textContent=s.inputs.t1+'/'+s.inputs.t2+(s.inputs.t3?'/'+s.inputs.t3:'')+'\u03BC | Sip: '+s.inputs.orderKg+' kg';
+    }
+    card.appendChild(params);
+    card.addEventListener('click',function(){openDetailModal(entry.id)});
+    cont.appendChild(card);
+  });
+}
+
+function openDetailModal(id){
+  var h=getHistory();var entry=h.find(function(e){return e.id===id});if(!entry)return;
+  var cont=$('detail-modal-content');cont.textContent='';
+  var title=el('h2');title.textContent=entry.label;cont.appendChild(title);
+  var dt=el('div',{cls:'modal-date'});dt.textContent=new Date(entry.date).toLocaleDateString('tr-TR',{weekday:'long',day:'2-digit',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'});cont.appendChild(dt);
+  var tabTag=el('span',{cls:'hc-tab hc-tab-'+entry.tab,style:'margin-bottom:16px;display:inline-block'});tabTag.textContent=TAB_NAMES[entry.tab];cont.appendChild(tabTag);
+  // Hero
+  var heroDiv=el('div',{cls:'hero hero-sm',style:'margin:12px 0'});
+  var heroVal=el('div',{cls:'val'});heroVal.textContent=entry.snapshot.hero||'-';heroDiv.appendChild(heroVal);
+  cont.appendChild(heroDiv);
+  var s=entry.snapshot;
+  // Render sections based on tab
+  if(entry.tab==='fiyat')renderFiyatDetail(cont,s);
+  else if(entry.tab==='doypack')renderDoypackDetail(cont,s);
+  else if(entry.tab==='flat')renderFlatDetail(cont,s);
+  else if(entry.tab==='silindir')renderSilindirDetail(cont,s);
+  // Actions
+  var actions=el('div',{cls:'modal-actions'});
+  var restoreBtn=el('button',{cls:'btn-restore','data-rid':id});restoreBtn.textContent='Geri Yükle';
+  restoreBtn.addEventListener('click',function(){restoreQuotation(id)});
+  var deleteBtn=el('button',{cls:'btn-delete','data-did':id});deleteBtn.textContent='Sil';
+  deleteBtn.addEventListener('click',function(){deleteQuotation(id)});
+  actions.appendChild(restoreBtn);actions.appendChild(deleteBtn);cont.appendChild(actions);
+  $('detail-modal').classList.add('open');
+}
+
+function closeDetailModal(){$('detail-modal').classList.remove('open')}
+
+function addDetailSection(cont,title,items){
+  var sec=el('div',{cls:'detail-section'});
+  var h3=el('h3');h3.textContent=title;sec.appendChild(h3);
+  items.forEach(function(item){
+    var row=el('div',{cls:'detail-item'});
+    var lbl=el('span',{cls:'di-label'});lbl.textContent=item[0];
+    var val=el('span',{cls:'di-value'});val.textContent=item[1];
+    row.appendChild(lbl);row.appendChild(val);sec.appendChild(row);
+  });
+  cont.appendChild(sec);
+}
+
+function renderFiyatDetail(cont,s){
+  if(!s.inputs)return;
+  // Layers
+  var layerItems=s.inputs.layers.map(function(l,i){return['Katman '+(i+1)+' ('+l.matName+')',l.thick+'\u03BC \u2192 '+fmt(l.gsm,1)+' g/m\u00B2 | Fiyat: '+l.priceRef.toUpperCase()]});
+  addDetailSection(cont,'Film Katmanları',layerItems);
+  // Extras
+  var extras=[['Tutkal (g/m\u00B2 değeri)',s.inputs.tutkalVal>0?'Var ('+s.inputs.tutkalVal+')':'Yok'],['Mürekkep (x3.2)',s.inputs.murekkepOn?'Var':'Yok'],['Mat Lak (x4)',s.inputs.matlakOn?'Var':'Yok'],['Cold Seal (x2)',s.inputs.coldsealOn?'Var':'Yok']];
+  addDetailSection(cont,'Ek Malzemeler',extras);
+  // Params
+  var params=[['Fire Oranı','%'+s.inputs.firePct],['Ek Maliyet 1',fmtE(s.inputs.x1)],['Ek Maliyet 2',fmtE(s.inputs.x2)],['Matlak Tahsisatı',fmtE(s.inputs.matlakTotal)],['Sipariş Adedi',fmt(s.inputs.orderQty,0)+' ad'],['Sipariş KG',fmt(s.inputs.orderKg,0)+' kg'],['KG Çarpan',String(s.inputs.kgMultiplier)]];
+  addDetailSection(cont,'Parametreler',params);
+  // Prices
+  var pp=s.inputs.productPrices;
+  var prices=[['PET',fmtE(pp.pet)],['7525',fmtE(pp['7525'])],['CPP/PE',fmtE(pp.cpp)],['Tutkal',fmtE(pp.tutkal)],['Mürekkep',fmtE(pp.murekkep)],['Solvent',fmtE(pp.solvent)],['Cold Seal',fmtE(pp.coldseal)],['Mat Lak',fmtE(pp.matlak)]];
+  addDetailSection(cont,'Ürün Fiyatları',prices);
+  // Results
+  var r=s.results;
+  var results=[['Toplam g/m\u00B2',r.gsm],['Ton Başı Maliyet',r.tonTotal],['Ton + Matlak',r.tonMatlak],['Fire Maliyeti',r.fire],['KG (Matlak Hariç)',r.kgNoMatlak],['KG (Matlak Dahil)',r.kgFull],['Min. Sipariş',r.minSip],['Matlak/1000 Ad',r.matlak1000]];
+  addDetailSection(cont,'Hesaplama Sonuçları',results);
+}
+
+function renderDoypackDetail(cont,s){
+  if(!s.inputs)return;
+  var matItems=s.inputs.materials.filter(function(m){return m.val>0}).map(function(m){return[m.name,String(m.val)]});
+  addDetailSection(cont,'Aktif Malzemeler',matItems);
+  var params=[['Fotosel',s.inputs.fotosel+' mm'],['Bobin Eni',s.inputs.bobinEni+' mm'],['Fire Tipi',s.inputs.fireType==='10'?'Flat Bottom %10':s.inputs.fireType==='5b'?'Quadro %5':'Doypack %5'],['KG Fiyatı',fmtE(s.inputs.kgPrice)],['Zip Fiyatı',fmtE(s.inputs.zipPrice)]];
+  addDetailSection(cont,'Parametreler',params);
+  var r=s.results;
+  var results=[['m\u00B2 Ağırlığı',r.gsm],['1 Poşet Ağırlığı',r.pouchGr],['Fireli Poşet Ağ.',r.pouchFire],['1000 Ad. KG',r.kg1000],['Malzeme Maliyeti',r.matCost],['Kesim Bedeli',r.cutCost],['Zip Maliyeti',r.zipCost],['Toplam (Ayrıştırma Dahil)',r.totalAyrist]];
+  addDetailSection(cont,'Hesaplama Sonuçları',results);
+}
+
+function renderFlatDetail(cont,s){
+  if(!s.inputs)return;
+  var gItems=s.inputs.govdeMat.filter(function(m){return m.val>0}).map(function(m){return[m.name,String(m.val)]});
+  addDetailSection(cont,'Gövde Malzemeleri',gItems);
+  var kItems=s.inputs.korukMat.filter(function(m){return m.val>0}).map(function(m){return[m.name,String(m.val)]});
+  addDetailSection(cont,'Körük Malzemeleri',kItems);
+  var params=[['Gövde Fotosel',s.inputs.gFotosel+' mm'],['Gövde Bobin',s.inputs.gBobin+' mm'],['Körük Fotosel',s.inputs.kFotosel+' mm'],['Körük Bobin',s.inputs.kBobin+' mm'],['KG Fiyatı',fmtE(s.inputs.kgPrice)],['Kesim Fiyatı',fmtE(s.inputs.cutPrice)+'/kg'],['Ayrıştırma',fmtE(s.inputs.ayrist)+'/kg'],['Gövde KG Fiyat',fmtE(s.inputs.govdeKgPrice)],['Körük KG Fiyat',fmtE(s.inputs.korukKgPrice)]];
+  addDetailSection(cont,'Boyutlar & Fiyatlar',params);
+  var r=s.results;
+  var results=[['Gövde m\u00B2/Ağ.',r.gGsm],['Körük m\u00B2/Ağ.',r.kGsm],['Gövde 1 Poşet',r.gPouch],['Körük 1 Poşet',r.kPouch],['Toplam Paket Ağ.',r.totalPouch],['1000 Ad. KG',r.kg1000],['Malzeme Maliyeti',r.matCost],['Kesim Maliyeti',r.cutCost]];
+  addDetailSection(cont,'Hesaplama Sonuçları',results);
+}
+
+function renderSilindirDetail(cont,s){
+  if(!s.inputs)return;
+  var inp=s.inputs;
+  var structure=[['1. Katman',inp.t1+'\u03BC (d: '+inp.d1+') | '+fmtE(inp.p1)+'/kg'],['2. Katman',inp.t2+'\u03BC (d: '+inp.d2+') | '+fmtE(inp.p2)+'/kg']];
+  if(inp.t3>0)structure.push(['3. Katman',inp.t3+'\u03BC (d: '+inp.d3+') | '+fmtE(inp.p3)+'/kg']);
+  structure.push(['Tutkal',inp.tutkalGsm+' g/m\u00B2 | '+fmtE(inp.pTutkal)+'/kg']);
+  structure.push(['Mürekkep',inp.murekkepGsm+' g/m\u00B2 | '+fmtE(inp.pMurekkep)+'/kg']);
+  structure.push(['Solvent',fmtE(inp.pSolvent)+'/kg']);
+  addDetailSection(cont,'Yapı & Fiyatlar',structure);
+  var params=[['Fire Oranı','%'+inp.firePct],['Ek Maliyet',fmtE(inp.x1)],['Sipariş KG',fmt(inp.orderKg,0)+' kg'],['Çarpan',String(inp.multiplier)],['Klişe Fiyat',fmtE(inp.klisePrice)+' x '+inp.colorCount+' renk'],['Fire Maliyeti',fmtE(inp.fireCost)]];
+  addDetailSection(cont,'Parametreler',params);
+  var r=s.results;
+  var results=[['Toplam g/m\u00B2',r.gsm],['Malzeme Toplamı',r.mat],['Fire Maliyeti',r.fire],['Klişe/Ton',r.klise],['Fire 150/Ton',r.fire150],['Min. Sipariş',r.minSip],['KG Fiyatı',r.kgPrice],['Klişe/KG',r.kliseKg],['Klişe+Ürün KG',r.totalKg],['DM Dahil KG',r.dmKg]];
+  addDetailSection(cont,'Hesaplama Sonuçları',results);
+}
+
+function restoreQuotation(id){
+  var h=getHistory();var entry=h.find(function(e){return e.id===id});if(!entry)return;
+  var s=entry.snapshot;var inp=s.inputs;
+  if(entry.tab==='fiyat'&&inp){
+    $('pp-pet').value=inp.productPrices.pet;$('pp-7525').value=inp.productPrices['7525'];$('pp-cpp').value=inp.productPrices.cpp;
+    $('pp-tutkal').value=inp.productPrices.tutkal;$('pp-murekkep').value=inp.productPrices.murekkep;$('pp-solvent').value=inp.productPrices.solvent;
+    $('pp-coldseal').value=inp.productPrices.coldseal;$('pp-matlak').value=inp.productPrices.matlak;
+    FH_LAYER_DATA=inp.layers.map(function(l){return{mat:l.mat,thick:l.thick,priceRef:l.priceRef}});
+    renderFHLayers();
+    $('fh-tutkal-val').value=inp.tutkalVal;$('fh-murekkep-on').checked=inp.murekkepOn;$('fh-matlak-on').checked=inp.matlakOn;$('fh-coldseal-on').checked=inp.coldsealOn;
+    $('fh-fire-pct').value=inp.firePct;$('fh-x1').value=inp.x1;$('fh-x2').value=inp.x2;
+    $('fh-matlak-total').value=inp.matlakTotal;$('fh-order-qty').value=inp.orderQty;$('fh-order-kg').value=inp.orderKg;
+    $('fh-kg-multiplier').value=inp.kgMultiplier;$('fh-min-matlak').value=inp.minMatlak;
+  }else if(entry.tab==='doypack'&&inp){
+    inp.materials.forEach(function(m,i){var el=document.querySelector('.dp-val[data-idx="'+i+'"]');if(el)el.value=m.val});
+    $('dp-fotosel').value=inp.fotosel;$('dp-bobin').value=inp.bobinEni;$('dp-fire-type').value=inp.fireType;
+    $('dp-kg-price').value=inp.kgPrice;$('dp-zip-price').value=inp.zipPrice;
+  }else if(entry.tab==='flat'&&inp){
+    inp.govdeMat.forEach(function(m,i){var e=document.querySelector('.fb-govde-val[data-idx="'+i+'"]');if(e)e.value=m.val});
+    inp.korukMat.forEach(function(m,i){var e=document.querySelector('.fb-koruk-val[data-idx="'+i+'"]');if(e)e.value=m.val});
+    $('fb-g-fotosel').value=inp.gFotosel;$('fb-g-bobin').value=inp.gBobin;$('fb-k-fotosel').value=inp.kFotosel;$('fb-k-bobin').value=inp.kBobin;
+    $('fb-kg-price').value=inp.kgPrice;$('fb-cut-price').value=inp.cutPrice;$('fb-ayrist').value=inp.ayrist;
+    $('fb-govde-kgprice').value=inp.govdeKgPrice;$('fb-koruk-kgprice').value=inp.korukKgPrice;
+  }else if(entry.tab==='silindir'&&inp){
+    $('sl-p1').value=inp.p1;$('sl-p2').value=inp.p2;$('sl-p3').value=inp.p3;
+    $('sl-p-tutkal').value=inp.pTutkal;$('sl-p-murekkep').value=inp.pMurekkep;$('sl-p-solvent').value=inp.pSolvent;
+    $('sl-t1').value=inp.t1;$('sl-t2').value=inp.t2;$('sl-t3').value=inp.t3;
+    $('sl-d1').value=inp.d1;$('sl-d2').value=inp.d2;$('sl-d3').value=inp.d3;
+    $('sl-tutkal-gsm').value=inp.tutkalGsm;$('sl-murekkep-gsm').value=inp.murekkepGsm;$('sl-fire-pct').value=inp.firePct;
+    $('sl-x1').value=inp.x1;$('sl-order-kg').value=inp.orderKg;$('sl-multiplier').value=inp.multiplier;
+    $('sl-klise-price').value=inp.klisePrice;$('sl-color-count').value=inp.colorCount;$('sl-fire-cost').value=inp.fireCost;
+  }
+  closeDetailModal();switchTab(entry.tab);recalcAll();
+}
+
+function deleteQuotation(id){
+  var h=getHistory().filter(function(e){return e.id!==id});setHistory(h);
+  closeDetailModal();renderHistory();
+}
+
+$('hist-clear-all').addEventListener('click',function(){
+  if(getHistory().length===0)return;
+  setHistory([]);renderHistory();
+});
+
+// Close modal on overlay click
+$('detail-modal').addEventListener('click',function(e){if(e.target===$('detail-modal'))closeDetailModal()});
+
 /* ═══ INIT ═══ */
 renderStaticTable('dp-cut-body',[[{t:'\u2264 5 g'},{t:'2,75',r:1}],[{t:'\u2264 7 g'},{t:'2,50',r:1}],[{t:'\u2264 9 g'},{t:'1,84',r:1}],[{t:'\u2264 12 g'},{t:'1,65',r:1}],[{t:'\u2264 15 g'},{t:'1,45',r:1}],[{t:'\u2264 17 g'},{t:'1,35',r:1}],[{t:'\u2264 21 g'},{t:'1,20',r:1}]]);
 renderStaticTable('dp-fire-body',[[{t:'500 KG'},{t:'%12',r:1}],[{t:'750 KG'},{t:'%9',r:1}],[{t:'1500 KG'},{t:'%7',r:1}],[{t:'2500 KG'},{t:'%5',r:1}],[{t:'5000-10000 KG'},{t:'%3-3,5',r:1}]]);
@@ -878,6 +1200,7 @@ renderFHLayers();
 renderMatTable('dp-materials',POUCH_MATERIALS,null,'dp');
 renderMatTable('fb-govde-materials',POUCH_MATERIALS,FB_G_DEF,'fb-govde');
 renderMatTable('fb-koruk-materials',POUCH_MATERIALS,FB_K_DEF,'fb-koruk');
+renderHistory();
 recalcAll();
 </script>
 </body>
