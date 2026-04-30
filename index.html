@@ -34,7 +34,13 @@ body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-h
 .hdr-logo-sep{color:var(--border2);font-size:1.2rem;font-weight:200;user-select:none}
 .hdr h1{font-size:1.15rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
 .hdr p{color:var(--t3);font-size:.68rem;margin-top:3px;letter-spacing:.3px}
-@media(max-width:380px){.hdr-logo{height:20px}.hdr-logos{gap:8px}.hdr h1{font-size:1rem}}
+.cur-bar{display:flex;align-items:center;justify-content:center;gap:10px;margin-top:10px;padding:8px 12px;background:var(--card);border:1px solid var(--border);border-radius:8px}
+.cur-bar label{font-size:.72rem;color:var(--t2);font-weight:600;white-space:nowrap}
+.cur-bar input{width:70px;padding:5px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--t1);font-family:inherit;font-size:.82rem;text-align:center}
+.cur-bar input:focus{outline:none;border-color:var(--accent)}
+.cur-bar .cur-preview{font-size:.72rem;color:var(--accent);font-weight:600}
+.try-val{color:var(--t2);font-size:.72rem;font-weight:500;margin-left:4px}
+@media(max-width:380px){.hdr-logo{height:20px}.hdr-logos{gap:8px}.hdr h1{font-size:1rem}.cur-bar{gap:6px;padding:6px 8px}.cur-bar input{width:58px;font-size:.78rem}}
 
 /* ─── BOTTOM NAV ─── */
 .bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(16,16,16,.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;z-index:100;padding:6px 8px env(safe-area-inset-bottom,6px)}
@@ -337,6 +343,11 @@ select option{background:var(--card);color:var(--t1)}
   </div>
   <h1>Ambalaj Fiyat Hesaplayıcı</h1>
   <p>Esnek ambalaj maliyet hesaplama sistemi</p>
+  <div class="cur-bar">
+    <label>EUR/TRY</label>
+    <input type="number" id="eur-try-rate" value="36.50" step="0.01" min="0.01">
+    <span class="cur-preview" id="cur-preview">1 EUR = 36,50 TRY</span>
+  </div>
 </div>
 
 <!-- ═══ TAB 1: FİYAT HESAPLAMA ═══ -->
@@ -831,6 +842,10 @@ function fmt(n,d){d=d==null?2:d;return n.toLocaleString('tr-TR',{minimumFraction
 function fmtE(n,d){return fmt(n,d)+' EUR'}
 function el(tag,attrs,children){var e=document.createElement(tag);if(attrs)Object.keys(attrs).forEach(function(k){if(k==='text')e.textContent=attrs[k];else if(k==='cls')e.className=attrs[k];else if(k==='style')e.style.cssText=attrs[k];else e.setAttribute(k,attrs[k])});if(children)(Array.isArray(children)?children:[children]).forEach(function(c){if(typeof c==='string')e.appendChild(document.createTextNode(c));else if(c)e.appendChild(c)});return e}
 function getCutRate(g){for(var i=0;i<CUT_TABLE.length;i++){if(g<=CUT_TABLE[i].max)return CUT_TABLE[i].r}return 1.20}
+function getRate(){return parseFloat($('eur-try-rate').value)||36.5}
+function fmtT(eurVal){return fmt(eurVal*getRate(),2)+' TRY'}
+function trySpan(eurVal){var s=el('span',{cls:'try-val'});s.textContent='('+fmtT(eurVal)+')';return s}
+function setWithTry(id,eurVal,suffix){var e=$(id);e.textContent=fmtE(eurVal)+(suffix||'');var sp=el('span',{cls:'try-val'});sp.textContent=' ('+fmtT(eurVal)+')';e.appendChild(sp)}
 function addTblRow(tbody,cells,isTotalRow){var tr=el('tr');if(isTotalRow)tr.className='total-row';cells.forEach(function(c){var td=el('td',null,[document.createTextNode(c.t||'')]);if(c.r)td.className='r';if(c.s)td.style.cssText=c.s;tr.appendChild(td)});tbody.appendChild(tr)}
 
 /* ═══ COLLAPSIBLE ═══ */
@@ -943,11 +958,11 @@ function calcFiyat(){
   var matlakPerKg=matlakTotal/1000,kgTotalFull=kgTotal+matlakPerKg;
   var minMatlak=$v('fh-min-matlak'),firstUsage=rows.length>0&&rows[0].type==='film'?rows[0].usage:1;
   var minSip=firstUsage>0?(minMatlak/firstUsage)*1000:0;
-  $('fh-result-kg').textContent=fmtE(kgTotalFull)+'/kg';
-  $('fh-r-ton').textContent=fmtE(tonTotal);$('fh-r-ton-mat').textContent=fmtE(tonTotalWithMatlak);
-  $('fh-r-kg-nomatlak').textContent=fmtE(kgTotal)+'/kg';$('fh-r-kg-full').textContent=fmtE(kgTotalFull)+'/kg';
-  $('fh-r-gsm').textContent=fmt(totalGsm,1)+' g/m\u00B2';$('fh-r-fire').textContent=fmtE(fireCost);
-  $('fh-r-minsip').textContent=fmt(minSip,0)+' kg';$('fh-r-matlak1000').textContent=fmtE(matlakPer1000);
+  setWithTry('fh-result-kg',kgTotalFull,'/kg');
+  setWithTry('fh-r-ton',tonTotal);setWithTry('fh-r-ton-mat',tonTotalWithMatlak);
+  setWithTry('fh-r-kg-nomatlak',kgTotal,'/kg');setWithTry('fh-r-kg-full',kgTotalFull,'/kg');
+  $('fh-r-gsm').textContent=fmt(totalGsm,1)+' g/m\u00B2';setWithTry('fh-r-fire',fireCost);
+  $('fh-r-minsip').textContent=fmt(minSip,0)+' kg';setWithTry('fh-r-matlak1000',matlakPer1000);
   var tbody=$('fh-detail-body');tbody.textContent='';
   rows.forEach(function(r){if(r.gsm===0&&r.cost===0)return;addTblRow(tbody,[{t:r.name},{t:fmt(r.gsm,1),r:1},{t:fmt(r.usage,2),r:1},{t:fmtE(r.cost),r:1}])});
   var totalUsage=0;rows.forEach(function(r){totalUsage+=r.usage});
@@ -971,11 +986,11 @@ function calcDoypack(){
   var cutRate=getCutRate(pouchWeightFire),cutCost=cutRate*kg1000;
   var zipPrice=$v('dp-zip-price'),zipCost=zipPrice*fotosel*1.03;
   var totalCost=matCost+cutCost+zipCost,totalWithAyrist=totalCost+2.2;
-  $('dp-hero-cost').textContent=fmtE(totalWithAyrist);
+  setWithTry('dp-hero-cost',totalWithAyrist);
   $('dp-r-gsm').textContent=fmt(totalGsm,2)+' g/m\u00B2';$('dp-r-pouch-gr').textContent=fmt(pouchWeight,2)+' g';
   $('dp-r-pouch-fire').textContent=fmt(pouchWeightFire,2)+' g';$('dp-r-1000kg').textContent=fmt(kg1000,2)+' kg';
-  $('dp-r-mat-cost').textContent=fmtE(matCost);$('dp-r-cut-cost').textContent=fmtE(cutCost)+' ('+fmt(cutRate,2)+'/kg)';
-  $('dp-r-zip-cost').textContent=fmtE(zipCost);$('dp-r-total-ayrist').textContent=fmtE(totalWithAyrist);
+  setWithTry('dp-r-mat-cost',matCost);$('dp-r-cut-cost').textContent=fmtE(cutCost)+' ('+fmt(cutRate,2)+'/kg)';
+  setWithTry('dp-r-zip-cost',zipCost);setWithTry('dp-r-total-ayrist',totalWithAyrist);
   var convKg=$v('dp-conv-kg');if(pouchWeightFire>0)$('dp-conv-adet').value=fmt((convKg/pouchWeightFire)*1000,0)+' adet';
   var convAdet=$v('dp-conv-adet2'),convBant=$v('dp-conv-bant'),fotoselMm=$v('dp-fotosel');
   if(convBant>0)$('dp-conv-metre').value=fmt((convAdet*fotoselMm/convBant)/1000,0)+' m';
@@ -995,11 +1010,11 @@ function calcFlatBottom(){
   var convKg=$v('fb-conv-kg'),convAdet=totalPW>0?(convKg/totalPW)*1000:0;
   var govdePct=totalPW>0?gWF/totalPW:0,govdeKg=convKg*govdePct,korukKg=convKg*(1-govdePct);
   var avgPrice=convKg>0?(govdeKg*$v('fb-govde-kgprice')+korukKg*$v('fb-koruk-kgprice'))/convKg:0;
-  $('fb-hero-cost').textContent=fmtE(totalWithAyrist);
+  setWithTry('fb-hero-cost',totalWithAyrist);
   $('fb-r-g-gsm').textContent=fmt(govdeGsm,2)+' g/m\u00B2';$('fb-r-k-gsm').textContent=fmt(korukGsm,2)+' g/m\u00B2';
   $('fb-r-g-pouch').textContent=fmt(gWF,2)+' g';$('fb-r-k-pouch').textContent=fmt(kWF,2)+' g';
   $('fb-r-total-pouch').textContent=fmt(totalPW,2)+' g';$('fb-r-1000kg').textContent=fmt(kg1000,2)+' kg';
-  $('fb-r-mat-cost').textContent=fmtE(matCost);$('fb-r-cut-cost').textContent=fmtE(cutCost);
+  setWithTry('fb-r-mat-cost',matCost);setWithTry('fb-r-cut-cost',cutCost);
   $('fb-conv-adet').value=fmt(convAdet,0)+' adet';
   $('fb-r-govde-kg').textContent=fmt(govdeKg,1)+' kg';$('fb-r-koruk-kg').textContent=fmt(korukKg,1)+' kg';
   $('fb-r-govde-pct').textContent='%'+fmt(govdePct*100,1);$('fb-r-avg-price').textContent=fmtE(avgPrice)+'/kg';
@@ -1024,7 +1039,7 @@ function calcSilindir(){
   var fireFlatCost=$v('sl-fire-cost'),fireFlatTon=orderKg>0?fireFlatCost/orderKg*1000:0;
   var sonToplam=matTotal+fireCost+x1+kliseTon+fireFlatTon;
   var firstUsage=rows.length>0?rows[0].u:1,minSip=firstUsage>0?(350/firstUsage)*1000:0;
-  $('sl-hero').textContent=fmtE(sonToplam);$('sl-r-mat').textContent=fmtE(matTotal);$('sl-r-fire').textContent=fmtE(fireCost);
+  setWithTry('sl-hero',sonToplam);setWithTry('sl-r-mat',matTotal);setWithTry('sl-r-fire',fireCost);
   $('sl-r-klise').textContent=fmtE(kliseTon);$('sl-r-fire150').textContent=fmtE(fireFlatTon);
   $('sl-r-gsm').textContent=fmt(totalGsm,1)+' g/m\u00B2';$('sl-r-minsip').textContent=fmt(minSip,0)+' kg';
   var tbody=$('sl-detail-body');tbody.textContent='';
@@ -1179,7 +1194,7 @@ function validateAll(){validateFiyat();validateDoypack();validateFlat();validate
 
 /* ═══ RECALC ═══ */
 var recalcTimer;
-function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire();validateAll()},100)}
+function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){$('cur-preview').textContent='1 EUR = '+fmt(getRate(),2)+' TRY';calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire();validateAll()},100)}
 document.addEventListener('input',recalcAll);document.addEventListener('change',recalcAll);
 
 /* ═══ QUOTATION HISTORY ═══ */
