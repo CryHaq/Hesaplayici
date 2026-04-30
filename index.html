@@ -3,91 +3,157 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#0a0a0a">
 <title>Ambalaj Fiyat Hesaplayıcı</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
---bg:#0a0a0a;--bg2:#111;--card:#1a1a1a;--card2:#151515;
---border:#2a2a2a;--border2:#333;
---t1:#f5f5f5;--t2:#a0a0a0;--t3:#666;
---accent:#10b981;--accent2:#059669;--accent-bg:rgba(16,185,129,.08);
---red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6;--blue:#3b82f6;--green:#22c55e;
---radius:10px;
+--bg:#0a0a0a;--bg2:#111;--card:#161616;--card2:#131313;
+--border:#1e1e1e;--border2:#2a2a2a;--border3:#333;
+--t1:#f0f0f0;--t2:#888;--t3:#555;
+--accent:#10b981;--accent2:#059669;--accent-bg:rgba(16,185,129,.06);--accent-glow:rgba(16,185,129,.15);
+--red:#ef4444;--orange:#f59e0b;--purple:#8b5cf6;--blue:#3b82f6;--green:#22c55e;--cyan:#06b6d4;
+--radius:12px;--radius-sm:8px;
+--shadow:0 2px 8px rgba(0,0,0,.3);
 }
-body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.5;padding-bottom:70px}
-.app{max-width:800px;margin:0 auto;padding:12px}
-.hdr{text-align:center;padding:16px 0 12px}
-.hdr h1{font-size:1.3rem;font-weight:800;background:linear-gradient(135deg,var(--accent),#06b6d4);-webkit-background-clip:text;-webkit-text-fill-color:transparent}
-.hdr p{color:var(--t3);font-size:.75rem;margin-top:2px}
-.bnav{position:fixed;bottom:0;left:0;right:0;background:var(--card);border-top:1px solid var(--border);display:flex;z-index:100;padding:4px 0 env(safe-area-inset-bottom,4px)}
-.bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;background:none;border:none;color:var(--t3);font-family:inherit;font-size:.6rem;font-weight:500;cursor:pointer;transition:color .2s}
+html{-webkit-tap-highlight-color:transparent}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--t1);min-height:100vh;line-height:1.5;padding-bottom:76px;-webkit-font-smoothing:antialiased}
+.app{max-width:820px;margin:0 auto;padding:12px 14px}
+
+/* ─── HEADER ─── */
+.hdr{text-align:center;padding:20px 0 16px;position:relative}
+.hdr::after{content:'';position:absolute;bottom:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent)}
+.hdr h1{font-size:1.35rem;font-weight:800;background:linear-gradient(135deg,var(--accent),var(--cyan));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.02em}
+.hdr p{color:var(--t3);font-size:.72rem;margin-top:4px;letter-spacing:.3px}
+
+/* ─── BOTTOM NAV ─── */
+.bnav{position:fixed;bottom:0;left:0;right:0;background:rgba(16,16,16,.85);-webkit-backdrop-filter:blur(20px);backdrop-filter:blur(20px);border-top:1px solid rgba(255,255,255,.06);display:flex;z-index:100;padding:6px 8px env(safe-area-inset-bottom,6px)}
+.bnav button{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;padding:6px 2px 4px;background:none;border:none;color:var(--t3);font-family:inherit;font-size:.58rem;font-weight:500;cursor:pointer;transition:all .2s;position:relative;border-radius:8px}
+.bnav button:active{transform:scale(.92)}
 .bnav button.active{color:var(--accent)}
-.bnav button .ico{font-size:1.2rem}
-.cd{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:14px;margin-bottom:12px}
-.cd h2{font-size:.88rem;font-weight:700;margin-bottom:12px;display:flex;align-items:center;gap:6px;color:var(--accent)}
-.cd h3{font-size:.78rem;font-weight:600;color:var(--t2);margin:12px 0 8px;text-transform:uppercase;letter-spacing:.5px}
+.bnav button.active::before{content:'';position:absolute;top:-6px;left:50%;transform:translateX(-50%);width:16px;height:2px;background:var(--accent);border-radius:2px}
+.bnav button svg{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+/* ─── CARDS ─── */
+.cd{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px;margin-bottom:12px;transition:border-color .2s}
+.cd h2{font-size:.85rem;font-weight:700;margin-bottom:14px;display:flex;align-items:center;gap:8px;color:var(--t1)}
+.cd h2 .h2-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0}
+.cd h3{font-size:.72rem;font-weight:600;color:var(--t3);margin:14px 0 8px;text-transform:uppercase;letter-spacing:.8px}
+.cd-accent{border-color:rgba(16,185,129,.15)}
+
+/* ─── COLLAPSIBLE ─── */
+.collapse-btn{display:flex;align-items:center;justify-content:space-between;width:100%;background:none;border:none;color:inherit;font:inherit;cursor:pointer;padding:0;margin-bottom:14px;-webkit-tap-highlight-color:transparent}
+.collapse-btn h2{margin-bottom:0;pointer-events:none}
+.collapse-btn .chevron{color:var(--t3);font-size:.7rem;transition:transform .25s;flex-shrink:0}
+.collapse-btn.open .chevron{transform:rotate(180deg)}
+.collapse-content{overflow:hidden;transition:max-height .3s ease,opacity .25s;max-height:0;opacity:0}
+.collapse-content.open{max-height:2000px;opacity:1}
+
+/* ─── FORMS ─── */
 .fg{margin-bottom:10px}
-.fg label{display:block;font-size:.75rem;color:var(--t2);margin-bottom:3px;font-weight:500}
+.fg label{display:block;font-size:.72rem;color:var(--t2);margin-bottom:4px;font-weight:500;letter-spacing:.2px}
 .iw{position:relative}
-.iw input,.iw select{width:100%;padding:9px 10px;background:var(--bg2);border:1px solid var(--border);border-radius:7px;color:var(--t1);font-family:inherit;font-size:.88rem;transition:border .2s}
-.iw input:focus,.iw select:focus{outline:none;border-color:var(--accent)}
-.iw.hu input{padding-right:36px}
-.iw .unit{position:absolute;right:10px;top:50%;transform:translateY(-50%);color:var(--t3);font-size:.78rem;font-weight:600;pointer-events:none}
-select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 10px center;padding-right:28px!important}
+.iw input,.iw select{width:100%;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--t1);font-family:inherit;font-size:.88rem;transition:all .2s}
+.iw input:focus,.iw select:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-glow)}
+.iw.hu input{padding-right:42px}
+.iw .unit{position:absolute;right:1px;top:1px;bottom:1px;display:flex;align-items:center;padding:0 10px;color:var(--t3);font-size:.72rem;font-weight:600;pointer-events:none;background:rgba(255,255,255,.02);border-left:1px solid var(--border);border-radius:0 7px 7px 0}
+input[readonly]{color:var(--t2);background:var(--card2)}
+select{cursor:pointer;appearance:none;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%23555' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 12px center;padding-right:30px!important}
 select option{background:var(--card);color:var(--t1)}
 .row{display:grid;gap:8px}.r2{grid-template-columns:1fr 1fr}.r3{grid-template-columns:1fr 1fr 1fr}.r4{grid-template-columns:1fr 1fr 1fr 1fr}
-.tgl-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)}
+
+/* ─── TOGGLES ─── */
+.tgl-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--border)}
 .tgl-row:last-child{border-bottom:none}
 .tgl-row .tgl-label{font-size:.82rem;font-weight:500}
-.switch{position:relative;width:40px;height:22px;flex-shrink:0;margin-left:8px}
+.switch{position:relative;width:42px;height:24px;flex-shrink:0;margin-left:8px}
 .switch input{opacity:0;width:0;height:0}
-.switch .slider{position:absolute;cursor:pointer;top:0;left:0;right:0;bottom:0;background:var(--border2);border-radius:22px;transition:.2s}
-.switch .slider:before{content:'';position:absolute;height:16px;width:16px;left:3px;bottom:3px;background:var(--t3);border-radius:50%;transition:.2s}
-.switch input:checked+.slider{background:var(--accent)}
+.switch .slider{position:absolute;cursor:pointer;inset:0;background:var(--border2);border-radius:24px;transition:.25s}
+.switch .slider:before{content:'';position:absolute;height:18px;width:18px;left:3px;bottom:3px;background:var(--t3);border-radius:50%;transition:.25s}
+.switch input:checked+.slider{background:var(--accent);box-shadow:0 0 8px var(--accent-glow)}
 .switch input:checked+.slider:before{transform:translateX(18px);background:#fff}
-.hero{text-align:center;padding:20px;background:linear-gradient(135deg,rgba(16,185,129,.1),rgba(6,182,212,.05));border:1px solid rgba(16,185,129,.25);border-radius:var(--radius);margin-bottom:12px}
-.hero .val{font-size:2.2rem;font-weight:800;color:var(--accent);line-height:1.1}
-.hero .lbl{font-size:.78rem;color:var(--t2);margin-top:4px}
+
+/* ─── HERO RESULT ─── */
+.hero{text-align:center;padding:24px 16px;background:linear-gradient(135deg,rgba(16,185,129,.08),rgba(6,182,212,.04));border:1px solid rgba(16,185,129,.18);border-radius:var(--radius);margin-bottom:12px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(16,185,129,.08),transparent 70%);pointer-events:none}
+.hero .val{font-size:2.4rem;font-weight:800;color:var(--accent);line-height:1;position:relative;transition:opacity .15s}
+.hero .lbl{font-size:.75rem;color:var(--t2);margin-top:8px;letter-spacing:.3px}
+.hero-sm{padding:18px 14px}
+.hero-sm .val{font-size:1.8rem}
+
+/* ─── RESULT GRID ─── */
 .rg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
-.ri{background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px}
-.ri .rl{font-size:.68rem;color:var(--t2);margin-bottom:2px;text-transform:uppercase;letter-spacing:.3px}
-.ri .rv{font-size:.95rem;font-weight:600}
-.ri .rv.green{color:var(--green)}.ri .rv.red{color:var(--red)}.ri .rv.accent{color:var(--accent)}.ri .rv.orange{color:var(--orange)}
+.ri{background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;transition:border-color .2s}
+.ri:hover{border-color:var(--border2)}
+.ri .rl{font-size:.62rem;color:var(--t3);margin-bottom:4px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+.ri .rv{font-size:.92rem;font-weight:700;line-height:1.2}
+.ri .rv.green{color:var(--green)}.ri .rv.red{color:var(--red)}.ri .rv.accent{color:var(--accent)}.ri .rv.orange{color:var(--orange)}.ri .rv.purple{color:var(--purple)}
+
+/* ─── TABLE ─── */
 .tbl{width:100%;border-collapse:collapse;font-size:.78rem}
-.tbl th,.tbl td{padding:7px 6px;border-bottom:1px solid var(--border);text-align:left}
-.tbl th{color:var(--t2);font-weight:500;font-size:.7rem;text-transform:uppercase;letter-spacing:.3px}
+.tbl th,.tbl td{padding:8px 8px;border-bottom:1px solid var(--border);text-align:left}
+.tbl th{color:var(--t3);font-weight:600;font-size:.65rem;text-transform:uppercase;letter-spacing:.5px;background:var(--bg)}
 .tbl td{color:var(--t1)}
+.tbl tbody tr:nth-child(even) td{background:rgba(255,255,255,.015)}
+.tbl tbody tr:hover td{background:rgba(16,185,129,.04)}
 .tbl tr:last-child td{border-bottom:none}
 .tbl .r{text-align:right}
-.tbl .total-row td{border-top:2px solid var(--accent);font-weight:700;color:var(--accent)}
-.tab{display:none;animation:fadeUp .25s ease}
+.tbl .total-row td{border-top:2px solid var(--accent);font-weight:700;color:var(--accent);background:var(--accent-bg)!important}
+.mi{width:62px;padding:6px 8px;background:var(--bg);border:1px solid var(--border);border-radius:6px;color:var(--t1);font-family:inherit;font-size:.82rem;text-align:right;transition:border-color .2s}
+.mi:focus{outline:none;border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-glow)}
+
+/* ─── TAB CONTENT ─── */
+.tab{display:none;animation:fadeUp .3s ease}
 .tab.active{display:block}
-@keyframes fadeUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+/* ─── COMPARISON ─── */
 .cmp{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0}
-.cmp-card{border:1px solid var(--border);border-radius:8px;padding:12px;text-align:center}
-.cmp-card.best{border-color:var(--accent);background:var(--accent-bg)}
-.cmp-card h4{font-size:.75rem;color:var(--t2);margin-bottom:6px;text-transform:uppercase}
-.cmp-card .price{font-size:1.4rem;font-weight:800;color:var(--t1)}
+.cmp-card{border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;transition:all .25s}
+.cmp-card.best{border-color:var(--accent);background:var(--accent-bg);box-shadow:0 0 16px var(--accent-glow)}
+.cmp-card h4{font-size:.68rem;color:var(--t3);margin-bottom:8px;text-transform:uppercase;letter-spacing:.5px}
+.cmp-card .price{font-size:1.3rem;font-weight:800;color:var(--t1)}
 .cmp-card.best .price{color:var(--accent)}
-.mi{width:60px;padding:4px 6px;background:var(--bg);border:1px solid var(--border);border-radius:5px;color:var(--t1);font-family:inherit;font-size:.82rem;text-align:right}
-.mi:focus{outline:none;border-color:var(--accent)}
-::-webkit-scrollbar{width:4px;height:4px}
+
+/* ─── DIVIDER ─── */
+.divider{height:1px;background:linear-gradient(90deg,transparent,var(--border2),transparent);margin:16px 0}
+
+/* ─── SECTION TAG ─── */
+.tag{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:4px;font-size:.65rem;font-weight:600;letter-spacing:.3px}
+.tag-green{background:rgba(16,185,129,.1);color:var(--accent)}
+.tag-orange{background:rgba(245,158,11,.1);color:var(--orange)}
+
+/* ─── ADD/DEL LAYER ─── */
+#fh-add-layer:hover{border-color:var(--accent);color:var(--accent)}
+#fh-add-layer:active{transform:scale(.98)}
+
+/* ─── SCROLLBAR ─── */
+::-webkit-scrollbar{width:3px;height:3px}
 ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
+
+/* ─── RESPONSIVE ─── */
 @media(min-width:768px){
-  .app{padding:20px}
+  .app{padding:24px 20px}
   .hdr h1{font-size:1.6rem}
   .rg{grid-template-columns:repeat(4,1fr)}
   body{padding-bottom:0}
-  .bnav{position:static;background:transparent;border:none;justify-content:center;gap:4px;padding:0;margin-bottom:20px}
-  .bnav button{flex:none;flex-direction:row;gap:6px;padding:8px 16px;border-radius:8px;border:1px solid var(--border);font-size:.78rem}
+  .bnav{position:static;background:transparent;-webkit-backdrop-filter:none;backdrop-filter:none;border:none;justify-content:center;gap:4px;padding:0;margin-bottom:24px}
+  .bnav button{flex:none;flex-direction:row;gap:8px;padding:10px 20px;border-radius:10px;border:1px solid var(--border);font-size:.8rem}
   .bnav button.active{background:var(--accent);color:#fff;border-color:var(--accent)}
+  .bnav button.active::before{display:none}
+  .bnav button svg{width:16px;height:16px}
+  .hero .val{font-size:2.8rem}
 }
 @media(max-width:380px){
-  .hero .val{font-size:1.7rem}
-  .bnav button{font-size:.55rem}
-  .bnav button .ico{font-size:1rem}
+  .hero .val{font-size:1.6rem}
+  .hero-sm .val{font-size:1.3rem}
+  .bnav button{font-size:.5rem;padding:5px 1px}
+  .bnav button svg{width:17px;height:17px}
   .r3,.r4{grid-template-columns:1fr 1fr}
+  .app{padding:8px 10px}
 }
 </style>
 </head>
@@ -99,100 +165,120 @@ select option{background:var(--card);color:var(--t1)}
   <p>Esnek ambalaj maliyet hesaplama sistemi</p>
 </div>
 
-<!-- TAB 1: FIYAT HESAPLAMA -->
+<!-- ═══ TAB 1: FİYAT HESAPLAMA ═══ -->
 <div class="tab active" id="tab-fiyat">
+  <!-- Fiyatlar (collapsible) -->
   <div class="cd">
-    <h2>Urun Fiyatlari (EUR/kg)</h2>
-    <div class="row r3" id="product-prices">
-      <div class="fg"><label>PET</label><div class="iw hu"><input type="number" step="0.01" id="pp-pet" value="2.85"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>7525</label><div class="iw hu"><input type="number" step="0.01" id="pp-7525" value="2.85"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>CPP/PE</label><div class="iw hu"><input type="number" step="0.01" id="pp-cpp" value="1.55"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Tutkal</label><div class="iw hu"><input type="number" step="0.01" id="pp-tutkal" value="3.50"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Murekkep</label><div class="iw hu"><input type="number" step="0.01" id="pp-murekkep" value="3.50"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Solvent</label><div class="iw hu"><input type="number" step="0.01" id="pp-solvent" value="1.35"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Cold Seal</label><div class="iw hu"><input type="number" step="0.01" id="pp-coldseal" value="2.00"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Mat Lak</label><div class="iw hu"><input type="number" step="0.01" id="pp-matlak" value="4.00"><span class="unit">EUR</span></div></div>
+    <button class="collapse-btn open" data-target="fiyat-prices">
+      <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#8364;</span> Ürün Fiyatları</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content open" id="fiyat-prices">
+      <div class="row r4">
+        <div class="fg"><label>PET</label><div class="iw hu"><input type="number" step="0.01" id="pp-pet" value="2.85"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>7525</label><div class="iw hu"><input type="number" step="0.01" id="pp-7525" value="2.85"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>CPP/PE</label><div class="iw hu"><input type="number" step="0.01" id="pp-cpp" value="1.55"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Tutkal</label><div class="iw hu"><input type="number" step="0.01" id="pp-tutkal" value="3.50"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Mürekkep</label><div class="iw hu"><input type="number" step="0.01" id="pp-murekkep" value="3.50"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Solvent</label><div class="iw hu"><input type="number" step="0.01" id="pp-solvent" value="1.35"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Cold Seal</label><div class="iw hu"><input type="number" step="0.01" id="pp-coldseal" value="2.00"><span class="unit">EUR</span></div></div>
+        <div class="fg"><label>Mat Lak</label><div class="iw hu"><input type="number" step="0.01" id="pp-matlak" value="4.00"><span class="unit">EUR</span></div></div>
+      </div>
     </div>
   </div>
 
-  <div class="cd">
-    <h2>Yapi ve Hesaplama</h2>
-    <h3>Film Katmanlari</h3>
+  <!-- Yapı -->
+  <div class="cd cd-accent">
+    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9881;</span> Yapı &amp; Hesaplama</h2>
+    <h3>Film Katmanları</h3>
     <div id="fh-layers"></div>
+    <button type="button" id="fh-add-layer" style="width:100%;padding:10px;border:1px dashed var(--border2);border-radius:var(--radius-sm);background:transparent;color:var(--t2);cursor:pointer;font-family:inherit;font-size:.8rem;font-weight:500;transition:all .2s;margin-bottom:14px">+ Katman Ekle</button>
+
     <h3>Ek Malzemeler</h3>
-    <div class="cd" style="padding:8px 12px;background:var(--bg2)">
+    <div style="background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 14px;margin-bottom:12px">
       <div class="tgl-row">
-        <span class="tgl-label">Tutkal (2.5 g/m2)</span>
-        <div class="fg" style="margin:0;width:50px"><div class="iw"><input type="number" id="fh-tutkal-val" value="1" step="0.5" min="0" style="padding:5px;font-size:.78rem;text-align:center"></div></div>
+        <span class="tgl-label">Tutkal <span style="color:var(--t3);font-size:.72rem">(2.5 g/m²)</span></span>
+        <div class="fg" style="margin:0;width:54px"><div class="iw"><input type="number" id="fh-tutkal-val" value="1" step="0.5" min="0" style="padding:6px;font-size:.8rem;text-align:center"></div></div>
       </div>
       <div class="tgl-row">
-        <span class="tgl-label">Murekkep (x3.2)</span>
+        <span class="tgl-label">Mürekkep <span style="color:var(--t3);font-size:.72rem">(x3.2)</span></span>
         <label class="switch"><input type="checkbox" id="fh-murekkep-on" checked><span class="slider"></span></label>
       </div>
       <div class="tgl-row">
-        <span class="tgl-label">Mat Lak (x4)</span>
+        <span class="tgl-label">Mat Lak <span style="color:var(--t3);font-size:.72rem">(x4)</span></span>
         <label class="switch"><input type="checkbox" id="fh-matlak-on"><span class="slider"></span></label>
       </div>
       <div class="tgl-row">
-        <span class="tgl-label">Cold Seal (x2)</span>
+        <span class="tgl-label">Cold Seal <span style="color:var(--t3);font-size:.72rem">(x2)</span></span>
         <label class="switch"><input type="checkbox" id="fh-coldseal-on" checked><span class="slider"></span></label>
       </div>
     </div>
-    <h3>Ek Maliyetler ve Fire</h3>
+
+    <h3>Ek Maliyetler &amp; Fire</h3>
     <div class="row r3">
-      <div class="fg"><label>Fire Orani</label><div class="iw hu"><input type="number" id="fh-fire-pct" value="7" step="1" min="0"><span class="unit">%</span></div></div>
+      <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="fh-fire-pct" value="7" step="1" min="0"><span class="unit">%</span></div></div>
       <div class="fg"><label>Ek Maliyet 1</label><div class="iw hu"><input type="number" id="fh-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
       <div class="fg"><label>Ek Maliyet 2</label><div class="iw hu"><input type="number" id="fh-x2" value="750" step="50"><span class="unit">EUR</span></div></div>
     </div>
     <div class="row r3">
-      <div class="fg"><label>Matlak Tahsisat</label><div class="iw hu"><input type="number" id="fh-matlak-total" value="350" step="10"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Siparis Adedi</label><div class="iw hu"><input type="number" id="fh-order-qty" value="30000" step="1000"><span class="unit">ad</span></div></div>
-      <div class="fg"><label>Siparis KG</label><div class="iw hu"><input type="number" id="fh-order-kg" value="500" step="50"><span class="unit">kg</span></div></div>
+      <div class="fg"><label>Matlak Tahsisatı</label><div class="iw hu"><input type="number" id="fh-matlak-total" value="350" step="10"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Sipariş Adedi</label><div class="iw hu"><input type="number" id="fh-order-qty" value="30000" step="1000"><span class="unit">ad</span></div></div>
+      <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fh-order-kg" value="500" step="50"><span class="unit">kg</span></div></div>
     </div>
-    <div class="row r2" style="margin-top:8px">
-      <div class="fg"><label>KG Carpan (Fire/Ek)</label><div class="iw"><input type="number" id="fh-kg-multiplier" value="2.4" step="0.1"></div></div>
-      <div class="fg"><label>Min.Sip. Matlak</label><div class="iw hu"><input type="number" id="fh-min-matlak" value="350" step="10"><span class="unit">EUR</span></div></div>
+    <div class="row r2" style="margin-top:6px">
+      <div class="fg"><label>KG Çarpan (Fire/Ek)</label><div class="iw"><input type="number" id="fh-kg-multiplier" value="2.4" step="0.1"></div></div>
+      <div class="fg"><label>Min. Sip. Matlak</label><div class="iw hu"><input type="number" id="fh-min-matlak" value="350" step="10"><span class="unit">EUR</span></div></div>
     </div>
   </div>
 
-  <div class="hero" id="fh-hero">
+  <!-- Sonuçlar -->
+  <div class="hero">
     <div class="val" id="fh-result-kg">0,00 EUR/kg</div>
-    <div class="lbl">KG Fiyati (Siparis Bazli)</div>
+    <div class="lbl">KG Fiyatı (Sipariş Bazlı)</div>
   </div>
-  <div class="rg" id="fh-results-grid">
-    <div class="ri"><div class="rl">TON BASI MALIYET</div><div class="rv accent" id="fh-r-ton">-</div></div>
-    <div class="ri"><div class="rl">TON + MATLAK</div><div class="rv accent" id="fh-r-ton-mat">-</div></div>
-    <div class="ri"><div class="rl">KG (MATLAK HARIC)</div><div class="rv" id="fh-r-kg-nomatlak">-</div></div>
-    <div class="ri"><div class="rl">KG (MATLAK DAHIL)</div><div class="rv green" id="fh-r-kg-full">-</div></div>
-    <div class="ri"><div class="rl">TOPLAM G/M2</div><div class="rv" id="fh-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">FIRE MALIYETI</div><div class="rv orange" id="fh-r-fire">-</div></div>
-    <div class="ri"><div class="rl">MIN. SIPARIS (KG)</div><div class="rv" id="fh-r-minsip">-</div></div>
-    <div class="ri"><div class="rl">MATLAK/1000 AD</div><div class="rv" id="fh-r-matlak1000">-</div></div>
+  <div class="rg">
+    <div class="ri"><div class="rl">Ton Başı Maliyet</div><div class="rv accent" id="fh-r-ton">-</div></div>
+    <div class="ri"><div class="rl">Ton + Matlak</div><div class="rv accent" id="fh-r-ton-mat">-</div></div>
+    <div class="ri"><div class="rl">KG (Matlak Hariç)</div><div class="rv" id="fh-r-kg-nomatlak">-</div></div>
+    <div class="ri"><div class="rl">KG (Matlak Dahil)</div><div class="rv green" id="fh-r-kg-full">-</div></div>
+    <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="fh-r-gsm">-</div></div>
+    <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="fh-r-fire">-</div></div>
+    <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="fh-r-minsip">-</div></div>
+    <div class="ri"><div class="rl">Matlak / 1000 Ad</div><div class="rv purple" id="fh-r-matlak1000">-</div></div>
   </div>
 
+  <!-- Detay -->
   <div class="cd">
-    <h2>Maliyet Kirilimi (Ton Bazli)</h2>
-    <table class="tbl" id="fh-detail-table">
-      <thead><tr><th>Kalem</th><th>g/m2</th><th class="r">Kullanim (kg)</th><th class="r">Tutar (EUR)</th></tr></thead>
-      <tbody id="fh-detail-body"></tbody>
-    </table>
+    <button class="collapse-btn open" data-target="fiyat-detail">
+      <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9776;</span> Maliyet Kırılımı</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content open" id="fiyat-detail">
+      <table class="tbl">
+        <thead><tr><th>Kalem</th><th>g/m²</th><th class="r">Kullanım (kg)</th><th class="r">Tutar (EUR)</th></tr></thead>
+        <tbody id="fh-detail-body"></tbody>
+      </table>
+    </div>
   </div>
 </div>
 
-<!-- TAB 2: DOYPACK -->
+<!-- ═══ TAB 2: DOYPACK ═══ -->
 <div class="tab" id="tab-doypack">
   <div class="cd">
-    <h2>Malzeme Yapisi</h2>
+    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9638;</span> Malzeme Yapısı</h2>
+    <div style="overflow-x:auto;margin:0 -4px;padding:0 4px">
     <table class="tbl">
-      <thead><tr><th>Malzeme</th><th class="r">Yogunluk</th><th class="r" style="width:70px">Deger</th><th class="r">g/m2</th></tr></thead>
+      <thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead>
       <tbody id="dp-materials"></tbody>
     </table>
+    </div>
   </div>
-  <div class="cd">
-    <h2>Poset Boyutlari</h2>
+
+  <div class="cd cd-accent">
+    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Poşet Boyutları</h2>
     <div class="row r2">
-      <div class="fg"><label>Fotosel (mm)</label><div class="iw hu"><input type="number" id="dp-fotosel" value="152" step="1"><span class="unit">mm</span></div></div>
-      <div class="fg"><label>Bobin Eni (mm)</label><div class="iw hu"><input type="number" id="dp-bobin" value="542.5" step="0.5"><span class="unit">mm</span></div></div>
+      <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="dp-fotosel" value="152" step="1"><span class="unit">mm</span></div></div>
+      <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="dp-bobin" value="542.5" step="0.5"><span class="unit">mm</span></div></div>
     </div>
     <div class="row r3">
       <div class="fg"><label>Fire Tipi</label><div class="iw"><select id="dp-fire-type">
@@ -200,253 +286,265 @@ select option{background:var(--card);color:var(--t1)}
         <option value="10">Flat Bottom %10</option>
         <option value="5b">Quadro %5</option>
       </select></div></div>
-      <div class="fg"><label>KG Fiyati (EUR)</label><div class="iw hu"><input type="number" id="dp-kg-price" value="4.13" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Zip Fiyati (EUR)</label><div class="iw hu"><input type="number" id="dp-zip-price" value="14.8" step="0.1"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="dp-kg-price" value="4.13" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Zip Fiyatı</label><div class="iw hu"><input type="number" id="dp-zip-price" value="14.8" step="0.1"><span class="unit">EUR</span></div></div>
     </div>
   </div>
+
   <div class="hero">
     <div class="val" id="dp-hero-cost">0,00 EUR</div>
-    <div class="lbl">1000 Adet Toplam Maliyet (Ayristirma Dahil)</div>
+    <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
   </div>
   <div class="rg">
-    <div class="ri"><div class="rl">M2 AGIRLIGI</div><div class="rv accent" id="dp-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">1 POSET AGIRLIGI</div><div class="rv" id="dp-r-pouch-gr">-</div></div>
-    <div class="ri"><div class="rl">FIRELI POSET AG.</div><div class="rv orange" id="dp-r-pouch-fire">-</div></div>
-    <div class="ri"><div class="rl">1000 AD. KG</div><div class="rv accent" id="dp-r-1000kg">-</div></div>
-    <div class="ri"><div class="rl">MALZEME MALIYETI</div><div class="rv" id="dp-r-mat-cost">-</div></div>
-    <div class="ri"><div class="rl">KESIM BEDELI</div><div class="rv" id="dp-r-cut-cost">-</div></div>
-    <div class="ri"><div class="rl">ZIP MALIYETI</div><div class="rv" id="dp-r-zip-cost">-</div></div>
-    <div class="ri"><div class="rl">+ AYRISTIRMA (2.2 EUR)</div><div class="rv green" id="dp-r-total-ayrist">-</div></div>
+    <div class="ri"><div class="rl">m² Ağırlığı</div><div class="rv accent" id="dp-r-gsm">-</div></div>
+    <div class="ri"><div class="rl">1 Poşet Ağırlığı</div><div class="rv" id="dp-r-pouch-gr">-</div></div>
+    <div class="ri"><div class="rl">Fireli Poşet Ağ.</div><div class="rv orange" id="dp-r-pouch-fire">-</div></div>
+    <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="dp-r-1000kg">-</div></div>
+    <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="dp-r-mat-cost">-</div></div>
+    <div class="ri"><div class="rl">Kesim Bedeli</div><div class="rv" id="dp-r-cut-cost">-</div></div>
+    <div class="ri"><div class="rl">Zip Maliyeti</div><div class="rv" id="dp-r-zip-cost">-</div></div>
+    <div class="ri"><div class="rl">+ Ayrıştırma (2.2)</div><div class="rv green" id="dp-r-total-ayrist">-</div></div>
   </div>
+
+  <!-- Referanslar (collapsible) -->
   <div class="cd">
-    <h2>Kesim Bedeli Tablosu</h2>
-    <table class="tbl" id="dp-cut-table">
-      <thead><tr><th>Poset Gramaji (g)</th><th class="r">Fiyat (EUR/kg)</th></tr></thead>
-      <tbody id="dp-cut-body"></tbody>
-    </table>
-  </div>
-  <div class="cd">
-    <h2>Adet - KG - Uzunluk Hesabi</h2>
-    <h3>KG -> Adet</h3>
-    <div class="row r2">
-      <div class="fg"><label>Siparis KG</label><div class="iw hu"><input type="number" id="dp-conv-kg" value="2850" step="50"><span class="unit">kg</span></div></div>
-      <div class="fg"><label>Sonuc (Adet)</label><div class="iw"><input type="text" id="dp-conv-adet" readonly></div></div>
-    </div>
-    <h3>Adet -> Uzunluk (Metre)</h3>
-    <div class="row r3">
-      <div class="fg"><label>Adet</label><div class="iw"><input type="number" id="dp-conv-adet2" value="480000" step="1000"></div></div>
-      <div class="fg"><label>Bant Sayisi</label><div class="iw"><input type="number" id="dp-conv-bant" value="1" step="1" min="1"></div></div>
-      <div class="fg"><label>Sonuc (m)</label><div class="iw"><input type="text" id="dp-conv-metre" readonly></div></div>
-    </div>
-    <h3>Uzunluk -> KG</h3>
-    <div class="row r3">
-      <div class="fg"><label>Bant Eni (mm)</label><div class="iw"><input type="number" id="dp-conv-bant-eni" value="625" step="0.5"></div></div>
-      <div class="fg"><label>Metre</label><div class="iw"><input type="number" id="dp-conv-metre2" value="96960" step="100"></div></div>
-      <div class="fg"><label>Sonuc (KG)</label><div class="iw"><input type="text" id="dp-conv-kg-result" readonly></div></div>
+    <button class="collapse-btn" data-target="dp-ref">
+      <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9986;</span> Kesim &amp; Fire Referans</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="dp-ref">
+      <h3>Kesim Bedeli Tablosu</h3>
+      <table class="tbl"><thead><tr><th>Poşet Gramajı</th><th class="r">Fiyat (EUR/kg)</th></tr></thead><tbody id="dp-cut-body"></tbody></table>
+      <div class="divider"></div>
+      <h3>Doypack Kesim Fire %</h3>
+      <table class="tbl"><thead><tr><th>Sipariş Miktarı</th><th class="r">Fire %</th></tr></thead><tbody id="dp-fire-body"></tbody></table>
     </div>
   </div>
+
+  <!-- Dönüştürücüler -->
   <div class="cd">
-    <h2>Doypack Kesim Fire %</h2>
-    <table class="tbl" id="dp-fire-table">
-      <thead><tr><th>Siparis Miktari</th><th class="r">Fire %</th></tr></thead>
-      <tbody id="dp-fire-body"></tbody>
-    </table>
+    <button class="collapse-btn" data-target="dp-conv">
+      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG / Uzunluk Hesabı</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="dp-conv">
+      <h3>KG &#8594; Adet</h3>
+      <div class="row r2">
+        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="dp-conv-kg" value="2850" step="50"><span class="unit">kg</span></div></div>
+        <div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="dp-conv-adet" readonly></div></div>
+      </div>
+      <h3>Adet &#8594; Uzunluk (Metre)</h3>
+      <div class="row r3">
+        <div class="fg"><label>Adet</label><div class="iw"><input type="number" id="dp-conv-adet2" value="480000" step="1000"></div></div>
+        <div class="fg"><label>Bant Sayısı</label><div class="iw"><input type="number" id="dp-conv-bant" value="1" step="1" min="1"></div></div>
+        <div class="fg"><label>Sonuç (m)</label><div class="iw"><input type="text" id="dp-conv-metre" readonly></div></div>
+      </div>
+      <h3>Uzunluk &#8594; KG</h3>
+      <div class="row r3">
+        <div class="fg"><label>Bant Eni</label><div class="iw hu"><input type="number" id="dp-conv-bant-eni" value="625" step="0.5"><span class="unit">mm</span></div></div>
+        <div class="fg"><label>Metre</label><div class="iw"><input type="number" id="dp-conv-metre2" value="96960" step="100"></div></div>
+        <div class="fg"><label>Sonuç (KG)</label><div class="iw"><input type="text" id="dp-conv-kg-result" readonly></div></div>
+      </div>
+    </div>
   </div>
 </div>
 
-<!-- TAB 3: FLAT BOTTOM -->
+<!-- ═══ TAB 3: FLAT BOTTOM ═══ -->
 <div class="tab" id="tab-flat">
   <div class="cd">
-    <h2>Govde Malzeme Yapisi</h2>
-    <table class="tbl">
-      <thead><tr><th>Malzeme</th><th class="r">Yogunluk</th><th class="r" style="width:70px">Deger</th><th class="r">g/m2</th></tr></thead>
-      <tbody id="fb-govde-materials"></tbody>
-    </table>
+    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9632;</span> Gövde Malzeme Yapısı</h2>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-govde-materials"></tbody></table></div>
   </div>
   <div class="cd">
-    <h2>Koruk Malzeme Yapisi</h2>
-    <table class="tbl">
-      <thead><tr><th>Malzeme</th><th class="r">Yogunluk</th><th class="r" style="width:70px">Deger</th><th class="r">g/m2</th></tr></thead>
-      <tbody id="fb-koruk-materials"></tbody>
-    </table>
+    <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9644;</span> Körük Malzeme Yapısı</h2>
+    <div style="overflow-x:auto"><table class="tbl"><thead><tr><th>Malzeme</th><th class="r">Yoğunluk</th><th class="r" style="width:72px">Değer</th><th class="r">g/m²</th></tr></thead><tbody id="fb-koruk-materials"></tbody></table></div>
   </div>
-  <div class="cd">
-    <h2>Boyutlar</h2>
+  <div class="cd cd-accent">
+    <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9633;</span> Boyutlar</h2>
     <div class="row r2">
-      <div>
-        <h3 style="margin-top:0">Govde</h3>
-        <div class="row r2">
-          <div class="fg"><label>Fotosel (mm)</label><div class="iw hu"><input type="number" id="fb-g-fotosel" value="221" step="1"><span class="unit">mm</span></div></div>
-          <div class="fg"><label>Bobin Eni (mm)</label><div class="iw hu"><input type="number" id="fb-g-bobin" value="732" step="0.5"><span class="unit">mm</span></div></div>
-        </div>
-      </div>
-      <div>
-        <h3 style="margin-top:0">Koruk</h3>
-        <div class="row r2">
-          <div class="fg"><label>Fotosel (mm)</label><div class="iw hu"><input type="number" id="fb-k-fotosel" value="300" step="1"><span class="unit">mm</span></div></div>
-          <div class="fg"><label>Bobin Eni (mm)</label><div class="iw hu"><input type="number" id="fb-k-bobin" value="193" step="0.5"><span class="unit">mm</span></div></div>
-        </div>
-      </div>
+      <div><h3 style="margin-top:0">Gövde</h3><div class="row r2">
+        <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-g-fotosel" value="221" step="1"><span class="unit">mm</span></div></div>
+        <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-g-bobin" value="732" step="0.5"><span class="unit">mm</span></div></div>
+      </div></div>
+      <div><h3 style="margin-top:0">Körük</h3><div class="row r2">
+        <div class="fg"><label>Fotosel</label><div class="iw hu"><input type="number" id="fb-k-fotosel" value="300" step="1"><span class="unit">mm</span></div></div>
+        <div class="fg"><label>Bobin Eni</label><div class="iw hu"><input type="number" id="fb-k-bobin" value="193" step="0.5"><span class="unit">mm</span></div></div>
+      </div></div>
     </div>
     <div class="row r3">
-      <div class="fg"><label>KG Fiyati (EUR)</label><div class="iw hu"><input type="number" id="fb-kg-price" value="3.86" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Kesim Fiyati (EUR/kg)</label><div class="iw hu"><input type="number" id="fb-cut-price" value="1.40" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Ayristirma (EUR/kg)</label><div class="iw hu"><input type="number" id="fb-ayrist" value="0.40" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>KG Fiyatı</label><div class="iw hu"><input type="number" id="fb-kg-price" value="3.86" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Kesim Fiyatı</label><div class="iw hu"><input type="number" id="fb-cut-price" value="1.40" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Ayrıştırma</label><div class="iw hu"><input type="number" id="fb-ayrist" value="0.40" step="0.01"><span class="unit">EUR</span></div></div>
     </div>
     <div class="row r2">
-      <div class="fg"><label>Govde KG Fiyat (EUR)</label><div class="iw hu"><input type="number" id="fb-govde-kgprice" value="4.10" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Koruk KG Fiyat (EUR)</label><div class="iw hu"><input type="number" id="fb-koruk-kgprice" value="3.20" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Gövde KG Fiyat</label><div class="iw hu"><input type="number" id="fb-govde-kgprice" value="4.10" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Körük KG Fiyat</label><div class="iw hu"><input type="number" id="fb-koruk-kgprice" value="3.20" step="0.01"><span class="unit">EUR</span></div></div>
     </div>
   </div>
   <div class="hero">
     <div class="val" id="fb-hero-cost">0,00 EUR</div>
-    <div class="lbl">1000 Adet Toplam Maliyet (Ayristirma Dahil)</div>
+    <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
   </div>
   <div class="rg">
-    <div class="ri"><div class="rl">GOVDE M2/AG.</div><div class="rv" id="fb-r-g-gsm">-</div></div>
-    <div class="ri"><div class="rl">KORUK M2/AG.</div><div class="rv" id="fb-r-k-gsm">-</div></div>
-    <div class="ri"><div class="rl">GOVDE 1 POSET</div><div class="rv" id="fb-r-g-pouch">-</div></div>
-    <div class="ri"><div class="rl">KORUK 1 POSET</div><div class="rv" id="fb-r-k-pouch">-</div></div>
-    <div class="ri"><div class="rl">TOPLAM PAKET AG.</div><div class="rv accent" id="fb-r-total-pouch">-</div></div>
-    <div class="ri"><div class="rl">1000 AD. KG</div><div class="rv accent" id="fb-r-1000kg">-</div></div>
-    <div class="ri"><div class="rl">MALZEME MALIYETI</div><div class="rv" id="fb-r-mat-cost">-</div></div>
-    <div class="ri"><div class="rl">KESIM MALIYETI</div><div class="rv" id="fb-r-cut-cost">-</div></div>
+    <div class="ri"><div class="rl">Gövde m²/Ağ.</div><div class="rv" id="fb-r-g-gsm">-</div></div>
+    <div class="ri"><div class="rl">Körük m²/Ağ.</div><div class="rv" id="fb-r-k-gsm">-</div></div>
+    <div class="ri"><div class="rl">Gövde 1 Poşet</div><div class="rv" id="fb-r-g-pouch">-</div></div>
+    <div class="ri"><div class="rl">Körük 1 Poşet</div><div class="rv" id="fb-r-k-pouch">-</div></div>
+    <div class="ri"><div class="rl">Toplam Paket Ağ.</div><div class="rv accent" id="fb-r-total-pouch">-</div></div>
+    <div class="ri"><div class="rl">1000 Ad. KG</div><div class="rv accent" id="fb-r-1000kg">-</div></div>
+    <div class="ri"><div class="rl">Malzeme Maliyeti</div><div class="rv" id="fb-r-mat-cost">-</div></div>
+    <div class="ri"><div class="rl">Kesim Maliyeti</div><div class="rv" id="fb-r-cut-cost">-</div></div>
   </div>
   <div class="cd">
-    <h2>Adet - KG Hesabi</h2>
-    <div class="row r2">
-      <div class="fg"><label>Siparis KG</label><div class="iw hu"><input type="number" id="fb-conv-kg" value="2400" step="50"><span class="unit">kg</span></div></div>
-      <div class="fg"><label>Sonuc (Adet)</label><div class="iw"><input type="text" id="fb-conv-adet" readonly></div></div>
-    </div>
-    <div class="rg" style="margin-top:12px">
-      <div class="ri"><div class="rl">GOVDE KG</div><div class="rv" id="fb-r-govde-kg">-</div></div>
-      <div class="ri"><div class="rl">KORUK KG</div><div class="rv" id="fb-r-koruk-kg">-</div></div>
-      <div class="ri"><div class="rl">GOVDE %</div><div class="rv" id="fb-r-govde-pct">-</div></div>
-      <div class="ri"><div class="rl">ORT. FIYAT (EUR/KG)</div><div class="rv green" id="fb-r-avg-price">-</div></div>
+    <button class="collapse-btn" data-target="fb-conv">
+      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG Hesabı</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="fb-conv">
+      <div class="row r2">
+        <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="fb-conv-kg" value="2400" step="50"><span class="unit">kg</span></div></div>
+        <div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="fb-conv-adet" readonly></div></div>
+      </div>
+      <div class="rg" style="margin-top:12px">
+        <div class="ri"><div class="rl">Gövde KG</div><div class="rv" id="fb-r-govde-kg">-</div></div>
+        <div class="ri"><div class="rl">Körük KG</div><div class="rv" id="fb-r-koruk-kg">-</div></div>
+        <div class="ri"><div class="rl">Gövde %</div><div class="rv" id="fb-r-govde-pct">-</div></div>
+        <div class="ri"><div class="rl">Ort. Fiyat</div><div class="rv green" id="fb-r-avg-price">-</div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TAB 4: SILINDIR -->
+<!-- ═══ TAB 4: SİLİNDİR ═══ -->
 <div class="tab" id="tab-silindir">
-  <div class="cd">
-    <h2>Silindir Fiyat Hesaplama</h2>
-    <h3>Urun Fiyatlari (EUR/kg)</h3>
+  <div class="cd cd-accent">
+    <h2><span class="h2-icon" style="background:rgba(16,185,129,.1);color:var(--accent)">&#9881;</span> Silindir Fiyat Hesaplama</h2>
+    <h3>Ürün Fiyatları (EUR/kg)</h3>
     <div class="row r3">
-      <div class="fg"><label>PET (1.katman)</label><div class="iw hu"><input type="number" id="sl-p1" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>PET (2.katman)</label><div class="iw hu"><input type="number" id="sl-p2" value="2.10" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>PET (1. katman)</label><div class="iw hu"><input type="number" id="sl-p1" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>PET (2. katman)</label><div class="iw hu"><input type="number" id="sl-p2" value="2.10" step="0.01"><span class="unit">EUR</span></div></div>
       <div class="fg"><label>CPP</label><div class="iw hu"><input type="number" id="sl-p3" value="1.55" step="0.01"><span class="unit">EUR</span></div></div>
     </div>
     <div class="row r3">
       <div class="fg"><label>Tutkal</label><div class="iw hu"><input type="number" id="sl-p-tutkal" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Murekkep</label><div class="iw hu"><input type="number" id="sl-p-murekkep" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Mürekkep</label><div class="iw hu"><input type="number" id="sl-p-murekkep" value="3.50" step="0.01"><span class="unit">EUR</span></div></div>
       <div class="fg"><label>Solvent</label><div class="iw hu"><input type="number" id="sl-p-solvent" value="1.35" step="0.01"><span class="unit">EUR</span></div></div>
     </div>
-    <h3>Yapi</h3>
+    <h3>Yapı</h3>
     <div class="row r3">
       <div class="fg"><label>1. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t1" value="24" step="1"></div></div>
       <div class="fg"><label>2. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t2" value="80" step="1"></div></div>
       <div class="fg"><label>3. Katman (mikron)</label><div class="iw"><input type="number" id="sl-t3" value="0" step="1"></div></div>
     </div>
     <div class="row r3">
-      <div class="fg"><label>Yogunluk 1</label><div class="iw"><input type="number" id="sl-d1" value="1.41" step="0.01"></div></div>
-      <div class="fg"><label>Yogunluk 2</label><div class="iw"><input type="number" id="sl-d2" value="0.92" step="0.01"></div></div>
-      <div class="fg"><label>Yogunluk 3</label><div class="iw"><input type="number" id="sl-d3" value="0.91" step="0.01"></div></div>
+      <div class="fg"><label>Yoğunluk 1</label><div class="iw"><input type="number" id="sl-d1" value="1.41" step="0.01"></div></div>
+      <div class="fg"><label>Yoğunluk 2</label><div class="iw"><input type="number" id="sl-d2" value="0.92" step="0.01"></div></div>
+      <div class="fg"><label>Yoğunluk 3</label><div class="iw"><input type="number" id="sl-d3" value="0.91" step="0.01"></div></div>
     </div>
     <h3>Parametreler</h3>
     <div class="row r3">
-      <div class="fg"><label>Tutkal (g/m2)</label><div class="iw"><input type="number" id="sl-tutkal-gsm" value="7.5" step="0.5"></div></div>
-      <div class="fg"><label>Murekkep (g/m2)</label><div class="iw"><input type="number" id="sl-murekkep-gsm" value="3" step="0.5"></div></div>
-      <div class="fg"><label>Fire Orani</label><div class="iw hu"><input type="number" id="sl-fire-pct" value="0" step="1"><span class="unit">%</span></div></div>
+      <div class="fg"><label>Tutkal (g/m²)</label><div class="iw"><input type="number" id="sl-tutkal-gsm" value="7.5" step="0.5"></div></div>
+      <div class="fg"><label>Mürekkep (g/m²)</label><div class="iw"><input type="number" id="sl-murekkep-gsm" value="3" step="0.5"></div></div>
+      <div class="fg"><label>Fire Oranı</label><div class="iw hu"><input type="number" id="sl-fire-pct" value="0" step="1"><span class="unit">%</span></div></div>
     </div>
     <div class="row r3">
       <div class="fg"><label>Ek Maliyet (X)</label><div class="iw hu"><input type="number" id="sl-x1" value="750" step="50"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Siparis KG</label><div class="iw hu"><input type="number" id="sl-order-kg" value="2400" step="100"><span class="unit">kg</span></div></div>
-      <div class="fg"><label>Sip. KG Carpan</label><div class="iw"><input type="number" id="sl-multiplier" value="0.84" step="0.01"></div></div>
+      <div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="sl-order-kg" value="2400" step="100"><span class="unit">kg</span></div></div>
+      <div class="fg"><label>Sip. KG Çarpan</label><div class="iw"><input type="number" id="sl-multiplier" value="0.84" step="0.01"></div></div>
     </div>
-    <h3>Klise / Silindir</h3>
+    <h3>Klişe / Silindir</h3>
     <div class="row r3">
-      <div class="fg"><label>Klise Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-klise-price" value="200" step="10"><span class="unit">EUR</span></div></div>
-      <div class="fg"><label>Renk Sayisi</label><div class="iw"><input type="number" id="sl-color-count" value="8" step="1" min="1"></div></div>
+      <div class="fg"><label>Klişe Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-klise-price" value="200" step="10"><span class="unit">EUR</span></div></div>
+      <div class="fg"><label>Renk Sayısı</label><div class="iw"><input type="number" id="sl-color-count" value="8" step="1" min="1"></div></div>
       <div class="fg"><label>Fire Maliyeti</label><div class="iw hu"><input type="number" id="sl-fire-cost" value="150" step="10"><span class="unit">EUR</span></div></div>
     </div>
   </div>
   <div class="hero">
     <div class="val" id="sl-hero">0,00 EUR</div>
-    <div class="lbl">Ton Basi Son Toplam</div>
+    <div class="lbl">Ton Başı Son Toplam</div>
   </div>
   <div class="rg">
-    <div class="ri"><div class="rl">MALZEME TOPLAMI</div><div class="rv accent" id="sl-r-mat">-</div></div>
-    <div class="ri"><div class="rl">FIRE MALIYETI</div><div class="rv orange" id="sl-r-fire">-</div></div>
-    <div class="ri"><div class="rl">KLISE/TON</div><div class="rv" id="sl-r-klise">-</div></div>
-    <div class="ri"><div class="rl">FIRE 150EUR/TON</div><div class="rv" id="sl-r-fire150">-</div></div>
-    <div class="ri"><div class="rl">TOPLAM G/M2</div><div class="rv" id="sl-r-gsm">-</div></div>
-    <div class="ri"><div class="rl">MIN. SIPARIS (KG)</div><div class="rv" id="sl-r-minsip">-</div></div>
+    <div class="ri"><div class="rl">Malzeme Toplamı</div><div class="rv accent" id="sl-r-mat">-</div></div>
+    <div class="ri"><div class="rl">Fire Maliyeti</div><div class="rv orange" id="sl-r-fire">-</div></div>
+    <div class="ri"><div class="rl">Klişe / Ton</div><div class="rv" id="sl-r-klise">-</div></div>
+    <div class="ri"><div class="rl">Fire 150 EUR/Ton</div><div class="rv" id="sl-r-fire150">-</div></div>
+    <div class="ri"><div class="rl">Toplam g/m²</div><div class="rv" id="sl-r-gsm">-</div></div>
+    <div class="ri"><div class="rl">Min. Sipariş</div><div class="rv" id="sl-r-minsip">-</div></div>
   </div>
   <div class="cd">
-    <h2>Maliyet Kirilimi</h2>
-    <table class="tbl">
-      <thead><tr><th>Kalem</th><th class="r">g/m2</th><th class="r">Kullanim</th><th class="r">Tutar (EUR)</th></tr></thead>
-      <tbody id="sl-detail-body"></tbody>
-    </table>
-  </div>
-  <div class="cd">
-    <h2>KG Bazli Fiyat</h2>
-    <div class="row r2">
-      <div class="fg"><label>Min. Sip. KG</label><div class="iw hu"><input type="number" id="sl-min-kg" value="840" step="10"><span class="unit">kg</span></div></div>
-      <div class="fg"><label>Min. Carpan</label><div class="iw"><input type="number" id="sl-min-multiplier" value="2.4" step="0.1"></div></div>
-    </div>
-    <div class="rg" style="margin-top:12px">
-      <div class="ri"><div class="rl">KG FIYATI</div><div class="rv accent" id="sl-r-kg-price">-</div></div>
-      <div class="ri"><div class="rl">KLISE/KG</div><div class="rv" id="sl-r-klise-kg">-</div></div>
-      <div class="ri"><div class="rl">KLISE+URUN KG</div><div class="rv green" id="sl-r-total-kg">-</div></div>
-      <div class="ri"><div class="rl">DM DAHIL KG</div><div class="rv orange" id="sl-r-dm-kg">-</div></div>
+    <button class="collapse-btn" data-target="sl-detail">
+      <h2><span class="h2-icon" style="background:rgba(139,92,246,.1);color:var(--purple)">&#9776;</span> Maliyet Kırılımı</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="sl-detail">
+      <table class="tbl"><thead><tr><th>Kalem</th><th class="r">g/m²</th><th class="r">Kullanım</th><th class="r">Tutar (EUR)</th></tr></thead><tbody id="sl-detail-body"></tbody></table>
     </div>
   </div>
   <div class="cd">
-    <h2>Rotogravur vs Dijital</h2>
-    <div class="row r2">
-      <div>
-        <h3 style="margin-top:0">Rotogravur</h3>
-        <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-roto-gr" value="118" step="1"></div></div>
-        <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-roto-petgr" value="290" step="1"></div></div>
-        <div class="fg"><label>PET Carpan</label><div class="iw"><input type="number" id="sl-roto-petmult" value="1.317" step="0.001"></div></div>
-        <div class="fg"><label>Yapi Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-unit" value="8.11" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-petprice" value="1.10" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>Lam. Maliyeti</label><div class="iw hu"><input type="number" id="sl-roto-lam" value="0.10" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>Ek Maliyet</label><div class="iw hu"><input type="number" id="sl-roto-extra" value="1.00" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>Kesim Mal.</label><div class="iw hu"><input type="number" id="sl-roto-cut" value="0.57" step="0.01"><span class="unit">EUR</span></div></div>
+    <button class="collapse-btn" data-target="sl-kg">
+      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#9878;</span> KG Bazlı Fiyat</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="sl-kg">
+      <div class="row r2">
+        <div class="fg"><label>Min. Sip. KG</label><div class="iw hu"><input type="number" id="sl-min-kg" value="840" step="10"><span class="unit">kg</span></div></div>
+        <div class="fg"><label>Min. Çarpan</label><div class="iw"><input type="number" id="sl-min-multiplier" value="2.4" step="0.1"></div></div>
       </div>
-      <div>
-        <h3 style="margin-top:0">Dijital</h3>
-        <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-dij-gr" value="119.64" step="1"></div></div>
-        <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-dij-petgr" value="280" step="1"></div></div>
-        <div class="fg"><label>PET Carpan</label><div class="iw"><input type="number" id="sl-dij-petmult" value="1.41" step="0.001"></div></div>
-        <div class="fg"><label>Yapi Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-unit" value="22.38" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-petprice" value="1.50" step="0.01"><span class="unit">EUR</span></div></div>
-        <div class="fg"><label>Kesim Fire %</label><div class="iw hu"><input type="number" id="sl-dij-cutfire" value="10" step="1"><span class="unit">%</span></div></div>
-        <div class="fg"><label>Lam. Fire %</label><div class="iw hu"><input type="number" id="sl-dij-lamfire" value="8" step="1"><span class="unit">%</span></div></div>
-        <div class="fg"><label>Kesim+Ek</label><div class="iw hu"><input type="number" id="sl-dij-extra" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+      <div class="rg" style="margin-top:12px">
+        <div class="ri"><div class="rl">KG Fiyatı</div><div class="rv accent" id="sl-r-kg-price">-</div></div>
+        <div class="ri"><div class="rl">Klişe / KG</div><div class="rv" id="sl-r-klise-kg">-</div></div>
+        <div class="ri"><div class="rl">Klişe+Ürün KG</div><div class="rv green" id="sl-r-total-kg">-</div></div>
+        <div class="ri"><div class="rl">DM Dahil KG</div><div class="rv orange" id="sl-r-dm-kg">-</div></div>
       </div>
     </div>
-    <div class="cmp" id="sl-cmp">
-      <div class="cmp-card" id="sl-cmp-roto-card"><h4>Rotogravur</h4><div class="price" id="sl-cmp-roto">-</div></div>
-      <div class="cmp-card" id="sl-cmp-dij-card"><h4>Dijital</h4><div class="price" id="sl-cmp-dij">-</div></div>
+  </div>
+  <div class="cd">
+    <button class="collapse-btn" data-target="sl-cmp-sec">
+      <h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9733;</span> Rotogravür vs Dijital</h2>
+      <span class="chevron">&#9660;</span>
+    </button>
+    <div class="collapse-content" id="sl-cmp-sec">
+      <div class="row r2">
+        <div><h3 style="margin-top:0">Rotogravür</h3>
+          <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-roto-gr" value="118" step="1"></div></div>
+          <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-roto-petgr" value="290" step="1"></div></div>
+          <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-roto-petmult" value="1.317" step="0.001"></div></div>
+          <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-unit" value="8.11" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-roto-petprice" value="1.10" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>Lam. Maliyeti</label><div class="iw hu"><input type="number" id="sl-roto-lam" value="0.10" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>Ek Maliyet</label><div class="iw hu"><input type="number" id="sl-roto-extra" value="1.00" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>Kesim Mal.</label><div class="iw hu"><input type="number" id="sl-roto-cut" value="0.57" step="0.01"><span class="unit">EUR</span></div></div>
+        </div>
+        <div><h3 style="margin-top:0">Dijital</h3>
+          <div class="fg"><label>Toplam GR</label><div class="iw"><input type="number" id="sl-dij-gr" value="119.64" step="1"></div></div>
+          <div class="fg"><label>PET GR</label><div class="iw"><input type="number" id="sl-dij-petgr" value="280" step="1"></div></div>
+          <div class="fg"><label>PET Çarpan</label><div class="iw"><input type="number" id="sl-dij-petmult" value="1.41" step="0.001"></div></div>
+          <div class="fg"><label>Yapı Birim Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-unit" value="22.38" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>PET Fiyat</label><div class="iw hu"><input type="number" id="sl-dij-petprice" value="1.50" step="0.01"><span class="unit">EUR</span></div></div>
+          <div class="fg"><label>Kesim Fire %</label><div class="iw hu"><input type="number" id="sl-dij-cutfire" value="10" step="1"><span class="unit">%</span></div></div>
+          <div class="fg"><label>Lam. Fire %</label><div class="iw hu"><input type="number" id="sl-dij-lamfire" value="8" step="1"><span class="unit">%</span></div></div>
+          <div class="fg"><label>Kesim + Ek</label><div class="iw hu"><input type="number" id="sl-dij-extra" value="1.60" step="0.01"><span class="unit">EUR</span></div></div>
+        </div>
+      </div>
+      <div class="cmp" id="sl-cmp">
+        <div class="cmp-card" id="sl-cmp-roto-card"><h4>Rotogravür</h4><div class="price" id="sl-cmp-roto">-</div></div>
+        <div class="cmp-card" id="sl-cmp-dij-card"><h4>Dijital</h4><div class="price" id="sl-cmp-dij">-</div></div>
+      </div>
     </div>
   </div>
 </div>
 
-<!-- TAB 5: FIRE -->
+<!-- ═══ TAB 5: FİRE ═══ -->
 <div class="tab" id="tab-fire">
-  <div class="cd">
-    <h2>Fire Hesaplama</h2>
-    <div class="fg"><label>Urun Miktari</label><div class="iw hu"><input type="number" id="fr-urun-kg" value="2642" step="1"><span class="unit">KG</span></div></div>
+  <div class="cd cd-accent">
+    <h2><span class="h2-icon" style="background:rgba(239,68,68,.1);color:var(--red)">&#9888;</span> Fire Hesaplama</h2>
+    <div class="fg"><label>Ürün Miktarı</label><div class="iw hu"><input type="number" id="fr-urun-kg" value="2642" step="1"><span class="unit">KG</span></div></div>
     <div class="row r2">
-      <div class="fg"><label>Brut Bant Eni</label><div class="iw hu"><input type="number" id="fr-brut-bant" value="517" step="1"><span class="unit">mm</span></div></div>
+      <div class="fg"><label>Brüt Bant Eni</label><div class="iw hu"><input type="number" id="fr-brut-bant" value="517" step="1"><span class="unit">mm</span></div></div>
       <div class="fg"><label>Net Bant Eni</label><div class="iw hu"><input type="number" id="fr-net-bant" value="500" step="1"><span class="unit">mm</span></div></div>
     </div>
     <div class="row r2">
-      <div class="fg"><label>Brut Fotosel</label><div class="iw hu"><input type="number" id="fr-brut-foto" value="133" step="1"><span class="unit">mm</span></div></div>
+      <div class="fg"><label>Brüt Fotosel</label><div class="iw hu"><input type="number" id="fr-brut-foto" value="133" step="1"><span class="unit">mm</span></div></div>
       <div class="fg"><label>Net Fotosel</label><div class="iw hu"><input type="number" id="fr-net-foto" value="130" step="1"><span class="unit">mm</span></div></div>
     </div>
   </div>
@@ -455,288 +553,194 @@ select option{background:var(--card);color:var(--t1)}
     <div class="lbl">Toplam Fire</div>
   </div>
   <div class="rg">
-    <div class="ri"><div class="rl">BANT ENI FIRE %</div><div class="rv orange" id="fr-r-bant-pct">-</div></div>
-    <div class="ri"><div class="rl">FOTOSEL FIRE %</div><div class="rv orange" id="fr-r-foto-pct">-</div></div>
-    <div class="ri"><div class="rl">BANT ENI FIRE</div><div class="rv red" id="fr-r-bant-kg">-</div></div>
-    <div class="ri"><div class="rl">FOTOSEL FIRE</div><div class="rv red" id="fr-r-foto-kg">-</div></div>
-    <div class="ri"><div class="rl">TOPLAM FIRE</div><div class="rv red" id="fr-r-total-kg">-</div></div>
-    <div class="ri"><div class="rl">NET KG</div><div class="rv green" id="fr-r-net-kg">-</div></div>
+    <div class="ri"><div class="rl">Bant Eni Fire %</div><div class="rv orange" id="fr-r-bant-pct">-</div></div>
+    <div class="ri"><div class="rl">Fotosel Fire %</div><div class="rv orange" id="fr-r-foto-pct">-</div></div>
+    <div class="ri"><div class="rl">Bant Eni Fire</div><div class="rv red" id="fr-r-bant-kg">-</div></div>
+    <div class="ri"><div class="rl">Fotosel Fire</div><div class="rv red" id="fr-r-foto-kg">-</div></div>
+    <div class="ri"><div class="rl">Toplam Fire</div><div class="rv red" id="fr-r-total-kg">-</div></div>
+    <div class="ri"><div class="rl">Net KG</div><div class="rv green" id="fr-r-net-kg">-</div></div>
   </div>
 </div>
 
 </div>
 
+<!-- ═══ BOTTOM NAV ═══ -->
 <nav class="bnav">
-  <button class="active" data-tab="fiyat"><span class="ico">&#128176;</span>Fiyat</button>
-  <button data-tab="doypack"><span class="ico">&#127991;</span>Doypack</button>
-  <button data-tab="flat"><span class="ico">&#128230;</span>Flat Bot.</button>
-  <button data-tab="silindir"><span class="ico">&#128297;</span>Silindir</button>
-  <button data-tab="fire"><span class="ico">&#128293;</span>Fire</button>
+  <button class="active" data-tab="fiyat">
+    <svg viewBox="0 0 24 24"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+    Fiyat
+  </button>
+  <button data-tab="doypack">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg>
+    Doypack
+  </button>
+  <button data-tab="flat">
+    <svg viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"/></svg>
+    Flat Bot.
+  </button>
+  <button data-tab="silindir">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>
+    Silindir
+  </button>
+  <button data-tab="fire">
+    <svg viewBox="0 0 24 24"><path d="M8.5 14.5A2.5 2.5 0 0011 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 11-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 002.5 2.5z"/></svg>
+    Fire
+  </button>
 </nav>
 
 <script>
 /* ═══ CONSTANTS ═══ */
-var DENSITIES = {
-  pet:1.41, seffaf_opp:0.91, pearlize_opp:0.70, opak_opp:0.96,
-  mat_opp:0.87, met_opp_cpp:0.91, pe:0.92, pe_opak:0.96,
-  alu:2.70, cold_seal_mat:1.20, opak_cpp_pe:0.96, kagit_bopa:1.00
-};
-
-var POUCH_MATERIALS = [
+var DENSITIES={pet:1.41,seffaf_opp:0.91,pearlize_opp:0.70,opak_opp:0.96,mat_opp:0.87,met_opp_cpp:0.91,pe:0.92,pe_opak:0.96,alu:2.70,cold_seal_mat:1.20,opak_cpp_pe:0.96,kagit_bopa:1.00};
+var POUCH_MATERIALS=[
   {id:'opp_pearlize',name:'OPP Pearlize',density:0.70,dv:0},
-  {id:'opp_beyaz',name:'OPP Beyaz/MDOP Seffaf',density:0.91,dv:0},
-  {id:'met_seffaf',name:'Met/Seffaf OPP/CPP',density:0.91,dv:0},
+  {id:'opp_beyaz',name:'OPP Beyaz/MDOP Şeffaf',density:0.91,dv:0},
+  {id:'met_seffaf',name:'Met/Şeffaf OPP/CPP',density:0.91,dv:0},
   {id:'pet',name:'PET',density:1.41,dv:12},
-  {id:'aluminyum',name:'Aluminyum',density:2.70,dv:0},
+  {id:'aluminyum',name:'Alüminyum',density:2.70,dv:0},
   {id:'mat_opp',name:'Mat OPP',density:0.87,dv:0},
   {id:'opak_opp',name:'Opak OPP',density:0.98,dv:0},
-  {id:'kagit_bopa',name:'Kagit/BOPA',density:1.00,dv:0},
+  {id:'kagit_bopa',name:'Kağıt/BOPA',density:1.00,dv:0},
   {id:'opak_cpp_pe',name:'Opak CPP/PE',density:0.96,dv:0},
-  {id:'pe_seffaf',name:'PE Seffaf',density:0.92,dv:70},
+  {id:'pe_seffaf',name:'PE Şeffaf',density:0.92,dv:70},
   {id:'pe_opak',name:'PE Opak',density:0.96,dv:0},
   {id:'tutkal',name:'Tutkal',density:2.50,dv:2},
   {id:'beyaz_zemin',name:'Beyaz Zemin',density:3.00,dv:0},
-  {id:'murekkep',name:'Murekkep Normal',density:3.50,dv:1},
+  {id:'murekkep',name:'Mürekkep Normal',density:3.50,dv:1},
   {id:'matlak',name:'Matlak',density:1.00,dv:0}
 ];
-
-var FB_G_DEF = [0,0,30,12,0,0,0,0,0,55,0,2,1,0,1];
-var FB_K_DEF = [0,0,30,12,0,0,0,0,0,55,0,2,1,0,1];
-
-var CUT_TABLE = [{max:5,r:2.75},{max:7,r:2.50},{max:9,r:1.84},{max:12,r:1.65},{max:15,r:1.45},{max:17,r:1.35},{max:21,r:1.20}];
-
-var FH_LAYER_DATA = [
-  {mat:'pet',thick:20,priceRef:'pet'},
-  {mat:'met_opp_cpp',thick:20,priceRef:'7525'},
-  {mat:'pe_opak',thick:0,priceRef:'cpp'}
-];
-
-var MAT_OPTIONS = [
-  {v:'pet',n:'PET'},{v:'seffaf_opp',n:'Seffaf OPP'},{v:'pearlize_opp',n:'Pearlize OPP'},
-  {v:'opak_opp',n:'Opak OPP'},{v:'mat_opp',n:'Mat OPP'},{v:'met_opp_cpp',n:'Met OPP/CPP'},
-  {v:'pe',n:'PE Seffaf'},{v:'pe_opak',n:'PE Opak'},{v:'alu',n:'Aluminyum'},
-  {v:'cold_seal_mat',n:'Cold Seal'},{v:'opak_cpp_pe',n:'Opak CPP/PE'}
-];
-
-var PRICE_OPTIONS = [{v:'pet',n:'PET'},{v:'7525',n:'7525'},{v:'cpp',n:'CPP/PE'}];
+var FB_G_DEF=[0,0,30,12,0,0,0,0,0,55,0,2,1,0,1];
+var FB_K_DEF=[0,0,30,12,0,0,0,0,0,55,0,2,1,0,1];
+var CUT_TABLE=[{max:5,r:2.75},{max:7,r:2.50},{max:9,r:1.84},{max:12,r:1.65},{max:15,r:1.45},{max:17,r:1.35},{max:21,r:1.20}];
+var FH_LAYER_DATA=[{mat:'pet',thick:20,priceRef:'pet'},{mat:'met_opp_cpp',thick:20,priceRef:'7525'},{mat:'pe_opak',thick:0,priceRef:'cpp'}];
+var MAT_OPTIONS=[{v:'pet',n:'PET'},{v:'seffaf_opp',n:'Şeffaf OPP'},{v:'pearlize_opp',n:'Pearlize OPP'},{v:'opak_opp',n:'Opak OPP'},{v:'mat_opp',n:'Mat OPP'},{v:'met_opp_cpp',n:'Met OPP/CPP'},{v:'pe',n:'PE Şeffaf'},{v:'pe_opak',n:'PE Opak'},{v:'alu',n:'Alüminyum'},{v:'cold_seal_mat',n:'Cold Seal'},{v:'opak_cpp_pe',n:'Opak CPP/PE'}];
+var PRICE_OPTIONS=[{v:'pet',n:'PET'},{v:'7525',n:'7525'},{v:'cpp',n:'CPP/PE'}];
 
 /* ═══ HELPERS ═══ */
 function $(id){return document.getElementById(id)}
 function $v(id){return parseFloat($(id).value)||0}
 function fmt(n,d){d=d==null?2:d;return n.toLocaleString('tr-TR',{minimumFractionDigits:d,maximumFractionDigits:d})}
 function fmtE(n,d){return fmt(n,d)+' EUR'}
-function el(tag,attrs,children){
-  var e=document.createElement(tag);
-  if(attrs)Object.keys(attrs).forEach(function(k){
-    if(k==='text')e.textContent=attrs[k];
-    else if(k==='cls')e.className=attrs[k];
-    else if(k==='style')e.style.cssText=attrs[k];
-    else e.setAttribute(k,attrs[k]);
-  });
-  if(children)(Array.isArray(children)?children:[children]).forEach(function(c){
-    if(typeof c==='string')e.appendChild(document.createTextNode(c));
-    else if(c)e.appendChild(c);
-  });
-  return e;
-}
+function el(tag,attrs,children){var e=document.createElement(tag);if(attrs)Object.keys(attrs).forEach(function(k){if(k==='text')e.textContent=attrs[k];else if(k==='cls')e.className=attrs[k];else if(k==='style')e.style.cssText=attrs[k];else e.setAttribute(k,attrs[k])});if(children)(Array.isArray(children)?children:[children]).forEach(function(c){if(typeof c==='string')e.appendChild(document.createTextNode(c));else if(c)e.appendChild(c)});return e}
 function getCutRate(g){for(var i=0;i<CUT_TABLE.length;i++){if(g<=CUT_TABLE[i].max)return CUT_TABLE[i].r}return 1.20}
+function addTblRow(tbody,cells,isTotalRow){var tr=el('tr');if(isTotalRow)tr.className='total-row';cells.forEach(function(c){var td=el('td',null,[document.createTextNode(c.t||'')]);if(c.r)td.className='r';if(c.s)td.style.cssText=c.s;tr.appendChild(td)});tbody.appendChild(tr)}
 
-function addTblRow(tbody,cells,isTotalRow){
-  var tr=el('tr');
-  if(isTotalRow)tr.className='total-row';
-  cells.forEach(function(c,i){
-    var td=el('td',null,[document.createTextNode(c.t||'')]);
-    if(c.r)td.className='r';
-    if(c.s)td.style.cssText=c.s;
-    tr.appendChild(td);
+/* ═══ COLLAPSIBLE ═══ */
+document.querySelectorAll('.collapse-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var target=$(btn.getAttribute('data-target'));
+    var isOpen=target.classList.contains('open');
+    if(isOpen){target.classList.remove('open');btn.classList.remove('open')}
+    else{target.classList.add('open');btn.classList.add('open')}
   });
-  tbody.appendChild(tr);
-}
+});
 
-/* ═══ RENDER: FIYAT HESAPLAMA LAYERS ═══ */
+/* ═══ RENDER: FH LAYERS ═══ */
 function renderFHLayers(){
-  var cont=$('fh-layers');
-  cont.textContent='';
+  var cont=$('fh-layers');cont.textContent='';
   FH_LAYER_DATA.forEach(function(ld,idx){
-    var layer=el('div',{cls:'cd',style:'padding:10px;background:var(--bg2);margin-bottom:8px'});
-    var row=el('div',{cls:'row r4'});
-
-    // Material select
-    var fg1=el('div',{cls:'fg'});
-    fg1.appendChild(el('label',null,['Katman '+(idx+1)]));
-    var iw1=el('div',{cls:'iw'});
-    var sel=el('select',{cls:'fh-mat','data-idx':String(idx)});
-    MAT_OPTIONS.forEach(function(o){
-      var opt=el('option',{value:o.v},o.n);
-      if(o.v===ld.mat)opt.selected=true;
-      sel.appendChild(opt);
-    });
+    var layer=el('div',{style:'background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:8px;position:relative'});
+    // Header with number + delete
+    var hdr=el('div',{style:'display:flex;align-items:center;justify-content:space-between;margin-bottom:8px'});
+    var numBadge=el('span',{style:'background:var(--accent);color:#fff;width:22px;height:22px;border-radius:6px;display:inline-flex;align-items:center;justify-content:center;font-size:.7rem;font-weight:700'},String(idx+1));
+    hdr.appendChild(numBadge);
+    if(FH_LAYER_DATA.length>1){
+      var delBtn=el('button',{type:'button','data-delidx':String(idx),style:'background:none;border:1px solid var(--border);color:var(--t3);cursor:pointer;border-radius:6px;width:26px;height:26px;display:flex;align-items:center;justify-content:center;font-size:.75rem;transition:all .15s'});
+      delBtn.textContent='\u2715';
+      delBtn.addEventListener('mouseover',function(){this.style.borderColor='var(--red)';this.style.color='var(--red)'});
+      delBtn.addEventListener('mouseout',function(){this.style.borderColor='var(--border)';this.style.color='var(--t3)'});
+      delBtn.addEventListener('click',function(){removeFHLayer(parseInt(this.getAttribute('data-delidx')))});
+      hdr.appendChild(delBtn);
+    }
+    layer.appendChild(hdr);
+    var row=el('div',{cls:'row r3'});
+    // Material
+    var fg1=el('div',{cls:'fg'});fg1.appendChild(el('label',null,['Malzeme']));
+    var iw1=el('div',{cls:'iw'});var sel=el('select',{cls:'fh-mat','data-idx':String(idx)});
+    MAT_OPTIONS.forEach(function(o){var opt=el('option',{value:o.v},o.n);if(o.v===ld.mat)opt.selected=true;sel.appendChild(opt)});
     iw1.appendChild(sel);fg1.appendChild(iw1);row.appendChild(fg1);
-
     // Thickness
-    var fg2=el('div',{cls:'fg'});
-    fg2.appendChild(el('label',null,['Kalinlik (u)']));
-    var iw2=el('div',{cls:'iw'});
-    var inp2=el('input',{type:'number',cls:'fh-thick','data-idx':String(idx),value:String(ld.thick),step:'1'});
-    iw2.appendChild(inp2);fg2.appendChild(iw2);row.appendChild(fg2);
-
-    // Density (readonly)
-    var fg3=el('div',{cls:'fg'});
-    fg3.appendChild(el('label',null,['Yogunluk']));
-    var iw3=el('div',{cls:'iw'});
-    var inp3=el('input',{type:'number',cls:'fh-dens','data-idx':String(idx),value:String(DENSITIES[ld.mat]||0.91),step:'0.01',readonly:'true'});
-    iw3.appendChild(inp3);fg3.appendChild(iw3);row.appendChild(fg3);
-
+    var fg2=el('div',{cls:'fg'});fg2.appendChild(el('label',null,['Kalınlık (μ)']));
+    var iw2=el('div',{cls:'iw'});iw2.appendChild(el('input',{type:'number',cls:'fh-thick','data-idx':String(idx),value:String(ld.thick),step:'1'}));
+    fg2.appendChild(iw2);row.appendChild(fg2);
     // Price ref
-    var fg4=el('div',{cls:'fg'});
-    fg4.appendChild(el('label',null,['Fiyat (EUR)']));
-    var iw4=el('div',{cls:'iw'});
-    var sel2=el('select',{cls:'fh-price-ref','data-idx':String(idx)});
-    PRICE_OPTIONS.forEach(function(o){
-      var opt=el('option',{value:o.v},o.n);
-      if(o.v===ld.priceRef)opt.selected=true;
-      sel2.appendChild(opt);
-    });
+    var fg4=el('div',{cls:'fg'});fg4.appendChild(el('label',null,['Fiyat Ref.']));
+    var iw4=el('div',{cls:'iw'});var sel2=el('select',{cls:'fh-price-ref','data-idx':String(idx)});
+    PRICE_OPTIONS.forEach(function(o){var opt=el('option',{value:o.v},o.n);if(o.v===ld.priceRef)opt.selected=true;sel2.appendChild(opt)});
     iw4.appendChild(sel2);fg4.appendChild(iw4);row.appendChild(fg4);
-
     layer.appendChild(row);
+    // Info line: density + g/m²
+    var dens=DENSITIES[ld.mat]||0.91;
+    var gsm=dens*ld.thick;
+    var infoLine=el('div',{cls:'fh-layer-info',style:'display:flex;gap:12px;margin-top:6px;font-size:.72rem;color:var(--t2)'});
+    infoLine.appendChild(el('span',null,['Yoğunluk: '+dens]));
+    infoLine.appendChild(el('span',{style:'color:var(--accent);font-weight:600'},['g/m\u00B2: '+fmt(gsm,1)]));
+    layer.appendChild(infoLine);
     cont.appendChild(layer);
   });
 }
 
-/* ═══ RENDER: MATERIAL TABLES (Doypack / FB) ═══ */
-function renderMatTable(tbodyId, materials, defaults, prefix){
-  var tbody=$(tbodyId);
-  tbody.textContent='';
+function addFHLayer(){
+  FH_LAYER_DATA.push({mat:'pe',thick:0,priceRef:'cpp'});
+  renderFHLayers();recalcAll();
+}
+function removeFHLayer(idx){
+  if(FH_LAYER_DATA.length<=1)return;
+  FH_LAYER_DATA.splice(idx,1);
+  renderFHLayers();recalcAll();
+}
+
+/* ═══ ADD LAYER BUTTON ═══ */
+$('fh-add-layer').addEventListener('click',addFHLayer);
+
+/* ═══ RENDER: MATERIAL TABLES ═══ */
+function renderMatTable(tbodyId,materials,defaults,prefix){
+  var tbody=$(tbodyId);tbody.textContent='';
   materials.forEach(function(m,i){
-    var dv = defaults ? (defaults[i]||0) : m.dv;
-    var dens = m.density;
-    // FB specific density overrides
-    if(prefix==='fb-govde'||prefix==='fb-koruk'){
-      if(m.id==='opp_beyaz')dens=0.92;
-      if(m.id==='mat_opp')dens=0.83;
-      if(m.id==='beyaz_zemin')dens=3.5;
-      if(m.id==='murekkep')dens=3.0;
-      if(m.id==='matlak')dens=2.1;
-    }
-    var tr=el('tr');
-    tr.appendChild(el('td',{style:'font-size:.78rem'},m.name));
-    tr.appendChild(el('td',{cls:'r',style:'color:var(--t2)'},String(dens)));
-
-    var tdInput=el('td',{cls:'r'});
-    var inp=el('input',{type:'number',cls:prefix+'-val','data-idx':String(i),'data-dens':String(dens),value:String(dv),step:'1',min:'0'});
-    inp.className='mi '+prefix+'-val';
-    inp.setAttribute('data-idx',String(i));
-    inp.setAttribute('data-dens',String(dens));
-    tdInput.appendChild(inp);
-    tr.appendChild(tdInput);
-
-    var tdGsm=el('td',{cls:'r '+prefix+'-gsm',style:'font-weight:600'});
-    tdGsm.setAttribute('data-idx',String(i));
-    tdGsm.textContent=fmt(dens*dv,1);
-    tr.appendChild(tdGsm);
-
+    var dv=defaults?(defaults[i]||0):m.dv;var dens=m.density;
+    if(prefix==='fb-govde'||prefix==='fb-koruk'){if(m.id==='opp_beyaz')dens=0.92;if(m.id==='mat_opp')dens=0.83;if(m.id==='beyaz_zemin')dens=3.5;if(m.id==='murekkep')dens=3.0;if(m.id==='matlak')dens=2.1}
+    var tr=el('tr');tr.appendChild(el('td',{style:'font-size:.76rem'},m.name));tr.appendChild(el('td',{cls:'r',style:'color:var(--t2)'},String(dens)));
+    var tdI=el('td',{cls:'r'});var inp=el('input',{type:'number',cls:'mi '+prefix+'-val','data-idx':String(i),'data-dens':String(dens),value:String(dv),step:'1',min:'0'});
+    tdI.appendChild(inp);tr.appendChild(tdI);
+    var tdG=el('td',{cls:'r '+prefix+'-gsm',style:'font-weight:600'});tdG.setAttribute('data-idx',String(i));tdG.textContent=fmt(dens*dv,1);tr.appendChild(tdG);
     tbody.appendChild(tr);
   });
 }
+function renderStaticTable(tbodyId,rows){var tbody=$(tbodyId);tbody.textContent='';rows.forEach(function(r){addTblRow(tbody,r)})}
 
-function renderStaticTable(tbodyId, rows){
-  var tbody=$(tbodyId);
-  tbody.textContent='';
-  rows.forEach(function(r){addTblRow(tbody,r)});
-}
-
-/* ═══ CALC: TAB 1 - FIYAT HESAPLAMA ═══ */
+/* ═══ CALC: TAB 1 ═══ */
 function calcFiyat(){
-  var pp={pet:$v('pp-pet'),'7525':$v('pp-7525'),cpp:$v('pp-cpp'),
-    tutkal:$v('pp-tutkal'),murekkep:$v('pp-murekkep'),solvent:$v('pp-solvent'),
-    coldseal:$v('pp-coldseal'),matlak:$v('pp-matlak')};
-
+  var pp={pet:$v('pp-pet'),'7525':$v('pp-7525'),cpp:$v('pp-cpp'),tutkal:$v('pp-tutkal'),murekkep:$v('pp-murekkep'),solvent:$v('pp-solvent'),coldseal:$v('pp-coldseal'),matlak:$v('pp-matlak')};
   var rows=[];
-  for(var i=0;i<3;i++){
-    var matSel=document.querySelector('.fh-mat[data-idx="'+i+'"]');
-    var thick=parseFloat(document.querySelector('.fh-thick[data-idx="'+i+'"]').value)||0;
-    var priceRef=document.querySelector('.fh-price-ref[data-idx="'+i+'"]').value;
-    var density=DENSITIES[matSel.value]||0.91;
-    rows.push({name:matSel.options[matSel.selectedIndex].text,gsm:density*thick,price:pp[priceRef],type:'film'});
-  }
-
-  var tutkalVal=$v('fh-tutkal-val');
-  var murekkepOn=$('fh-murekkep-on').checked;
-  var matlakOn=$('fh-matlak-on').checked;
-  var coldsealOn=$('fh-coldseal-on').checked;
-
+  for(var i=0;i<FH_LAYER_DATA.length;i++){var matSel=document.querySelector('.fh-mat[data-idx="'+i+'"]');if(!matSel)continue;var thick=parseFloat(document.querySelector('.fh-thick[data-idx="'+i+'"]').value)||0;var priceRef=document.querySelector('.fh-price-ref[data-idx="'+i+'"]').value;var density=DENSITIES[matSel.value]||0.91;FH_LAYER_DATA[i].mat=matSel.value;FH_LAYER_DATA[i].thick=thick;FH_LAYER_DATA[i].priceRef=priceRef;rows.push({name:matSel.options[matSel.selectedIndex].text,gsm:density*thick,price:pp[priceRef],type:'film'})}
+  var tutkalVal=$v('fh-tutkal-val'),murekkepOn=$('fh-murekkep-on').checked,matlakOn=$('fh-matlak-on').checked,coldsealOn=$('fh-coldseal-on').checked;
   if(tutkalVal>0)rows.push({name:'Tutkal',gsm:2.5,price:pp.tutkal,type:'extra'});
-  if(murekkepOn)rows.push({name:'Murekkep',gsm:2.5,price:pp.murekkep,type:'murekkep'});
+  if(murekkepOn)rows.push({name:'Mürekkep',gsm:2.5,price:pp.murekkep,type:'murekkep'});
   if(matlakOn)rows.push({name:'Mat Lak',gsm:0,price:pp.matlak,type:'matlak'});
   if(coldsealOn)rows.push({name:'Cold Seal',gsm:1.5,price:pp.coldseal,type:'coldseal'});
-
-  var totalGsm=0;
-  rows.forEach(function(r){totalGsm+=r.gsm});
-
-  // Solvent row (always present for calculation)
+  var totalGsm=0;rows.forEach(function(r){totalGsm+=r.gsm});
   var solventRow={name:'Solvent',gsm:0,price:pp.solvent,type:'solvent',usage:0,cost:0};
-
-  rows.forEach(function(r){
-    if(totalGsm===0){r.usage=0;r.cost=0;return}
-    r.usage=(r.gsm/totalGsm)*1000;
-    if(r.type==='murekkep'){r.cost=r.usage*3.2*r.price}
-    else if(r.type==='matlak'){r.cost=r.usage*4*r.price}
-    else if(r.type==='coldseal'){r.cost=r.usage*2*r.price}
-    else{r.cost=r.usage*r.price}
-  });
-
-  // Solvent cost
-  var inkRow=rows.find(function(x){return x.type==='murekkep'});
-  var matRow=rows.find(function(x){return x.type==='matlak'});
-  var inkUsage=inkRow?inkRow.usage:0;
-  var matUsage=matRow?matRow.usage:0;
-  solventRow.cost=(inkUsage+matUsage)*3.2*pp.solvent;
+  rows.forEach(function(r){if(totalGsm===0){r.usage=0;r.cost=0;return}r.usage=(r.gsm/totalGsm)*1000;if(r.type==='murekkep')r.cost=r.usage*3.2*r.price;else if(r.type==='matlak')r.cost=r.usage*4*r.price;else if(r.type==='coldseal')r.cost=r.usage*2*r.price;else r.cost=r.usage*r.price});
+  var inkRow=rows.find(function(x){return x.type==='murekkep'}),matRow=rows.find(function(x){return x.type==='matlak'});
+  solventRow.cost=((inkRow?inkRow.usage:0)+(matRow?matRow.usage:0))*3.2*pp.solvent;
   if(solventRow.cost>0)rows.push(solventRow);
-
-  var materialTotal=0;var filmCosts=0;
-  rows.forEach(function(r){materialTotal+=r.cost;if(r.type==='film')filmCosts+=r.cost});
-
-  var firePct=$v('fh-fire-pct')/100;
-  var fireCost=filmCosts*firePct;
-  var x1=$v('fh-x1'),x2=$v('fh-x2');
+  var materialTotal=0,filmCosts=0;rows.forEach(function(r){materialTotal+=r.cost;if(r.type==='film')filmCosts+=r.cost});
+  var firePct=$v('fh-fire-pct')/100,fireCost=filmCosts*firePct,x1=$v('fh-x1'),x2=$v('fh-x2');
   var tonTotal=materialTotal+fireCost+x1+x2;
-
-  var matlakTotal=$v('fh-matlak-total');
-  var orderQty=$v('fh-order-qty');
+  var matlakTotal=$v('fh-matlak-total'),orderQty=$v('fh-order-qty');
   var matlakPer1000=orderQty>0?(matlakTotal/orderQty)*1000:0;
   var tonTotalWithMatlak=tonTotal+matlakPer1000;
-
   var kgMult=$v('fh-kg-multiplier');
-  var rMat=materialTotal;
-  var rFire=fireCost*kgMult;
-  var rX1=x1*kgMult;
-  var rX2=x2*kgMult;
-  var kgTotal=(rMat+rFire+rX1+rX2)/1000;
-  var matlakPerKg=matlakTotal/1000;
-  var kgTotalFull=kgTotal+matlakPerKg;
-
-  var minMatlak=$v('fh-min-matlak');
-  var firstUsage=rows.length>0&&rows[0].type==='film'?rows[0].usage:1;
+  var kgTotal=(materialTotal+fireCost*kgMult+x1*kgMult+x2*kgMult)/1000;
+  var matlakPerKg=matlakTotal/1000,kgTotalFull=kgTotal+matlakPerKg;
+  var minMatlak=$v('fh-min-matlak'),firstUsage=rows.length>0&&rows[0].type==='film'?rows[0].usage:1;
   var minSip=firstUsage>0?(minMatlak/firstUsage)*1000:0;
-
   $('fh-result-kg').textContent=fmtE(kgTotalFull)+'/kg';
-  $('fh-r-ton').textContent=fmtE(tonTotal);
-  $('fh-r-ton-mat').textContent=fmtE(tonTotalWithMatlak);
-  $('fh-r-kg-nomatlak').textContent=fmtE(kgTotal)+'/kg';
-  $('fh-r-kg-full').textContent=fmtE(kgTotalFull)+'/kg';
-  $('fh-r-gsm').textContent=fmt(totalGsm,1)+' g/m2';
-  $('fh-r-fire').textContent=fmtE(fireCost);
-  $('fh-r-minsip').textContent=fmt(minSip,0)+' kg';
-  $('fh-r-matlak1000').textContent=fmtE(matlakPer1000);
-
-  // Detail table
-  var tbody=$('fh-detail-body');
-  tbody.textContent='';
-  rows.forEach(function(r){
-    if(r.gsm===0&&r.cost===0)return;
-    addTblRow(tbody,[{t:r.name},{t:fmt(r.gsm,1),r:1},{t:fmt(r.usage,2),r:1},{t:fmtE(r.cost),r:1}]);
-  });
+  $('fh-r-ton').textContent=fmtE(tonTotal);$('fh-r-ton-mat').textContent=fmtE(tonTotalWithMatlak);
+  $('fh-r-kg-nomatlak').textContent=fmtE(kgTotal)+'/kg';$('fh-r-kg-full').textContent=fmtE(kgTotalFull)+'/kg';
+  $('fh-r-gsm').textContent=fmt(totalGsm,1)+' g/m\u00B2';$('fh-r-fire').textContent=fmtE(fireCost);
+  $('fh-r-minsip').textContent=fmt(minSip,0)+' kg';$('fh-r-matlak1000').textContent=fmtE(matlakPer1000);
+  var tbody=$('fh-detail-body');tbody.textContent='';
+  rows.forEach(function(r){if(r.gsm===0&&r.cost===0)return;addTblRow(tbody,[{t:r.name},{t:fmt(r.gsm,1),r:1},{t:fmt(r.usage,2),r:1},{t:fmtE(r.cost),r:1}])});
   var totalUsage=0;rows.forEach(function(r){totalUsage+=r.usage});
   addTblRow(tbody,[{t:'TOPLAM'},{t:fmt(totalGsm,1),r:1},{t:fmt(totalUsage,2),r:1},{t:fmtE(materialTotal),r:1}],true);
   addTblRow(tbody,[{t:'Fire ('+$v('fh-fire-pct')+'%)'},{t:''},{t:'',r:1},{t:fmtE(fireCost),r:1,s:'color:var(--orange)'}]);
@@ -747,300 +751,129 @@ function calcFiyat(){
   addTblRow(tbody,[{t:'SON TOPLAM'},{t:''},{t:'',r:1},{t:fmtE(tonTotalWithMatlak),r:1}],true);
 }
 
-/* ═══ CALC: TAB 2 - DOYPACK ═══ */
+/* ═══ CALC: TAB 2 ═══ */
 function calcDoypack(){
-  var totalGsm=0;
-  var vals=document.querySelectorAll('.dp-val');
-  vals.forEach(function(inp){
-    var idx=parseInt(inp.getAttribute('data-idx'));
-    var dens=parseFloat(inp.getAttribute('data-dens'))||POUCH_MATERIALS[idx].density;
-    var v=parseFloat(inp.value)||0;
-    var gsm=dens*v;
-    totalGsm+=gsm;
-    var cell=document.querySelector('.dp-gsm[data-idx="'+idx+'"]');
-    if(cell)cell.textContent=fmt(gsm,1);
-  });
-
-  var fotosel=$v('dp-fotosel')/1000;
-  var bobinEni=$v('dp-bobin')/1000;
+  var totalGsm=0;document.querySelectorAll('.dp-val').forEach(function(inp){var idx=parseInt(inp.getAttribute('data-idx'));var dens=parseFloat(inp.getAttribute('data-dens'))||POUCH_MATERIALS[idx].density;var v=parseFloat(inp.value)||0;var gsm=dens*v;totalGsm+=gsm;var cell=document.querySelector('.dp-gsm[data-idx="'+idx+'"]');if(cell)cell.textContent=fmt(gsm,1)});
+  var fotosel=$v('dp-fotosel')/1000,bobinEni=$v('dp-bobin')/1000;
   var pouchWeight=totalGsm*fotosel*bobinEni;
-
-  var fireType=$('dp-fire-type').value;
-  var fireRate=fireType==='10'?0.10:0.05;
-  var pouchWeightFire=pouchWeight*(1+fireRate);
-  var kg1000=pouchWeightFire;
-
-  var kgPrice=$v('dp-kg-price');
-  var matCost=kg1000*kgPrice;
-  var cutRate=getCutRate(pouchWeightFire);
-  var cutCost=cutRate*kg1000;
-
-  var zipPrice=$v('dp-zip-price');
-  var zipCost=zipPrice*fotosel*1.03;
-
-  var totalCost=matCost+cutCost+zipCost;
-  var totalWithAyrist=totalCost+2.2;
-
+  var fireType=$('dp-fire-type').value,fireRate=fireType==='10'?0.10:0.05;
+  var pouchWeightFire=pouchWeight*(1+fireRate),kg1000=pouchWeightFire;
+  var kgPrice=$v('dp-kg-price'),matCost=kg1000*kgPrice;
+  var cutRate=getCutRate(pouchWeightFire),cutCost=cutRate*kg1000;
+  var zipPrice=$v('dp-zip-price'),zipCost=zipPrice*fotosel*1.03;
+  var totalCost=matCost+cutCost+zipCost,totalWithAyrist=totalCost+2.2;
   $('dp-hero-cost').textContent=fmtE(totalWithAyrist);
-  $('dp-r-gsm').textContent=fmt(totalGsm,2)+' g/m2';
-  $('dp-r-pouch-gr').textContent=fmt(pouchWeight,2)+' g';
-  $('dp-r-pouch-fire').textContent=fmt(pouchWeightFire,2)+' g';
-  $('dp-r-1000kg').textContent=fmt(kg1000,2)+' kg';
-  $('dp-r-mat-cost').textContent=fmtE(matCost);
-  $('dp-r-cut-cost').textContent=fmtE(cutCost)+' ('+fmt(cutRate,2)+' EUR/kg)';
-  $('dp-r-zip-cost').textContent=fmtE(zipCost);
-  $('dp-r-total-ayrist').textContent=fmtE(totalWithAyrist);
-
-  // Converters
-  var convKg=$v('dp-conv-kg');
-  if(pouchWeightFire>0)$('dp-conv-adet').value=fmt((convKg/pouchWeightFire)*1000,0)+' adet';
-
-  var convAdet=$v('dp-conv-adet2');
-  var convBant=$v('dp-conv-bant');
-  var fotoselMm=$v('dp-fotosel');
-  if(convBant>0){var metre=(convAdet*fotoselMm/convBant)/1000;$('dp-conv-metre').value=fmt(metre,0)+' m'}
-
-  var bantEniMm=$v('dp-conv-bant-eni');
-  var convMetre=$v('dp-conv-metre2');
-  var grPerMetre=totalGsm*(bantEniMm/1000);
-  var totalKg=grPerMetre*convMetre/1000;
-  $('dp-conv-kg-result').value=fmt(totalKg,2)+' kg';
+  $('dp-r-gsm').textContent=fmt(totalGsm,2)+' g/m\u00B2';$('dp-r-pouch-gr').textContent=fmt(pouchWeight,2)+' g';
+  $('dp-r-pouch-fire').textContent=fmt(pouchWeightFire,2)+' g';$('dp-r-1000kg').textContent=fmt(kg1000,2)+' kg';
+  $('dp-r-mat-cost').textContent=fmtE(matCost);$('dp-r-cut-cost').textContent=fmtE(cutCost)+' ('+fmt(cutRate,2)+'/kg)';
+  $('dp-r-zip-cost').textContent=fmtE(zipCost);$('dp-r-total-ayrist').textContent=fmtE(totalWithAyrist);
+  var convKg=$v('dp-conv-kg');if(pouchWeightFire>0)$('dp-conv-adet').value=fmt((convKg/pouchWeightFire)*1000,0)+' adet';
+  var convAdet=$v('dp-conv-adet2'),convBant=$v('dp-conv-bant'),fotoselMm=$v('dp-fotosel');
+  if(convBant>0)$('dp-conv-metre').value=fmt((convAdet*fotoselMm/convBant)/1000,0)+' m';
+  var bantEniMm=$v('dp-conv-bant-eni'),convMetre=$v('dp-conv-metre2');
+  $('dp-conv-kg-result').value=fmt(totalGsm*(bantEniMm/1000)*convMetre/1000,2)+' kg';
 }
 
-/* ═══ CALC: TAB 3 - FLAT BOTTOM ═══ */
+/* ═══ CALC: TAB 3 ═══ */
 function calcFlatBottom(){
-  function calcPartGsm(prefix){
-    var total=0;
-    var vals=document.querySelectorAll('.'+prefix+'-val');
-    vals.forEach(function(inp){
-      var idx=parseInt(inp.getAttribute('data-idx'));
-      var dens=parseFloat(inp.getAttribute('data-dens'))||1;
-      var v=parseFloat(inp.value)||0;
-      var gsm=dens*v;
-      total+=gsm;
-      var cell=document.querySelector('.'+prefix+'-gsm[data-idx="'+idx+'"]');
-      if(cell)cell.textContent=fmt(gsm,1);
-    });
-    return total;
-  }
-
-  var govdeGsm=calcPartGsm('fb-govde');
-  var korukGsm=calcPartGsm('fb-koruk');
-
-  var gFotosel=$v('fb-g-fotosel')/1000;
-  var gBobin=$v('fb-g-bobin')/1000;
-  var kFotosel=$v('fb-k-fotosel')/1000;
-  var kBobin=$v('fb-k-bobin')/1000;
-
-  var govdeWeight=govdeGsm*gFotosel*gBobin;
-  var korukWeight=korukGsm*kFotosel*kBobin;
-  var govdeWeightFire=govdeWeight*1.10;
-  var korukWeightFire=korukWeight*1.10;
-  var totalPouchWeight=govdeWeightFire+korukWeightFire;
-  var kg1000=totalPouchWeight;
-
-  var kgPrice=$v('fb-kg-price');
-  var matCost=kg1000*kgPrice;
-  var cutPrice=$v('fb-cut-price');
-  var cutCost=cutPrice*totalPouchWeight;
-  var ayrist=$v('fb-ayrist');
-  var ayristCost=ayrist*totalPouchWeight;
+  function calcPartGsm(prefix){var total=0;document.querySelectorAll('.'+prefix+'-val').forEach(function(inp){var idx=parseInt(inp.getAttribute('data-idx'));var dens=parseFloat(inp.getAttribute('data-dens'))||1;var v=parseFloat(inp.value)||0;var gsm=dens*v;total+=gsm;var cell=document.querySelector('.'+prefix+'-gsm[data-idx="'+idx+'"]');if(cell)cell.textContent=fmt(gsm,1)});return total}
+  var govdeGsm=calcPartGsm('fb-govde'),korukGsm=calcPartGsm('fb-koruk');
+  var gF=$v('fb-g-fotosel')/1000,gB=$v('fb-g-bobin')/1000,kF=$v('fb-k-fotosel')/1000,kB=$v('fb-k-bobin')/1000;
+  var gW=govdeGsm*gF*gB,kW=korukGsm*kF*kB;
+  var gWF=gW*1.10,kWF=kW*1.10,totalPW=gWF+kWF,kg1000=totalPW;
+  var matCost=kg1000*$v('fb-kg-price'),cutCost=$v('fb-cut-price')*totalPW,ayristCost=$v('fb-ayrist')*totalPW;
   var totalWithAyrist=matCost+cutCost+ayristCost;
-
-  var convKg=$v('fb-conv-kg');
-  var convAdet=totalPouchWeight>0?(convKg/totalPouchWeight)*1000:0;
-  var govdePct=totalPouchWeight>0?govdeWeightFire/totalPouchWeight:0;
-  var govdeKg=convKg*govdePct;
-  var korukKg=convKg*(1-govdePct);
-
-  var govdeKgPrice=$v('fb-govde-kgprice');
-  var korukKgPrice=$v('fb-koruk-kgprice');
-  var avgPrice=convKg>0?(govdeKg*govdeKgPrice+korukKg*korukKgPrice)/convKg:0;
-
+  var convKg=$v('fb-conv-kg'),convAdet=totalPW>0?(convKg/totalPW)*1000:0;
+  var govdePct=totalPW>0?gWF/totalPW:0,govdeKg=convKg*govdePct,korukKg=convKg*(1-govdePct);
+  var avgPrice=convKg>0?(govdeKg*$v('fb-govde-kgprice')+korukKg*$v('fb-koruk-kgprice'))/convKg:0;
   $('fb-hero-cost').textContent=fmtE(totalWithAyrist);
-  $('fb-r-g-gsm').textContent=fmt(govdeGsm,2)+' g/m2';
-  $('fb-r-k-gsm').textContent=fmt(korukGsm,2)+' g/m2';
-  $('fb-r-g-pouch').textContent=fmt(govdeWeightFire,2)+' g';
-  $('fb-r-k-pouch').textContent=fmt(korukWeightFire,2)+' g';
-  $('fb-r-total-pouch').textContent=fmt(totalPouchWeight,2)+' g';
-  $('fb-r-1000kg').textContent=fmt(kg1000,2)+' kg';
-  $('fb-r-mat-cost').textContent=fmtE(matCost);
-  $('fb-r-cut-cost').textContent=fmtE(cutCost);
+  $('fb-r-g-gsm').textContent=fmt(govdeGsm,2)+' g/m\u00B2';$('fb-r-k-gsm').textContent=fmt(korukGsm,2)+' g/m\u00B2';
+  $('fb-r-g-pouch').textContent=fmt(gWF,2)+' g';$('fb-r-k-pouch').textContent=fmt(kWF,2)+' g';
+  $('fb-r-total-pouch').textContent=fmt(totalPW,2)+' g';$('fb-r-1000kg').textContent=fmt(kg1000,2)+' kg';
+  $('fb-r-mat-cost').textContent=fmtE(matCost);$('fb-r-cut-cost').textContent=fmtE(cutCost);
   $('fb-conv-adet').value=fmt(convAdet,0)+' adet';
-  $('fb-r-govde-kg').textContent=fmt(govdeKg,1)+' kg';
-  $('fb-r-koruk-kg').textContent=fmt(korukKg,1)+' kg';
-  $('fb-r-govde-pct').textContent='%'+fmt(govdePct*100,1);
-  $('fb-r-avg-price').textContent=fmtE(avgPrice)+'/kg';
+  $('fb-r-govde-kg').textContent=fmt(govdeKg,1)+' kg';$('fb-r-koruk-kg').textContent=fmt(korukKg,1)+' kg';
+  $('fb-r-govde-pct').textContent='%'+fmt(govdePct*100,1);$('fb-r-avg-price').textContent=fmtE(avgPrice)+'/kg';
 }
 
-/* ═══ CALC: TAB 4 - SILINDIR ═══ */
+/* ═══ CALC: TAB 4 ═══ */
 function calcSilindir(){
-  var p1=$v('sl-p1'),p2=$v('sl-p2'),p3=$v('sl-p3');
-  var pT=$v('sl-p-tutkal'),pM=$v('sl-p-murekkep'),pS=$v('sl-p-solvent');
-  var t1=$v('sl-t1'),t2=$v('sl-t2'),t3=$v('sl-t3');
-  var d1=$v('sl-d1'),d2=$v('sl-d2'),d3=$v('sl-d3');
-
-  var gsm1=d1*t1,gsm2=d2*t2,gsm3=d3*t3;
-  var tutkalGsm=$v('sl-tutkal-gsm'),murekkepGsm=$v('sl-murekkep-gsm');
+  var p1=$v('sl-p1'),p2=$v('sl-p2'),p3=$v('sl-p3'),pT=$v('sl-p-tutkal'),pM=$v('sl-p-murekkep'),pS=$v('sl-p-solvent');
+  var t1=$v('sl-t1'),t2=$v('sl-t2'),t3=$v('sl-t3'),d1=$v('sl-d1'),d2=$v('sl-d2'),d3=$v('sl-d3');
+  var gsm1=d1*t1,gsm2=d2*t2,gsm3=d3*t3,tutkalGsm=$v('sl-tutkal-gsm'),murekkepGsm=$v('sl-murekkep-gsm');
   var totalGsm=gsm1+gsm2+gsm3+tutkalGsm+murekkepGsm;
-
   var rows=[];
-  if(totalGsm>0){
-    var u1=gsm1/totalGsm*1000,u2=gsm2/totalGsm*1000,u3=gsm3/totalGsm*1000;
-    var uT=tutkalGsm/totalGsm*1000,uM=murekkepGsm/totalGsm*1000;
-    rows.push({n:'Katman 1 (PET)',g:gsm1,u:u1,c:u1*p1});
-    rows.push({n:'Katman 2 (PET)',g:gsm2,u:u2,c:u2*p2});
+  if(totalGsm>0){var u1=gsm1/totalGsm*1000,u2=gsm2/totalGsm*1000,u3=gsm3/totalGsm*1000,uT=tutkalGsm/totalGsm*1000,uM=murekkepGsm/totalGsm*1000;
+    rows.push({n:'Katman 1 (PET)',g:gsm1,u:u1,c:u1*p1});rows.push({n:'Katman 2 (PET)',g:gsm2,u:u2,c:u2*p2});
     if(t3>0)rows.push({n:'Katman 3 (CPP)',g:gsm3,u:u3,c:u3*p3});
-    rows.push({n:'Tutkal',g:tutkalGsm,u:uT,c:uT*pT});
-    rows.push({n:'Murekkep',g:murekkepGsm,u:uM,c:uM*3.2*pM});
-    rows.push({n:'Solvent',g:0,u:0,c:uM*3.2*pS});
-  }
-
+    rows.push({n:'Tutkal',g:tutkalGsm,u:uT,c:uT*pT});rows.push({n:'Mürekkep',g:murekkepGsm,u:uM,c:uM*3.2*pM});rows.push({n:'Solvent',g:0,u:0,c:uM*3.2*pS})}
   var matTotal=0;rows.forEach(function(r){matTotal+=r.c});
   var filmCost=(rows[0]?rows[0].c:0)+(rows[1]?rows[1].c:0)+(rows[2]&&rows[2].n.indexOf('Katman')>=0?rows[2].c:0);
-  var firePct=$v('sl-fire-pct')/100;
-  var fireCost=filmCost*firePct;
-
-  var x1=$v('sl-x1');
-  var orderKg=$v('sl-order-kg');
-  var subTotal=matTotal+fireCost+x1;
-
+  var firePct=$v('sl-fire-pct')/100,fireCost=filmCost*firePct,x1=$v('sl-x1'),orderKg=$v('sl-order-kg');
   var klisePrice=$v('sl-klise-price'),colorCount=$v('sl-color-count');
   var kliseTon=orderKg>0?(klisePrice*colorCount)/orderKg*1000:0;
-  var fireFlatCost=$v('sl-fire-cost');
-  var fireFlatTon=orderKg>0?fireFlatCost/orderKg*1000:0;
-  var sonToplam=subTotal+kliseTon+fireFlatTon;
-
-  var firstUsage=rows.length>0?rows[0].u:1;
-  var minSip=firstUsage>0?(350/firstUsage)*1000:0;
-
-  $('sl-hero').textContent=fmtE(sonToplam);
-  $('sl-r-mat').textContent=fmtE(matTotal);
-  $('sl-r-fire').textContent=fmtE(fireCost);
-  $('sl-r-klise').textContent=fmtE(kliseTon);
-  $('sl-r-fire150').textContent=fmtE(fireFlatTon);
-  $('sl-r-gsm').textContent=fmt(totalGsm,1)+' g/m2';
-  $('sl-r-minsip').textContent=fmt(minSip,0)+' kg';
-
-  var tbody=$('sl-detail-body');
-  tbody.textContent='';
+  var fireFlatCost=$v('sl-fire-cost'),fireFlatTon=orderKg>0?fireFlatCost/orderKg*1000:0;
+  var sonToplam=matTotal+fireCost+x1+kliseTon+fireFlatTon;
+  var firstUsage=rows.length>0?rows[0].u:1,minSip=firstUsage>0?(350/firstUsage)*1000:0;
+  $('sl-hero').textContent=fmtE(sonToplam);$('sl-r-mat').textContent=fmtE(matTotal);$('sl-r-fire').textContent=fmtE(fireCost);
+  $('sl-r-klise').textContent=fmtE(kliseTon);$('sl-r-fire150').textContent=fmtE(fireFlatTon);
+  $('sl-r-gsm').textContent=fmt(totalGsm,1)+' g/m\u00B2';$('sl-r-minsip').textContent=fmt(minSip,0)+' kg';
+  var tbody=$('sl-detail-body');tbody.textContent='';
   rows.forEach(function(r){addTblRow(tbody,[{t:r.n},{t:fmt(r.g,1),r:1},{t:fmt(r.u,2),r:1},{t:fmtE(r.c),r:1}])});
   var totalUsage=0;rows.forEach(function(r){totalUsage+=r.u});
   addTblRow(tbody,[{t:'TOPLAM'},{t:fmt(totalGsm,1),r:1},{t:fmt(totalUsage,2),r:1},{t:fmtE(matTotal),r:1}],true);
-
-  // KG pricing
   var minKg=$v('sl-min-kg'),minMult=$v('sl-min-multiplier'),mult=$v('sl-multiplier');
-  var kgMat=matTotal*mult,kgFire=fireCost*minMult,kgX=x1*minMult;
-  var kgSub=kgMat+kgFire+kgX;
-  var kgPrice=minKg>0?kgSub/minKg:0;
-  var kliseKg=minKg>0?(klisePrice*colorCount)/minKg:0;
-  var fireKg=minKg>0?fireFlatCost/minKg:0;
-  var totalKgPrice=kgPrice+kliseKg+fireKg;
-  var dmKg=totalKgPrice+1.5;
-
-  $('sl-r-kg-price').textContent=fmtE(kgPrice)+'/kg';
-  $('sl-r-klise-kg').textContent=fmtE(kliseKg)+'/kg';
-  $('sl-r-total-kg').textContent=fmtE(totalKgPrice)+'/kg';
-  $('sl-r-dm-kg').textContent=fmtE(dmKg)+'/kg';
-
+  var kgSub=matTotal*mult+fireCost*minMult+x1*minMult;
+  var kgPrice=minKg>0?kgSub/minKg:0,kliseKg=minKg>0?(klisePrice*colorCount)/minKg:0;
+  var fireKg=minKg>0?fireFlatCost/minKg:0,totalKgP=kgPrice+kliseKg+fireKg;
+  $('sl-r-kg-price').textContent=fmtE(kgPrice)+'/kg';$('sl-r-klise-kg').textContent=fmtE(kliseKg)+'/kg';
+  $('sl-r-total-kg').textContent=fmtE(totalKgP)+'/kg';$('sl-r-dm-kg').textContent=fmtE(totalKgP+1.5)+'/kg';
   // Roto vs Digital
-  var rGr=$v('sl-roto-gr'),rPetGr=$v('sl-roto-petgr'),rPetMult=$v('sl-roto-petmult');
-  var rUnit=$v('sl-roto-unit'),rPetPrice=$v('sl-roto-petprice');
-  var rLam=$v('sl-roto-lam'),rExtra=$v('sl-roto-extra'),rCut=$v('sl-roto-cut');
-  var rPetVal=rPetGr*rPetMult;
-  var rTotalGr=rGr+rPetVal;
-  var rMat1=rGr*rUnit,rMat2=rPetVal*rPetPrice;
-  var rAvg=rTotalGr>0?(rMat1+rMat2)/rTotalGr:0;
-  var rWithLam=(rAvg+rLam+rExtra)*1.10;
-  var rWithKesim=rWithLam*1.03;
-  var rFinal=rWithKesim+rCut;
-
-  var dGr=$v('sl-dij-gr'),dPetGr=$v('sl-dij-petgr'),dPetMult=$v('sl-dij-petmult');
-  var dUnit=$v('sl-dij-unit'),dPetPrice=$v('sl-dij-petprice');
-  var dCutFire=$v('sl-dij-cutfire')/100,dLamFire=$v('sl-dij-lamfire')/100;
-  var dExtra=$v('sl-dij-extra');
-  var dPetVal=dPetGr*dPetMult;
-  var dTotalGr=dGr+dPetVal;
-  var dMat1=dGr*dUnit,dMat2=dPetVal*dPetPrice;
-  var dAvg=dTotalGr>0?(dMat1+dMat2)/dTotalGr:0;
-  var dWithCut=dAvg*(1+dCutFire);
-  var dWithLam=dWithCut*(1+dLamFire);
-  var dWithKesim=dWithLam+1.5;
-  var dFinal=dWithKesim+dExtra;
-
-  $('sl-cmp-roto').textContent=fmtE(rFinal)+'/kg';
-  $('sl-cmp-dij').textContent=fmtE(dFinal)+'/kg';
-
+  var rGr=$v('sl-roto-gr'),rPG=$v('sl-roto-petgr'),rPM=$v('sl-roto-petmult'),rU=$v('sl-roto-unit'),rPP=$v('sl-roto-petprice');
+  var rL=$v('sl-roto-lam'),rE=$v('sl-roto-extra'),rC=$v('sl-roto-cut');
+  var rPV=rPG*rPM,rTG=rGr+rPV,rAvg=rTG>0?(rGr*rU+rPV*rPP)/rTG:0;
+  var rFinal=(rAvg+rL+rE)*1.10*1.03+rC;
+  var dGr=$v('sl-dij-gr'),dPG=$v('sl-dij-petgr'),dPM=$v('sl-dij-petmult'),dU=$v('sl-dij-unit'),dPP=$v('sl-dij-petprice');
+  var dCF=$v('sl-dij-cutfire')/100,dLF=$v('sl-dij-lamfire')/100,dE=$v('sl-dij-extra');
+  var dPV=dPG*dPM,dTG=dGr+dPV,dAvg=dTG>0?(dGr*dU+dPV*dPP)/dTG:0;
+  var dFinal=dAvg*(1+dCF)*(1+dLF)+1.5+dE;
+  $('sl-cmp-roto').textContent=fmtE(rFinal)+'/kg';$('sl-cmp-dij').textContent=fmtE(dFinal)+'/kg';
   $('sl-cmp-roto-card').className='cmp-card'+(rFinal<=dFinal&&rFinal>0?' best':'');
   $('sl-cmp-dij-card').className='cmp-card'+(dFinal<rFinal&&dFinal>0?' best':'');
 }
 
-/* ═══ CALC: TAB 5 - FIRE ═══ */
+/* ═══ CALC: TAB 5 ═══ */
 function calcFire(){
-  var urunKg=$v('fr-urun-kg');
-  var brutBant=$v('fr-brut-bant'),netBant=$v('fr-net-bant');
-  var brutFoto=$v('fr-brut-foto'),netFoto=$v('fr-net-foto');
-
-  var bantFirePct=brutBant>0?(brutBant-netBant)/brutBant:0;
-  var fotoFirePct=netFoto>0?(brutFoto-netFoto)/netFoto:0;
-  var bantFireKg=urunKg*bantFirePct;
-  var fotoFireKg=fotoFirePct*urunKg;
-  var totalFire=bantFireKg+fotoFireKg;
-  var netKg=urunKg-totalFire;
-
-  $('fr-hero').textContent=fmt(totalFire,2)+' KG';
-  $('fr-r-bant-pct').textContent='%'+fmt(bantFirePct*100,2);
-  $('fr-r-foto-pct').textContent='%'+fmt(fotoFirePct*100,2);
-  $('fr-r-bant-kg').textContent=fmt(bantFireKg,2)+' kg';
-  $('fr-r-foto-kg').textContent=fmt(fotoFireKg,2)+' kg';
-  $('fr-r-total-kg').textContent=fmt(totalFire,2)+' kg';
-  $('fr-r-net-kg').textContent=fmt(netKg,2)+' kg';
+  var uK=$v('fr-urun-kg'),bB=$v('fr-brut-bant'),nB=$v('fr-net-bant'),bF=$v('fr-brut-foto'),nF=$v('fr-net-foto');
+  var bP=bB>0?(bB-nB)/bB:0,fP=nF>0?(bF-nF)/nF:0;
+  var bK=uK*bP,fK=fP*uK,tF=bK+fK,nK=uK-tF;
+  $('fr-hero').textContent=fmt(tF,2)+' KG';
+  $('fr-r-bant-pct').textContent='%'+fmt(bP*100,2);$('fr-r-foto-pct').textContent='%'+fmt(fP*100,2);
+  $('fr-r-bant-kg').textContent=fmt(bK,2)+' kg';$('fr-r-foto-kg').textContent=fmt(fK,2)+' kg';
+  $('fr-r-total-kg').textContent=fmt(tF,2)+' kg';$('fr-r-net-kg').textContent=fmt(nK,2)+' kg';
 }
 
-/* ═══ TAB NAVIGATION ═══ */
-function switchTab(name){
-  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});
-  document.querySelectorAll('.bnav button').forEach(function(b){b.classList.remove('active')});
-  $('tab-'+name).classList.add('active');
-  document.querySelector('.bnav button[data-tab="'+name+'"]').classList.add('active');
-  recalcAll();
-}
+/* ═══ TAB NAV ═══ */
+function switchTab(name){document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});document.querySelectorAll('.bnav button').forEach(function(b){b.classList.remove('active')});$('tab-'+name).classList.add('active');document.querySelector('.bnav button[data-tab="'+name+'"]').classList.add('active');recalcAll()}
+document.querySelectorAll('.bnav button').forEach(function(btn){btn.addEventListener('click',function(){switchTab(btn.getAttribute('data-tab'))})});
 
-document.querySelectorAll('.bnav button').forEach(function(btn){
-  btn.addEventListener('click',function(){switchTab(btn.getAttribute('data-tab'))});
-});
-
-/* ═══ DENSITY AUTO-FILL ═══ */
+/* ═══ DENSITY AUTO-FILL & LAYER INFO UPDATE ═══ */
 document.addEventListener('change',function(e){
   if(e.target.classList.contains('fh-mat')){
-    var idx=e.target.getAttribute('data-idx');
-    var densInput=document.querySelector('.fh-dens[data-idx="'+idx+'"]');
-    if(densInput)densInput.value=DENSITIES[e.target.value]||0.91;
+    var idx=parseInt(e.target.getAttribute('data-idx'));
+    FH_LAYER_DATA[idx].mat=e.target.value;
+    renderFHLayers();recalcAll();
   }
 });
 
 /* ═══ RECALC ═══ */
 var recalcTimer;
-function recalcAll(){
-  clearTimeout(recalcTimer);
-  recalcTimer=setTimeout(function(){
-    calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire();
-  },100);
-}
-document.addEventListener('input',recalcAll);
-document.addEventListener('change',recalcAll);
-
-/* ═══ INIT: RENDER STATIC TABLES ═══ */
-renderStaticTable('dp-cut-body',[
-  [{t:'< 5 g'},{t:'2,75',r:1}],[{t:'< 7 g'},{t:'2,50',r:1}],[{t:'< 9 g'},{t:'1,84',r:1}],
-  [{t:'< 12 g'},{t:'1,65',r:1}],[{t:'< 15 g'},{t:'1,45',r:1}],[{t:'< 17 g'},{t:'1,35',r:1}],[{t:'< 21 g'},{t:'1,20',r:1}]
-]);
-renderStaticTable('dp-fire-body',[
-  [{t:'500 KG'},{t:'%12',r:1}],[{t:'750 KG'},{t:'%9',r:1}],[{t:'1500 KG'},{t:'%7',r:1}],
-  [{t:'2500 KG'},{t:'%5',r:1}],[{t:'5000-10000 KG'},{t:'%3-3,5',r:1}]
-]);
+function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire()},100)}
+document.addEventListener('input',recalcAll);document.addEventListener('change',recalcAll);
 
 /* ═══ INIT ═══ */
+renderStaticTable('dp-cut-body',[[{t:'\u2264 5 g'},{t:'2,75',r:1}],[{t:'\u2264 7 g'},{t:'2,50',r:1}],[{t:'\u2264 9 g'},{t:'1,84',r:1}],[{t:'\u2264 12 g'},{t:'1,65',r:1}],[{t:'\u2264 15 g'},{t:'1,45',r:1}],[{t:'\u2264 17 g'},{t:'1,35',r:1}],[{t:'\u2264 21 g'},{t:'1,20',r:1}]]);
+renderStaticTable('dp-fire-body',[[{t:'500 KG'},{t:'%12',r:1}],[{t:'750 KG'},{t:'%9',r:1}],[{t:'1500 KG'},{t:'%7',r:1}],[{t:'2500 KG'},{t:'%5',r:1}],[{t:'5000-10000 KG'},{t:'%3-3,5',r:1}]]);
 renderFHLayers();
 renderMatTable('dp-materials',POUCH_MATERIALS,null,'dp');
 renderMatTable('fb-govde-materials',POUCH_MATERIALS,FB_G_DEF,'fb-govde');
