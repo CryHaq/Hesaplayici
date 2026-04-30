@@ -8,6 +8,7 @@
 <meta name="theme-color" content="#0a0a0a">
 <title>Ambalaj Fiyat Hesaplayıcı</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.2/jspdf.umd.min.js"></script>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 :root{
@@ -452,7 +453,7 @@ select option{background:var(--card);color:var(--t1)}
         </table>
       </div>
     </div>
-    <div class="save-bar"><input type="text" id="fh-save-label" placeholder="Teklif adı (ör: ABC Firma PET yapı)" class="iw"><button type="button" onclick="saveQuotation('fiyat')">Teklif Kaydet</button></div>
+    <div class="save-bar"><input type="text" id="fh-save-label" placeholder="Teklif adı (ör: ABC Firma PET yapı)" class="iw"><button type="button" onclick="saveQuotation('fiyat')">Teklif Kaydet</button><button type="button" class="pdf-btn" style="white-space:nowrap;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--t1)'">PDF</button></div>
     <div class="save-ok" id="fh-save-ok">Teklif kaydedildi</div>
   </div>
 
@@ -506,7 +507,7 @@ select option{background:var(--card);color:var(--t1)}
     </div>
     <div class="cd"><button class="collapse-btn" data-target="dp-ref"><h2><span class="h2-icon" style="background:rgba(245,158,11,.1);color:var(--orange)">&#9986;</span> Kesim &amp; Fire Referans</h2><span class="chevron">&#9660;</span></button><div class="collapse-content" id="dp-ref"><h3>Kesim Bedeli Tablosu</h3><table class="tbl"><thead><tr><th>Poşet Gramajı</th><th class="r">Fiyat (EUR/kg)</th></tr></thead><tbody id="dp-cut-body"></tbody></table><div class="divider"></div><h3>Doypack Kesim Fire %</h3><table class="tbl"><thead><tr><th>Sipariş Miktarı</th><th class="r">Fire %</th></tr></thead><tbody id="dp-fire-body"></tbody></table></div></div>
     <div class="cd"><button class="collapse-btn" data-target="dp-conv"><h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#8644;</span> Adet / KG / Uzunluk Hesabı</h2><span class="chevron">&#9660;</span></button><div class="collapse-content" id="dp-conv"><h3>KG &#8594; Adet</h3><div class="row r2"><div class="fg"><label>Sipariş KG</label><div class="iw hu"><input type="number" id="dp-conv-kg" value="2850" step="50"><span class="unit">kg</span></div></div><div class="fg"><label>Sonuç (Adet)</label><div class="iw"><input type="text" id="dp-conv-adet" readonly></div></div></div><h3>Adet &#8594; Uzunluk (Metre)</h3><div class="row r3"><div class="fg"><label>Adet</label><div class="iw"><input type="number" id="dp-conv-adet2" value="480000" step="1000"></div></div><div class="fg"><label>Bant Sayısı</label><div class="iw"><input type="number" id="dp-conv-bant" value="1" step="1" min="1"></div></div><div class="fg"><label>Sonuç (m)</label><div class="iw"><input type="text" id="dp-conv-metre" readonly></div></div></div><h3>Uzunluk &#8594; KG</h3><div class="row r3"><div class="fg"><label>Bant Eni</label><div class="iw hu"><input type="number" id="dp-conv-bant-eni" value="625" step="0.5"><span class="unit">mm</span></div></div><div class="fg"><label>Metre</label><div class="iw"><input type="number" id="dp-conv-metre2" value="96960" step="100"></div></div><div class="fg"><label>Sonuç (KG)</label><div class="iw"><input type="text" id="dp-conv-kg-result" readonly></div></div></div></div></div>
-    <div class="save-bar"><input type="text" id="dp-save-label" placeholder="Teklif adı (ör: XYZ Doypack 152mm)" class="iw"><button type="button" onclick="saveQuotation('doypack')">Teklif Kaydet</button></div>
+    <div class="save-bar"><input type="text" id="dp-save-label" placeholder="Teklif adı (ör: XYZ Doypack 152mm)" class="iw"><button type="button" onclick="saveQuotation('doypack')">Teklif Kaydet</button><button type="button" class="pdf-btn" style="white-space:nowrap;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--t1)'">PDF</button></div>
     <div class="save-ok" id="dp-save-ok">Teklif kaydedildi</div>
   </div>
 
@@ -590,7 +591,7 @@ select option{background:var(--card);color:var(--t1)}
         </div>
       </div>
     </div>
-    <div class="save-bar"><input type="text" id="fb-save-label" placeholder="Teklif adı (ör: Flat Bottom 221mm)" class="iw"><button type="button" onclick="saveQuotation('flat')">Teklif Kaydet</button></div>
+    <div class="save-bar"><input type="text" id="fb-save-label" placeholder="Teklif adı (ör: Flat Bottom 221mm)" class="iw"><button type="button" onclick="saveQuotation('flat')">Teklif Kaydet</button><button type="button" class="pdf-btn" style="white-space:nowrap;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--t1)'">PDF</button></div>
     <div class="save-ok" id="fb-save-ok">Teklif kaydedildi</div>
   </div>
 
@@ -729,7 +730,7 @@ select option{background:var(--card);color:var(--t1)}
         </div>
       </div>
     </div>
-    <div class="save-bar"><input type="text" id="sl-save-label" placeholder="Teklif adı (ör: Silindir 24/80)" class="iw"><button type="button" onclick="saveQuotation('silindir')">Teklif Kaydet</button></div>
+    <div class="save-bar"><input type="text" id="sl-save-label" placeholder="Teklif adı (ör: Silindir 24/80)" class="iw"><button type="button" onclick="saveQuotation('silindir')">Teklif Kaydet</button><button type="button" class="pdf-btn" style="white-space:nowrap;padding:10px 14px;border-radius:var(--radius-sm);border:1px solid var(--border);background:var(--card);color:var(--t1);font-family:inherit;font-size:.82rem;font-weight:600;cursor:pointer;transition:all .15s" onmouseover="this.style.borderColor='var(--red)';this.style.color='var(--red)'" onmouseout="this.style.borderColor='var(--border)';this.style.color='var(--t1)'">PDF</button></div>
     <div class="save-ok" id="sl-save-ok">Teklif kaydedildi</div>
   </div>
 
@@ -1552,6 +1553,110 @@ function wizBuild(wiz){
   }
 }
 Object.keys(WIZ_DEFS).forEach(function(wiz){wizBuild(wiz)});
+
+/* ═══ PDF EXPORT ═══ */
+document.querySelectorAll('.pdf-btn').forEach(function(btn){
+  btn.addEventListener('click',function(){
+    var tab=this.closest('.tab');if(!tab)return;
+    var tabId=tab.id.replace('tab-','');
+    exportPDF(tabId);
+  });
+});
+
+function exportPDF(tab){
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF({unit:'mm',format:'a4'});
+  var y=15,lm=15,pw=180;
+  var rate=getRate();
+
+  function title(t){doc.setFontSize(8);doc.setTextColor(100);doc.text(t,lm,y);y+=5}
+  function line(label,val){doc.setFontSize(9);doc.setTextColor(40);doc.text(label,lm,y);doc.text(String(val),lm+pw,y,{align:'right'});y+=5;if(y>275){doc.addPage();y=15}}
+  function sep(){doc.setDrawColor(200);doc.line(lm,y,lm+pw,y);y+=4}
+  function heading(t){doc.setFontSize(12);doc.setTextColor(16,185,129);doc.text(t,lm,y);y+=7}
+
+  // Header
+  doc.setFontSize(14);doc.setTextColor(40);doc.text('Ambalaj Fiyat Hesaplama',lm,y);y+=6;
+  doc.setFontSize(8);doc.setTextColor(120);doc.text('Tarih: '+new Date().toLocaleDateString('tr-TR',{day:'2-digit',month:'long',year:'numeric'})+' | Kur: 1 EUR = '+fmt(rate,2)+' TRY',lm,y);y+=4;
+  sep();
+
+  if(tab==='fiyat'){
+    heading('Fiyat Hesaplama Raporu');
+    // Layers
+    title('YAPI');
+    FH_LAYER_DATA.forEach(function(l,i){
+      var matName=(MAT_OPTIONS.find(function(o){return o.v===l.mat})||{}).n||l.mat;
+      line('Katman '+(i+1)+': '+matName,l.thick+'\u03BC (d:'+( DENSITIES[l.mat]||0.91)+')');
+    });
+    sep();
+    title('EK MALZEMELER');
+    line('Tutkal',$v('fh-tutkal-val')>0?'Var':'Yok');
+    line('M\u00fcrekkep',$('fh-murekkep-on').checked?'Var':'Yok');
+    line('Mat Lak',$('fh-matlak-on').checked?'Var':'Yok');
+    line('Cold Seal',$('fh-coldseal-on').checked?'Var':'Yok');
+    sep();
+    title('PARAMETRELER');
+    line('Fire Oran\u0131','%'+$v('fh-fire-pct'));
+    line('Ek Maliyet 1',fmtE($v('fh-x1')));
+    line('Ek Maliyet 2',fmtE($v('fh-x2')));
+    line('Sipari\u015f Adedi',fmt($v('fh-order-qty'),0));
+    line('Sipari\u015f KG',fmt($v('fh-order-kg'),0)+' kg');
+    sep();
+    title('SONU\u00c7LAR');
+    var kgF=$('fh-r-kg-full').textContent.split('(')[0].trim();
+    line('KG Fiyat\u0131 (Matlak Dahil)',kgF);
+    line('TRY Kar\u015f\u0131l\u0131\u011f\u0131',fmtT(parseFloat(kgF)||0));
+    line('Ton Ba\u015f\u0131 Maliyet',$('fh-r-ton').textContent.split('(')[0].trim());
+    line('Toplam g/m\u00B2',$('fh-r-gsm').textContent);
+    line('Fire Maliyeti',$('fh-r-fire').textContent.split('(')[0].trim());
+    line('Min. Sipari\u015f',$('fh-r-minsip').textContent);
+  }else if(tab==='doypack'){
+    heading('Doypack Hesaplama Raporu');
+    title('BOYUTLAR');
+    line('Fotosel',$v('dp-fotosel')+' mm');
+    line('Bobin Eni',$v('dp-bobin')+' mm');
+    line('KG Fiyat\u0131',fmtE($v('dp-kg-price')));
+    sep();
+    title('SONU\u00c7LAR');
+    line('m\u00B2 A\u011f\u0131rl\u0131\u011f\u0131',$('dp-r-gsm').textContent);
+    line('1 Po\u015fet',$('dp-r-pouch-gr').textContent);
+    line('Fireli Po\u015fet',$('dp-r-pouch-fire').textContent);
+    line('1000 Ad. KG',$('dp-r-1000kg').textContent);
+    line('Malzeme Maliyeti',$('dp-r-mat-cost').textContent.split('(')[0].trim());
+    line('Kesim Bedeli',$('dp-r-cut-cost').textContent.split('(')[0].trim());
+    line('Zip Maliyeti',$('dp-r-zip-cost').textContent.split('(')[0].trim());
+    var dpT=$('dp-r-total-ayrist').textContent.split('(')[0].trim();
+    line('TOPLAM (Ayr\u0131\u015ft\u0131rma Dahil)',dpT);
+  }else if(tab==='flat'){
+    heading('Flat Bottom Hesaplama Raporu');
+    title('BOYUTLAR');
+    line('G\u00f6vde Fotosel',$v('fb-g-fotosel')+' mm');line('G\u00f6vde Bobin',$v('fb-g-bobin')+' mm');
+    line('K\u00f6r\u00fck Fotosel',$v('fb-k-fotosel')+' mm');line('K\u00f6r\u00fck Bobin',$v('fb-k-bobin')+' mm');
+    sep();
+    title('SONU\u00c7LAR');
+    line('Toplam Paket A\u011f.',$('fb-r-total-pouch').textContent);
+    line('1000 Ad. KG',$('fb-r-1000kg').textContent);
+    line('Malzeme Maliyeti',$('fb-r-mat-cost').textContent.split('(')[0].trim());
+    line('TOPLAM',$('fb-hero-cost').textContent.split('(')[0].trim());
+  }else if(tab==='silindir'){
+    heading('Silindir Hesaplama Raporu');
+    title('YAPI');
+    line('1. Katman',$v('sl-t1')+'\u03BC');line('2. Katman',$v('sl-t2')+'\u03BC');
+    if($v('sl-t3')>0)line('3. Katman',$v('sl-t3')+'\u03BC');
+    sep();
+    title('SONU\u00c7LAR');
+    line('Malzeme Toplam\u0131',$('sl-r-mat').textContent.split('(')[0].trim());
+    line('Ton Ba\u015f\u0131 Son Toplam',$('sl-hero').textContent.split('(')[0].trim());
+    line('KG Fiyat\u0131',$('sl-r-kg-price').textContent);
+    line('Kli\u015fe+\u00dcr\u00fcn KG',$('sl-r-total-kg').textContent);
+  }
+
+  // Footer
+  y+=5;sep();
+  doc.setFontSize(7);doc.setTextColor(150);
+  doc.text('\u00c7evikba\u015f Ambalaj | CVK Dijital | '+new Date().toLocaleString('tr-TR'),lm,y);
+
+  doc.save('teklif-'+(tab)+'-'+new Date().toISOString().slice(0,10)+'.pdf');
+}
 
 /* ═══ FORM PERSISTENCE (localStorage) ═══ */
 var FORM_KEY='fh-form-state';
