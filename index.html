@@ -126,6 +126,18 @@ select option{background:var(--card);color:var(--t1)}
 .tag-green{background:rgba(16,185,129,.1);color:var(--accent)}
 .tag-orange{background:rgba(245,158,11,.1);color:var(--orange)}
 
+/* ─── VALIDATION ─── */
+.input-error{border-color:var(--red)!important;box-shadow:0 0 0 2px rgba(239,68,68,.15)!important}
+.input-error:focus{box-shadow:0 0 0 3px rgba(239,68,68,.25)!important}
+.warn-box{background:rgba(239,68,68,.06);border:1px solid rgba(239,68,68,.2);border-radius:var(--radius-sm);padding:10px 12px;margin-bottom:10px;font-size:.78rem;color:var(--red);line-height:1.5;display:none}
+.warn-box.visible{display:block;animation:fadeUp .2s ease}
+.warn-box ul{margin:4px 0 0 16px;list-style:none}
+.warn-box ul li{padding:2px 0;position:relative;padding-left:14px}
+.warn-box ul li::before{content:'\26A0';position:absolute;left:0;top:2px;font-size:.7rem}
+.warn-title{font-weight:700;font-size:.72rem;text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.hero-error{border-color:rgba(239,68,68,.3)!important;background:linear-gradient(135deg,rgba(239,68,68,.08),rgba(239,68,68,.03))!important}
+.hero-error .val{color:var(--red)!important}
+
 /* ─── ADD/DEL LAYER ─── */
 #fh-add-layer:hover{border-color:var(--accent);color:var(--accent)}
 #fh-add-layer:active{transform:scale(.98)}
@@ -278,8 +290,9 @@ select option{background:var(--card);color:var(--t1)}
     </div>
   </div>
 
-  <!-- Sonuçlar -->
-  <div class="hero">
+  <!-- Uyarılar + Sonuçlar -->
+  <div class="warn-box" id="fh-warnings"><div class="warn-title">Dikkat</div><ul id="fh-warn-list"></ul></div>
+  <div class="hero" id="fh-hero">
     <div class="val" id="fh-result-kg">0,00 EUR/kg</div>
     <div class="lbl">KG Fiyatı (Sipariş Bazlı)</div>
   </div>
@@ -340,7 +353,8 @@ select option{background:var(--card);color:var(--t1)}
     </div>
   </div>
 
-  <div class="hero">
+  <div class="warn-box" id="dp-warnings"><div class="warn-title">Dikkat</div><ul id="dp-warn-list"></ul></div>
+  <div class="hero" id="dp-hero">
     <div class="val" id="dp-hero-cost">0,00 EUR</div>
     <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
   </div>
@@ -432,7 +446,8 @@ select option{background:var(--card);color:var(--t1)}
       <div class="fg"><label>Körük KG Fiyat</label><div class="iw hu"><input type="number" id="fb-koruk-kgprice" value="3.20" step="0.01"><span class="unit">EUR</span></div></div>
     </div>
   </div>
-  <div class="hero">
+  <div class="warn-box" id="fb-warnings"><div class="warn-title">Dikkat</div><ul id="fb-warn-list"></ul></div>
+  <div class="hero" id="fb-hero">
     <div class="val" id="fb-hero-cost">0,00 EUR</div>
     <div class="lbl">1000 Adet Toplam Maliyet (Ayrıştırma Dahil)</div>
   </div>
@@ -512,7 +527,8 @@ select option{background:var(--card);color:var(--t1)}
       <div class="fg"><label>Fire Maliyeti</label><div class="iw hu"><input type="number" id="sl-fire-cost" value="150" step="10"><span class="unit">EUR</span></div></div>
     </div>
   </div>
-  <div class="hero">
+  <div class="warn-box" id="sl-warnings"><div class="warn-title">Dikkat</div><ul id="sl-warn-list"></ul></div>
+  <div class="hero" id="sl-hero-card">
     <div class="val" id="sl-hero">0,00 EUR</div>
     <div class="lbl">Ton Başı Son Toplam</div>
   </div>
@@ -603,7 +619,8 @@ select option{background:var(--card);color:var(--t1)}
       <div class="fg"><label>Net Fotosel</label><div class="iw hu"><input type="number" id="fr-net-foto" value="130" step="1"><span class="unit">mm</span></div></div>
     </div>
   </div>
-  <div class="hero">
+  <div class="warn-box" id="fr-warnings"><div class="warn-title">Dikkat</div><ul id="fr-warn-list"></ul></div>
+  <div class="hero" id="fr-hero-card">
     <div class="val" id="fr-hero">0,00 KG</div>
     <div class="lbl">Toplam Fire</div>
   </div>
@@ -942,9 +959,111 @@ document.addEventListener('change',function(e){
   }
 });
 
+/* ═══ VALIDATION ENGINE ═══ */
+function showWarnings(boxId,listId,heroId,warnings){
+  var box=$(boxId),list=$(listId),hero=heroId?$(heroId):null;
+  list.textContent='';
+  if(warnings.length===0){box.classList.remove('visible');if(hero)hero.classList.remove('hero-error');return}
+  warnings.forEach(function(w){var li=el('li');li.textContent=w;list.appendChild(li)});
+  box.classList.add('visible');
+  if(hero)hero.classList.add('hero-error');
+}
+
+function markError(selector,isErr){
+  var inp=typeof selector==='string'?document.querySelector(selector):selector;
+  if(!inp)return;
+  if(isErr)inp.classList.add('input-error');else inp.classList.remove('input-error');
+}
+
+function validateFiyat(){
+  var w=[];
+  // Check all layer thicknesses
+  var anyFilm=false;
+  for(var i=0;i<FH_LAYER_DATA.length;i++){
+    var thickEl=document.querySelector('.fh-thick[data-idx="'+i+'"]');
+    var v=thickEl?parseFloat(thickEl.value):0;
+    if(v<0){w.push('Katman '+(i+1)+': Kalınlık negatif olamaz');markError(thickEl,true)}
+    else{markError(thickEl,false);if(v>0)anyFilm=true}
+  }
+  if(!anyFilm&&!$('fh-murekkep-on').checked&&!$('fh-coldseal-on').checked&&$v('fh-tutkal-val')<=0){
+    w.push('En az bir film katmanı veya ek malzeme gerekli (toplam g/m\u00B2 = 0)');
+  }
+  // Price checks
+  var priceIds=['pp-pet','pp-7525','pp-cpp','pp-tutkal','pp-murekkep','pp-solvent','pp-coldseal','pp-matlak'];
+  priceIds.forEach(function(id){var v=$v(id);if(v<0){w.push($(id).closest('.fg').querySelector('label').textContent+' fiyatı negatif olamaz');markError('#'+id,true)}else markError('#'+id,false)});
+  // Fire check
+  var firePct=$v('fh-fire-pct');
+  if(firePct<0||firePct>100){w.push('Fire oranı 0-100 arasında olmalı');markError('#fh-fire-pct',true)}else markError('#fh-fire-pct',false);
+  // Order qty
+  if($v('fh-order-qty')<=0){w.push('Sipariş adedi 0 olamaz (matlak hesabı bozulur)');markError('#fh-order-qty',true)}else markError('#fh-order-qty',false);
+  if($v('fh-order-kg')<=0){w.push('Sipariş KG 0 olamaz');markError('#fh-order-kg',true)}else markError('#fh-order-kg',false);
+  showWarnings('fh-warnings','fh-warn-list','fh-hero',w);
+}
+
+function validateDoypack(){
+  var w=[];
+  // Negative values
+  document.querySelectorAll('.dp-val').forEach(function(inp){
+    var v=parseFloat(inp.value)||0;
+    if(v<0){var idx=parseInt(inp.getAttribute('data-idx'));w.push(POUCH_MATERIALS[idx].name+': Negatif değer girilemez');markError(inp,true)}
+    else markError(inp,false);
+  });
+  // Total gsm check
+  var totalGsm=0;document.querySelectorAll('.dp-val').forEach(function(inp){
+    var dens=parseFloat(inp.getAttribute('data-dens'))||0;totalGsm+=dens*(parseFloat(inp.value)||0)});
+  if(totalGsm<=0)w.push('Toplam m\u00B2 ağırlığı 0 \u2014 en az bir malzeme değeri girin');
+  // Dimensions
+  if($v('dp-fotosel')<=0){w.push('Fotosel 0 olamaz \u2014 poşet ağırlığı hesaplanamaz');markError('#dp-fotosel',true)}else markError('#dp-fotosel',false);
+  if($v('dp-bobin')<=0){w.push('Bobin eni 0 olamaz');markError('#dp-bobin',true)}else markError('#dp-bobin',false);
+  // KG price
+  if($v('dp-kg-price')<=0){w.push('KG fiyatı 0 veya negatif \u2014 maliyet hesaplanamaz');markError('#dp-kg-price',true)}else markError('#dp-kg-price',false);
+  showWarnings('dp-warnings','dp-warn-list','dp-hero',w);
+}
+
+function validateFlat(){
+  var w=[];
+  if($v('fb-g-fotosel')<=0){w.push('Gövde fotosel 0 olamaz');markError('#fb-g-fotosel',true)}else markError('#fb-g-fotosel',false);
+  if($v('fb-g-bobin')<=0){w.push('Gövde bobin eni 0 olamaz');markError('#fb-g-bobin',true)}else markError('#fb-g-bobin',false);
+  if($v('fb-k-fotosel')<=0){w.push('Körük fotosel 0 olamaz');markError('#fb-k-fotosel',true)}else markError('#fb-k-fotosel',false);
+  if($v('fb-k-bobin')<=0){w.push('Körük bobin eni 0 olamaz');markError('#fb-k-bobin',true)}else markError('#fb-k-bobin',false);
+  if($v('fb-kg-price')<=0){w.push('KG fiyatı 0 veya negatif');markError('#fb-kg-price',true)}else markError('#fb-kg-price',false);
+  // Check total gsm
+  var gT=0,kT=0;
+  document.querySelectorAll('.fb-govde-val').forEach(function(inp){var d=parseFloat(inp.getAttribute('data-dens'))||0;var v=parseFloat(inp.value)||0;if(v<0){w.push('Gövde: Negatif malzeme değeri');markError(inp,true)}else markError(inp,false);gT+=d*v});
+  document.querySelectorAll('.fb-koruk-val').forEach(function(inp){var d=parseFloat(inp.getAttribute('data-dens'))||0;var v=parseFloat(inp.value)||0;if(v<0){w.push('Körük: Negatif malzeme değeri');markError(inp,true)}else markError(inp,false);kT+=d*v});
+  if(gT<=0&&kT<=0)w.push('Gövde ve körük toplam ağırlığı 0 \u2014 malzeme değerlerini girin');
+  showWarnings('fb-warnings','fb-warn-list','fb-hero',w);
+}
+
+function validateSilindir(){
+  var w=[];
+  if($v('sl-t1')<=0&&$v('sl-t2')<=0&&$v('sl-t3')<=0){w.push('En az bir katman kalınlığı girilmeli');markError('#sl-t1',true)}else markError('#sl-t1',false);
+  if($v('sl-t1')<0){w.push('1. katman negatif olamaz');markError('#sl-t1',true)}
+  if($v('sl-t2')<0){w.push('2. katman negatif olamaz');markError('#sl-t2',true)}
+  if($v('sl-order-kg')<=0){w.push('Sipariş KG 0 olamaz (klişe hesabı bozulur)');markError('#sl-order-kg',true)}else markError('#sl-order-kg',false);
+  if($v('sl-color-count')<=0){w.push('Renk sayısı 0 olamaz');markError('#sl-color-count',true)}else markError('#sl-color-count',false);
+  var firePct=$v('sl-fire-pct');
+  if(firePct<0||firePct>100){w.push('Fire oranı 0-100 arasında olmalı');markError('#sl-fire-pct',true)}else markError('#sl-fire-pct',false);
+  showWarnings('sl-warnings','sl-warn-list','sl-hero-card',w);
+}
+
+function validateFire(){
+  var w=[];
+  if($v('fr-urun-kg')<=0){w.push('Ürün miktarı 0 olamaz');markError('#fr-urun-kg',true)}else markError('#fr-urun-kg',false);
+  var bB=$v('fr-brut-bant'),nB=$v('fr-net-bant'),bF=$v('fr-brut-foto'),nF=$v('fr-net-foto');
+  if(bB<=0){w.push('Brüt bant eni 0 olamaz');markError('#fr-brut-bant',true)}else markError('#fr-brut-bant',false);
+  if(nB<=0){w.push('Net bant eni 0 olamaz');markError('#fr-net-bant',true)}else markError('#fr-net-bant',false);
+  if(nB>bB&&bB>0){w.push('Net bant eni brütten büyük olamaz \u2014 değerleri kontrol edin');markError('#fr-net-bant',true)}
+  if(nF<=0){w.push('Net fotosel 0 olamaz');markError('#fr-net-foto',true)}else markError('#fr-net-foto',false);
+  if(nF>bF&&bF>0){w.push('Net fotosel brütten büyük olamaz');markError('#fr-net-foto',true)}
+  showWarnings('fr-warnings','fr-warn-list','fr-hero-card',w);
+}
+
+function validateAll(){validateFiyat();validateDoypack();validateFlat();validateSilindir();validateFire()}
+
 /* ═══ RECALC ═══ */
 var recalcTimer;
-function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire()},100)}
+function recalcAll(){clearTimeout(recalcTimer);recalcTimer=setTimeout(function(){calcFiyat();calcDoypack();calcFlatBottom();calcSilindir();calcFire();validateAll()},100)}
 document.addEventListener('input',recalcAll);document.addEventListener('change',recalcAll);
 
 /* ═══ QUOTATION HISTORY ═══ */
