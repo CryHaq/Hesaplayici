@@ -994,6 +994,9 @@ function calcFiyat(){
   var matlakPerKg=matlakTotal/1000,kgTotalFull=kgTotal+matlakPerKg;
   var minMatlak=$v('fh-min-matlak'),firstUsage=rows.length>0&&rows[0].type==='film'?rows[0].usage:1;
   var minSip=firstUsage>0?(minMatlak/firstUsage)*1000:0;
+  // Sekmeler arası veri akışı: KG fiyatını Doypack ve FB'ye aktar (manuel override yoksa)
+  if(kgTotalFull>0&&!window._dpKgManual){$('dp-kg-price').value=parseFloat(kgTotalFull.toFixed(2))}
+  if(kgTotalFull>0&&!window._fbKgManual){$('fb-kg-price').value=parseFloat(kgTotalFull.toFixed(2))}
   setWithTry('fh-result-kg',kgTotalFull,'/kg');
   setWithTry('fh-r-ton',tonTotal);setWithTry('fh-r-ton-mat',tonTotalWithMatlak);
   setWithTry('fh-r-kg-nomatlak',kgTotal,'/kg');setWithTry('fh-r-kg-full',kgTotalFull,'/kg');
@@ -1227,6 +1230,11 @@ function validateFire(){
 }
 
 function validateAll(){validateFiyat();validateDoypack();validateFlat();validateSilindir();validateFire()}
+
+/* ═══ CROSS-TAB FLOW: manual override flags ═══ */
+window._dpKgManual=false;window._fbKgManual=false;
+$('dp-kg-price').addEventListener('focus',function(){window._dpKgManual=true});
+$('fb-kg-price').addEventListener('focus',function(){window._fbKgManual=true});
 
 /* ═══ RECALC ═══ */
 var recalcTimer;
