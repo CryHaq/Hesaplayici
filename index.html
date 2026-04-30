@@ -356,6 +356,10 @@ select option{background:var(--card);color:var(--t1)}
 
   <!-- Adım 1: Yapı -->
   <div class="wiz-content active" data-wiz="fh" data-step="0">
+    <div class="cd">
+      <h2><span class="h2-icon" style="background:rgba(59,130,246,.1);color:var(--blue)">&#9733;</span> Hazır Şablon Seç</h2>
+      <div style="display:flex;flex-wrap:wrap;gap:6px" id="fh-templates"></div>
+    </div>
     <div class="cd cd-accent">
       <h2><span class="h2-icon" style="background:rgba(6,182,212,.1);color:var(--cyan)">&#9881;</span> Film Katmanları</h2>
       <div id="fh-layers"></div>
@@ -835,6 +839,15 @@ var FH_LAYER_DATA=[{mat:'pet',thick:20,priceRef:'pet'},{mat:'met_opp_cpp',thick:
 var MAT_OPTIONS=[{v:'pet',n:'PET'},{v:'seffaf_opp',n:'Şeffaf OPP'},{v:'pearlize_opp',n:'Pearlize OPP'},{v:'opak_opp',n:'Opak OPP'},{v:'mat_opp',n:'Mat OPP'},{v:'met_opp_cpp',n:'Met OPP/CPP'},{v:'pe',n:'PE Şeffaf'},{v:'pe_opak',n:'PE Opak'},{v:'alu',n:'Alüminyum'},{v:'cold_seal_mat',n:'Cold Seal'},{v:'opak_cpp_pe',n:'Opak CPP/PE'}];
 var PRICE_OPTIONS=[{v:'pet',n:'PET'},{v:'7525',n:'7525'},{v:'cpp',n:'CPP/PE'}];
 
+var TEMPLATES=[
+  {name:'12PET / 12MPET / 70PE',layers:[{mat:'pet',thick:12,priceRef:'pet'},{mat:'met_opp_cpp',thick:12,priceRef:'7525'},{mat:'pe',thick:70,priceRef:'cpp'}],tutkal:1,murekkep:true,matlak:false,coldseal:false},
+  {name:'12PET / 12MPET / 80CPP',layers:[{mat:'pet',thick:12,priceRef:'pet'},{mat:'met_opp_cpp',thick:12,priceRef:'7525'},{mat:'pe_opak',thick:80,priceRef:'cpp'}],tutkal:1,murekkep:true,matlak:false,coldseal:false},
+  {name:'20OPP / 20MOPP / 70PE',layers:[{mat:'seffaf_opp',thick:20,priceRef:'pet'},{mat:'met_opp_cpp',thick:20,priceRef:'7525'},{mat:'pe',thick:70,priceRef:'cpp'}],tutkal:1,murekkep:true,matlak:false,coldseal:false},
+  {name:'12PET / ALU / 70PE',layers:[{mat:'pet',thick:12,priceRef:'pet'},{mat:'alu',thick:7,priceRef:'7525'},{mat:'pe',thick:70,priceRef:'cpp'}],tutkal:1,murekkep:true,matlak:false,coldseal:false},
+  {name:'12PET / 80PE',layers:[{mat:'pet',thick:12,priceRef:'pet'},{mat:'pe',thick:80,priceRef:'cpp'}],tutkal:1,murekkep:true,matlak:false,coldseal:false},
+  {name:'20OPP / 30PE (Cold Seal)',layers:[{mat:'seffaf_opp',thick:20,priceRef:'pet'},{mat:'pe',thick:30,priceRef:'cpp'}],tutkal:0,murekkep:true,matlak:false,coldseal:true},
+];
+
 /* ═══ HELPERS ═══ */
 function $(id){return document.getElementById(id)}
 function $v(id){return parseFloat($(id).value)||0}
@@ -915,6 +928,29 @@ function removeFHLayer(idx){
 
 /* ═══ ADD LAYER BUTTON ═══ */
 $('fh-add-layer').addEventListener('click',addFHLayer);
+
+/* ═══ TEMPLATES ═══ */
+function renderTemplates(){
+  var cont=$('fh-templates');cont.textContent='';
+  TEMPLATES.forEach(function(t,i){
+    var btn=el('button',{type:'button',style:'padding:7px 14px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--t2);font-family:inherit;font-size:.72rem;font-weight:600;cursor:pointer;transition:all .15s;white-space:nowrap'});
+    btn.textContent=t.name;
+    btn.addEventListener('mouseover',function(){this.style.borderColor='var(--accent)';this.style.color='var(--accent)'});
+    btn.addEventListener('mouseout',function(){this.style.borderColor='var(--border)';this.style.color='var(--t2)'});
+    btn.addEventListener('click',function(){applyTemplate(i)});
+    cont.appendChild(btn);
+  });
+}
+function applyTemplate(idx){
+  var t=TEMPLATES[idx];
+  FH_LAYER_DATA=t.layers.map(function(l){return{mat:l.mat,thick:l.thick,priceRef:l.priceRef}});
+  renderFHLayers();
+  $('fh-tutkal-val').value=t.tutkal;
+  $('fh-murekkep-on').checked=t.murekkep;
+  $('fh-matlak-on').checked=t.matlak;
+  $('fh-coldseal-on').checked=t.coldseal;
+  recalcAll();
+}
 
 /* ═══ RENDER: MATERIAL TABLES ═══ */
 function renderMatTable(tbodyId,materials,defaults,prefix){
@@ -1512,6 +1548,7 @@ Object.keys(WIZ_DEFS).forEach(function(wiz){wizBuild(wiz)});
 /* ═══ INIT ═══ */
 renderStaticTable('dp-cut-body',[[{t:'\u2264 5 g'},{t:'2,75',r:1}],[{t:'\u2264 7 g'},{t:'2,50',r:1}],[{t:'\u2264 9 g'},{t:'1,84',r:1}],[{t:'\u2264 12 g'},{t:'1,65',r:1}],[{t:'\u2264 15 g'},{t:'1,45',r:1}],[{t:'\u2264 17 g'},{t:'1,35',r:1}],[{t:'\u2264 21 g'},{t:'1,20',r:1}]]);
 renderStaticTable('dp-fire-body',[[{t:'500 KG'},{t:'%12',r:1}],[{t:'750 KG'},{t:'%9',r:1}],[{t:'1500 KG'},{t:'%7',r:1}],[{t:'2500 KG'},{t:'%5',r:1}],[{t:'5000-10000 KG'},{t:'%3-3,5',r:1}]]);
+renderTemplates();
 renderFHLayers();
 renderMatTable('dp-materials',POUCH_MATERIALS,null,'dp');
 renderMatTable('fb-govde-materials',POUCH_MATERIALS,FB_G_DEF,'fb-govde');
